@@ -44,9 +44,20 @@ interface CollectedData {
   readonly sources: DataSources
 }
 
+async function fetchFinancialsWithFallback(
+  corpCode: string
+): Promise<readonly FinancialStatement[]> {
+  // Try recent years in order (latest annual report may not be filed yet)
+  const currentYear = new Date().getFullYear()
+  for (const year of [currentYear - 1, currentYear - 2]) {
+    const result = await getFinancialStatements(corpCode, String(year))
+    if (result.length > 0) return result
+  }
+  return []
+}
+
 async function collectAllData(ticker: string, stockName: string): Promise<CollectedData> {
   const corpCode = resolveCorpCode(ticker)
-  const currentYear = String(new Date().getFullYear() - 1)
 
   // Collect all 6 data sources in parallel using Promise.allSettled
   const [
@@ -60,7 +71,7 @@ async function collectAllData(ticker: string, stockName: string): Promise<Collec
     getQuote(ticker),
     getHistorical(ticker, "1y"),
     corpCode ? getCompanyOverview(corpCode) : Promise.resolve(null),
-    corpCode ? getFinancialStatements(corpCode, currentYear) : Promise.resolve([]),
+    corpCode ? fetchFinancialsWithFallback(corpCode) : Promise.resolve([]),
     getNaverNews(stockName),
     getGoogleNews(stockName),
   ])

@@ -1,11 +1,27 @@
 import { cache, ONE_HOUR } from "@/lib/cache/memory-cache"
 import type { NewsArticle } from "./news-types"
 
-const HEADERS = {
-  "User-Agent":
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-  Accept: "text/html,application/xhtml+xml",
-  "Accept-Language": "ko-KR,ko;q=0.9",
+const NAVER_SEARCH_API = "https://openapi.naver.com/v1/search/news.json"
+
+function getNaverCredentials(): { clientId: string; clientSecret: string } | null {
+  const clientId = process.env.NAVER_CLIENT_ID
+  const clientSecret = process.env.NAVER_CLIENT_SECRET
+  if (!clientId || !clientSecret) return null
+  return { clientId, clientSecret }
+}
+
+interface NaverNewsItem {
+  readonly title: string
+  readonly originallink: string
+  readonly link: string
+  readonly description: string
+  readonly pubDate: string
+}
+
+interface NaverSearchResponse {
+  readonly items: readonly NaverNewsItem[]
+  readonly total: number
+  readonly display: number
 }
 
 export async function getNaverNews(
@@ -15,19 +31,32 @@ export async function getNaverNews(
   const cached = cache.get<readonly NewsArticle[]>(cacheKey)
   if (cached) return cached
 
+  const credentials = getNaverCredentials()
+  if (!credentials) return []
+
   try {
     const query = encodeURIComponent(`${stockName} 주가`)
-    const url = `https://m.search.naver.com/search.naver?where=news&query=${query}&sm=tab_opt&sort=1`
+    const url = `${NAVER_SEARCH_API}?query=${query}&display=10&sort=date`
 
     const res = await fetch(url, {
-      headers: HEADERS,
+      headers: {
+        "X-Naver-Client-Id": credentials.clientId,
+        "X-Naver-Client-Secret": credentials.clientSecret,
+      },
       signal: AbortSignal.timeout(10000),
     })
 
     if (!res.ok) return []
 
-    const html = await res.text()
-    const articles = parseNaverNewsHtml(html)
+    const data = (await res.json()) as NaverSearchResponse
+
+    const articles: NewsArticle[] = data.items.map((item) => ({
+      title: stripHtmlTags(item.title),
+      source: "네이버뉴스",
+      url: item.originallink || item.link,
+      publishedAt: item.pubDate,
+      snippet: stripHtmlTags(item.description),
+    }))
 
     cache.set(cacheKey, articles, ONE_HOUR)
     return articles
@@ -37,79 +66,9 @@ export async function getNaverNews(
   }
 }
 
-function parseNaverNewsHtml(html: string): readonly NewsArticle[] {
-  const articles: NewsArticle[] = []
-
-  // Match news titles and links from Naver mobile news search results
-  // Pattern targets <a class="news_tit" href="..." title="...">
-  const titlePattern =
-    /class="news_tit"[^>]*href="([^"]*)"[^>]*title="([^"]*)"/g
-  let match = titlePattern.exec(html)
-
-  while (match && articles.length < 10) {
-    const [, url, title] = match
-    if (url && title) {
-      articles.push({
-        title: decodeHtmlEntities(title),
-        source: "네이버뉴스",
-        url,
-        publishedAt: new Date().toISOString(),
-      })
-    }
-    match = titlePattern.exec(html)
-  }
-
-  // Fallback: try alternative pattern for news items
-  if (articles.length === 0) {
-    const altPattern =
-      /<a[^>]*class="[^"]*news[^"]*tit[^"]*"[^>]*href="([^"]*)"[^>]*>([^<]+)</g
-    let altMatch = altPattern.exec(html)
-
-    while (altMatch && articles.length < 10) {
-      const [, url, title] = altMatch
-      if (url && title) {
-        articles.push({
-          title: decodeHtmlEntities(title.trim()),
-          source: "네이버뉴스",
-          url,
-          publishedAt: new Date().toISOString(),
-        })
-      }
-      altMatch = altPattern.exec(html)
-    }
-  }
-
-  // Extract source and date info where available
-  const infoPattern = new RegExp(
-    'class="[^"]*info_group[^"]*"[^>]*>[\\s\\S]*?class="[^"]*press[^"]*"[^>]*>([^<]*)<[\\s\\S]*?<span[^>]*>([^<]*)<',
-    "g"
-  )
-  let infoMatch = infoPattern.exec(html)
-  let idx = 0
-
-  while (infoMatch && idx < articles.length) {
-    const [, source, dateStr] = infoMatch
-    if (source) {
-      articles[idx] = {
-        ...articles[idx],
-        source: decodeHtmlEntities(source.trim()),
-      }
-    }
-    if (dateStr) {
-      articles[idx] = {
-        ...articles[idx],
-        publishedAt: dateStr.trim(),
-      }
-    }
-    idx++
-    infoMatch = infoPattern.exec(html)
-  }
-
-  return articles
-}
-
-function decodeHtmlEntities(text: string): string {
+function stripHtmlTags(text: string): string {
   return text
+    .replace(/<[^>]*>/g, "")
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
