@@ -8,7 +8,12 @@ interface CardProps {
 
 export function Card({ children, className }: CardProps) {
   return (
-    <div className={cn("rounded-xl border border-gray-200 bg-white p-5 shadow-sm", className)}>
+    <div
+      className={cn(
+        "glass-card p-5",
+        className
+      )}
+    >
       {children}
     </div>
   )
@@ -16,7 +21,7 @@ export function Card({ children, className }: CardProps) {
 
 export function CardHeader({ children, className }: CardProps) {
   return (
-    <div className={cn("mb-3 flex items-center justify-between", className)}>
+    <div className={cn("mb-4 flex items-center justify-between", className)}>
       {children}
     </div>
   )
@@ -24,7 +29,13 @@ export function CardHeader({ children, className }: CardProps) {
 
 export function CardTitle({ children, className }: CardProps) {
   return (
-    <h3 className={cn("text-sm font-semibold text-gray-500 uppercase tracking-wide", className)}>
+    <h3
+      className={cn(
+        "text-xs font-semibold uppercase tracking-widest",
+        "text-[var(--color-text-secondary)]",
+        className
+      )}
+    >
       {children}
     </h3>
   )

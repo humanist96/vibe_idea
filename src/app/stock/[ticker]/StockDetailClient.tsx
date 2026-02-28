@@ -5,6 +5,7 @@ import { StockHeader } from "@/components/stock/StockHeader"
 import { PriceChart } from "@/components/stock/PriceChart"
 import { StockMetrics } from "@/components/stock/StockMetrics"
 import { FundamentalsTable } from "@/components/stock/FundamentalsTable"
+import { InvestorFlowPanel } from "@/components/stock/InvestorFlowPanel"
 import { InsiderActivityTable } from "@/components/stock/InsiderActivityTable"
 import { CompanyInfo } from "@/components/stock/CompanyInfo"
 import { AIScorePanel } from "@/components/stock/AIScorePanel"
@@ -104,6 +105,8 @@ export function StockDetailClient({ ticker, stockName }: StockDetailClientProps)
       />
 
       <FundamentalsTable ticker={ticker} />
+
+      <InvestorFlowPanel ticker={ticker} />
 
       <InsiderActivityTable ticker={ticker} />
 

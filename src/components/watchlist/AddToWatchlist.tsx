@@ -26,17 +26,17 @@ export function AddToWatchlist({ ticker, className }: AddToWatchlistProps) {
       type="button"
       onClick={toggle}
       className={cn(
-        "rounded-lg p-1.5 transition-colors hover:bg-gray-100",
+        "rounded-lg p-1.5 transition-colors hover:bg-[var(--color-surface-100)]",
         className
       )}
       title={watched ? "관심종목에서 제거" : "관심종목에 추가"}
     >
       <Star
         className={cn(
-          "h-4 w-4",
+          "h-4 w-4 transition-colors",
           watched
-            ? "fill-yellow-400 text-yellow-400"
-            : "text-gray-400"
+            ? "fill-amber-400 text-amber-400"
+            : "text-[var(--color-text-muted)]"
         )}
       />
     </button>

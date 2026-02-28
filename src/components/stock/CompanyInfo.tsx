@@ -16,6 +16,19 @@ function formatEstDate(est_dt: string | undefined): string {
   return `${est_dt.slice(0, 4)}.${est_dt.slice(4, 6)}.${est_dt.slice(6, 8)}`
 }
 
+function InfoRow({ label, value }: { readonly label: string; readonly value: string }) {
+  return (
+    <div>
+      <span className="text-[10px] uppercase tracking-widest text-[var(--color-text-muted)]">
+        {label}
+      </span>
+      <p className="mt-0.5 text-sm font-medium text-[var(--color-text-primary)]">
+        {value}
+      </p>
+    </div>
+  )
+}
+
 export function CompanyInfo({ ticker, stockName, market, sector }: CompanyInfoProps) {
   const [dartInfo, setDartInfo] = useState<CompanyOverview | null>(null)
 
@@ -38,45 +51,25 @@ export function CompanyInfo({ ticker, stockName, market, sector }: CompanyInfoPr
   }, [ticker])
 
   return (
-    <Card>
+    <Card className="animate-fade-up stagger-6">
       <CardHeader>
         <CardTitle>기업 정보</CardTitle>
       </CardHeader>
-      <div className="grid gap-3 text-sm sm:grid-cols-2">
-        <div>
-          <span className="text-gray-500">종목코드</span>
-          <p className="font-medium text-gray-900">{ticker}</p>
-        </div>
-        <div>
-          <span className="text-gray-500">시장</span>
-          <p className="font-medium text-gray-900">{market}</p>
-        </div>
-        <div>
-          <span className="text-gray-500">섹터</span>
-          <p className="font-medium text-gray-900">{sector}</p>
-        </div>
+      <div className="grid gap-4 text-sm sm:grid-cols-2">
+        <InfoRow label="종목코드" value={ticker} />
+        <InfoRow label="시장" value={market} />
+        <InfoRow label="섹터" value={sector || "N/A"} />
         {dartInfo ? (
           <>
-            <div>
-              <span className="text-gray-500">대표이사</span>
-              <p className="font-medium text-gray-900">{dartInfo.ceo_nm}</p>
-            </div>
-            <div>
-              <span className="text-gray-500">설립일</span>
-              <p className="font-medium text-gray-900">
-                {formatEstDate(dartInfo.est_dt)}
-              </p>
-            </div>
-            <div>
-              <span className="text-gray-500">업종코드</span>
-              <p className="font-medium text-gray-900">
-                {dartInfo.induty_code}
-              </p>
-            </div>
+            <InfoRow label="대표이사" value={dartInfo.ceo_nm} />
+            <InfoRow label="설립일" value={formatEstDate(dartInfo.est_dt)} />
+            <InfoRow label="업종코드" value={dartInfo.induty_code} />
             {dartInfo.hm_url && (
               <div>
-                <span className="text-gray-500">홈페이지</span>
-                <p className="font-medium text-blue-600 truncate">
+                <span className="text-[10px] uppercase tracking-widest text-[var(--color-text-muted)]">
+                  홈페이지
+                </span>
+                <p className="mt-0.5 text-sm font-medium text-[var(--color-accent-400)] truncate">
                   <a
                     href={
                       dartInfo.hm_url.startsWith("http")
@@ -93,16 +86,17 @@ export function CompanyInfo({ ticker, stockName, market, sector }: CompanyInfoPr
             )}
             {dartInfo.adres && (
               <div className="sm:col-span-2">
-                <span className="text-gray-500">주소</span>
-                <p className="font-medium text-gray-900">{dartInfo.adres}</p>
+                <span className="text-[10px] uppercase tracking-widest text-[var(--color-text-muted)]">
+                  주소
+                </span>
+                <p className="mt-0.5 text-sm font-medium text-[var(--color-text-primary)]">
+                  {dartInfo.adres}
+                </p>
               </div>
             )}
           </>
         ) : (
-          <div>
-            <span className="text-gray-500">종목명</span>
-            <p className="font-medium text-gray-900">{stockName}</p>
-          </div>
+          <InfoRow label="종목명" value={stockName} />
         )}
       </div>
     </Card>

@@ -92,7 +92,6 @@ function ScreenerContent() {
     [updateUrl]
   )
 
-  // Fetch sectors once
   useEffect(() => {
     async function fetchSectors() {
       try {
@@ -108,7 +107,6 @@ function ScreenerContent() {
     fetchSectors()
   }, [])
 
-  // Fetch stocks whenever URL params change
   useEffect(() => {
     async function fetchData() {
       setLoading(true)
@@ -152,7 +150,7 @@ function ScreenerContent() {
 
   return (
     <>
-      <Card>
+      <Card className="animate-fade-up stagger-2">
         <FilterPanel
           filters={filters}
           onFilterChange={handleFilterChange}
@@ -160,7 +158,7 @@ function ScreenerContent() {
         />
       </Card>
 
-      <Card className="p-0">
+      <Card className="p-0 animate-fade-up stagger-3">
         <div className="p-5">
           {loading ? (
             <div className="space-y-3">
@@ -170,29 +168,59 @@ function ScreenerContent() {
             </div>
           ) : (
             <>
-              <div className="mb-4 text-sm text-gray-500">
-                총 {meta.total.toLocaleString()}개 종목 중 {stocks.length}개 표시
-                (페이지 {meta.page}/{meta.totalPages})
+              <div className="mb-4 text-xs text-[var(--color-text-tertiary)]">
+                총{" "}
+                <span className="font-medium tabular-nums text-[var(--color-text-secondary)]">
+                  {meta.total.toLocaleString()}
+                </span>
+                개 종목 중{" "}
+                <span className="font-medium tabular-nums text-[var(--color-text-secondary)]">
+                  {stocks.length}
+                </span>
+                개 표시
+                <span className="mx-2 text-[var(--color-text-muted)]">/</span>
+                페이지{" "}
+                <span className="tabular-nums text-[var(--color-text-secondary)]">
+                  {meta.page}
+                </span>
+                {" / "}
+                <span className="tabular-nums text-[var(--color-text-secondary)]">
+                  {meta.totalPages}
+                </span>
               </div>
+
               <StockTable stocks={stocks} />
+
               {meta.totalPages > 1 && (
-                <div className="mt-6 flex items-center justify-center gap-2">
+                <div className="mt-6 flex items-center justify-center gap-3">
                   <button
                     type="button"
                     disabled={meta.page <= 1}
                     onClick={() => handlePageChange(meta.page - 1)}
-                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    className={
+                      "rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 " +
+                      "bg-[var(--color-glass-2)] text-[var(--color-text-secondary)] " +
+                      "ring-1 ring-[var(--color-border-subtle)] " +
+                      "hover:bg-[var(--color-glass-3)] hover:text-[var(--color-text-primary)] " +
+                      "disabled:cursor-not-allowed disabled:opacity-30"
+                    }
                   >
                     이전
                   </button>
-                  <span className="px-4 text-sm text-gray-500">
+                  <span className="px-3 text-sm tabular-nums text-[var(--color-text-tertiary)]">
                     {meta.page} / {meta.totalPages}
                   </span>
                   <button
                     type="button"
                     disabled={meta.page >= meta.totalPages}
                     onClick={() => handlePageChange(meta.page + 1)}
-                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    className={
+                      "rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 " +
+                      "bg-[var(--color-glass-2)] text-[var(--color-text-secondary)] " +
+                      "ring-1 ring-[var(--color-border-subtle)] " +
+                      "hover:bg-[var(--color-glass-3)] hover:text-[var(--color-text-primary)] " +
+                      "disabled:cursor-not-allowed disabled:opacity-30"
+                    }
                   >
                     다음
                   </button>
@@ -209,9 +237,11 @@ function ScreenerContent() {
 export default function ScreenerPage() {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">스크리너</h1>
-        <p className="mt-1 text-sm text-gray-500">
+      <div className="animate-fade-up">
+        <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">
+          스크리너
+        </h1>
+        <p className="mt-1 text-sm text-[var(--color-text-tertiary)]">
           전 종목 필터링 및 비교
         </p>
       </div>

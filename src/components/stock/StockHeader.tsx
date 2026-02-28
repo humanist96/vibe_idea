@@ -37,18 +37,22 @@ export function StockHeader({
   }
 
   return (
-    <div className="flex items-start justify-between">
+    <div className="flex items-start justify-between animate-fade-up">
       <div>
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-gray-900">{name}</h1>
-          <span className="font-mono text-sm text-gray-400">{ticker}</span>
+          <h1 className="font-display text-2xl font-bold text-[var(--color-text-primary)]">
+            {name}
+          </h1>
+          <span className="font-mono text-sm text-[var(--color-text-muted)]">
+            {ticker}
+          </span>
           <Badge variant={market === "KOSPI" ? "blue" : "green"}>
             {market}
           </Badge>
-          <Badge variant="gray">{sector}</Badge>
+          {sector && <Badge variant="gray">{sector}</Badge>}
         </div>
         <div className="mt-2 flex items-baseline gap-3">
-          <span className="text-3xl font-bold text-gray-900">
+          <span className="font-display text-3xl font-bold tabular-nums text-[var(--color-text-primary)]">
             {formatCurrency(price)}
           </span>
           <PriceChange
@@ -61,14 +65,14 @@ export function StockHeader({
       <button
         type="button"
         onClick={toggleWatchlist}
-        className="rounded-lg p-2 transition-colors hover:bg-gray-100"
+        className="rounded-xl p-2.5 transition-colors hover:bg-[var(--color-surface-100)]"
         title={watched ? "관심종목에서 제거" : "관심종목에 추가"}
       >
         <Star
-          className={`h-6 w-6 ${
+          className={`h-6 w-6 transition-colors ${
             watched
-              ? "fill-yellow-400 text-yellow-400"
-              : "text-gray-400"
+              ? "fill-amber-400 text-amber-400"
+              : "text-[var(--color-text-muted)]"
           }`}
         />
       </button>

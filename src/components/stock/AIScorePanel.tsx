@@ -25,10 +25,10 @@ function DataSourceDot({ label, active }: DataSourceDotProps) {
     <div className="flex items-center gap-1.5">
       <div
         className={`h-2 w-2 rounded-full ${
-          active ? "bg-green-500" : "bg-gray-300"
+          active ? "bg-[var(--color-gain)]" : "bg-[var(--color-surface-200)]"
         }`}
       />
-      <span className="text-xs text-gray-600">{label}</span>
+      <span className="text-xs text-[var(--color-text-secondary)]">{label}</span>
     </div>
   )
 }
@@ -41,8 +41,10 @@ function DataSourcesStatus({
   if (!dataSources) return null
 
   return (
-    <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
-      <p className="mb-2 text-xs font-semibold text-gray-500">데이터 소스</p>
+    <div className="rounded-xl bg-[var(--color-surface-50)] p-3 ring-1 ring-[var(--color-border-subtle)]">
+      <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text-muted)]">
+        데이터 소스
+      </p>
       <div className="flex flex-wrap gap-3">
         <DataSourceDot label="시세" active={dataSources.quote} />
         <DataSourceDot label="기술적" active={dataSources.technical} />
@@ -63,15 +65,15 @@ function NewsHeadlines({
   if (headlines.length === 0) return null
 
   return (
-    <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
-      <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-gray-500">
+    <div className="rounded-xl bg-[var(--color-surface-50)] p-3 ring-1 ring-[var(--color-border-subtle)]">
+      <p className="mb-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text-muted)]">
         <Newspaper className="h-3 w-3" />
         최근 뉴스
       </p>
       <ul className="space-y-1.5">
         {headlines.map((headline, i) => (
-          <li key={i} className="text-xs text-gray-700 leading-relaxed">
-            <span className="text-gray-400 mr-1">{i + 1}.</span>
+          <li key={i} className="text-xs leading-relaxed text-[var(--color-text-secondary)]">
+            <span className="text-[var(--color-text-muted)] mr-1">{i + 1}.</span>
             {headline}
           </li>
         ))}
@@ -92,7 +94,7 @@ function AnalyzedTime({ analyzedAt }: { readonly analyzedAt?: string }) {
   })
 
   return (
-    <p className="flex items-center justify-center gap-1 text-xs text-gray-400">
+    <p className="flex items-center justify-center gap-1 text-xs text-[var(--color-text-muted)]">
       <Clock className="h-3 w-3" />
       분석 시간: {timeStr}
     </p>
@@ -127,22 +129,22 @@ export function AIScorePanel({ ticker }: AIScorePanelProps) {
       <CardHeader>
         <CardTitle>
           <span className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-blue-500" />
+            <Sparkles className="h-3.5 w-3.5 text-[var(--color-accent-500)]" />
             AI 분석
           </span>
         </CardTitle>
       </CardHeader>
 
       {!score && !loading && (
-        <div className="flex flex-col items-center gap-3 py-6">
-          <p className="text-sm text-gray-500">
+        <div className="flex flex-col items-center gap-3 py-8">
+          <p className="text-sm text-[var(--color-text-tertiary)]">
             AI 분석을 실행하여 종합 점수를 확인하세요
           </p>
           <Button onClick={fetchScore} size="md">
             <Sparkles className="mr-2 h-4 w-4" />
             AI 분석 시작
           </Button>
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-[var(--color-loss)]">{error}</p>}
         </div>
       )}
 
@@ -173,7 +175,7 @@ export function AIScorePanel({ ticker }: AIScorePanelProps) {
           />
 
           <div>
-            <h4 className="mb-2 text-sm font-semibold text-gray-700">
+            <h4 className="mb-2 text-sm font-semibold text-[var(--color-text-secondary)]">
               주요 요인
             </h4>
             <FactorsList factors={score.factors} />

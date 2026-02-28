@@ -14,14 +14,12 @@ const tabs: { label: string; value: TabType }[] = [
   { label: "현금흐름표", value: "cashflow" },
 ]
 
-// DART sj_div code mapping
 const TAB_TO_SJ_DIV: Record<TabType, string> = {
   income: "IS",
   balance: "BS",
   cashflow: "CF",
 }
 
-// Key accounts to display per tab
 const KEY_ACCOUNTS: Record<TabType, readonly string[]> = {
   income: [
     "매출액",
@@ -50,9 +48,9 @@ const KEY_ACCOUNTS: Record<TabType, readonly string[]> = {
 }
 
 function formatAmount(value: string | undefined): string {
-  if (!value || value === "") return "-"
+  if (!value || value === "") return "--"
   const num = Number(value.replace(/,/g, ""))
-  if (isNaN(num)) return "-"
+  if (isNaN(num)) return "--"
   const absNum = Math.abs(num)
   const sign = num < 0 ? "-" : ""
   if (absNum >= 1_000_000_000_000) {
@@ -76,7 +74,6 @@ function filterStatements(
 
   const filtered = statements.filter((s) => s.sj_div === sjDiv)
 
-  // Match key accounts in order, dedup by account name
   const result: FinancialStatement[] = []
   const seen = new Set<string>()
 
@@ -138,7 +135,7 @@ export function FundamentalsTable({ ticker }: FundamentalsTableProps) {
       : null
 
   return (
-    <Card>
+    <Card className="animate-fade-up stagger-5">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>재무제표{year ? ` (${year}년)` : ""}</CardTitle>
@@ -166,13 +163,13 @@ export function FundamentalsTable({ ticker }: FundamentalsTableProps) {
       )}
 
       {!loading && error && (
-        <div className="text-center py-8 text-sm text-gray-400">
+        <div className="text-center py-8 text-sm text-[var(--color-text-muted)]">
           <p>{error}</p>
         </div>
       )}
 
       {!loading && !error && filtered.length === 0 && (
-        <div className="text-center py-8 text-sm text-gray-400">
+        <div className="text-center py-8 text-sm text-[var(--color-text-muted)]">
           <p>
             {activeTab === "income" && "손익계산서 데이터가 없습니다."}
             {activeTab === "balance" && "재무상태표 데이터가 없습니다."}
@@ -185,15 +182,17 @@ export function FundamentalsTable({ ticker }: FundamentalsTableProps) {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-200 text-gray-500">
-                <th className="py-2 text-left font-medium">항목</th>
-                <th className="py-2 text-right font-medium">
+              <tr className="border-b border-[var(--color-border-subtle)]">
+                <th className="py-2 text-left text-[10px] font-medium uppercase tracking-widest text-[var(--color-text-muted)]">
+                  항목
+                </th>
+                <th className="py-2 text-right text-[10px] font-medium uppercase tracking-widest text-[var(--color-text-muted)]">
                   {termLabels?.current ?? "당기"}
                 </th>
-                <th className="py-2 text-right font-medium">
+                <th className="py-2 text-right text-[10px] font-medium uppercase tracking-widest text-[var(--color-text-muted)]">
                   {termLabels?.previous ?? "전기"}
                 </th>
-                <th className="py-2 text-right font-medium">
+                <th className="py-2 text-right text-[10px] font-medium uppercase tracking-widest text-[var(--color-text-muted)]">
                   {termLabels?.beforePrevious ?? "전전기"}
                 </th>
               </tr>
@@ -202,25 +201,25 @@ export function FundamentalsTable({ ticker }: FundamentalsTableProps) {
               {filtered.map((item) => (
                 <tr
                   key={item.account_nm}
-                  className="border-b border-gray-100 hover:bg-gray-50"
+                  className="table-row-hover border-b border-[var(--color-border-subtle)]"
                 >
-                  <td className="py-2 text-gray-700 font-medium">
+                  <td className="py-2 text-sm font-medium text-[var(--color-text-secondary)]">
                     {item.account_nm}
                   </td>
-                  <td className="py-2 text-right tabular-nums">
+                  <td className="py-2 text-right tabular-nums text-[var(--color-text-primary)]">
                     {formatAmount(item.thstrm_amount)}
                   </td>
-                  <td className="py-2 text-right tabular-nums text-gray-500">
+                  <td className="py-2 text-right tabular-nums text-[var(--color-text-tertiary)]">
                     {formatAmount(item.frmtrm_amount)}
                   </td>
-                  <td className="py-2 text-right tabular-nums text-gray-500">
+                  <td className="py-2 text-right tabular-nums text-[var(--color-text-tertiary)]">
                     {formatAmount(item.bfefrmtrm_amount)}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <p className="py-2 text-xs text-gray-400 text-right">
+          <p className="py-2 text-[10px] text-[var(--color-text-muted)] text-right">
             출처: DART 전자공시 (연결재무제표, 단위: 원)
           </p>
         </div>

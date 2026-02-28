@@ -66,18 +66,21 @@ export function StockTable({ stocks }: StockTableProps) {
     )
   }
 
-  const thClass = "pb-3 pr-4 text-xs text-gray-500 cursor-pointer hover:text-gray-700 select-none"
+  const thClass =
+    "pb-3 pr-4 text-[10px] font-medium uppercase tracking-widest text-[var(--color-text-muted)] cursor-pointer select-none hover:text-[var(--color-text-secondary)] transition-colors"
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-100 text-left">
-            <th className="pb-3 pr-4 text-xs text-gray-500">#</th>
+          <tr className="border-b border-[var(--color-border-subtle)] text-left">
+            <th className="pb-3 pr-4 text-[10px] font-medium uppercase tracking-widest text-[var(--color-text-muted)]">
+              #
+            </th>
             <th className={thClass} onClick={() => handleSort("name")}>
               종목 <SortIcon field="name" />
             </th>
-            <th className={`${thClass} text-center`}>AI점수</th>
+            <th className={`${thClass} text-center`}>AI</th>
             <th className={`${thClass} text-right`} onClick={() => handleSort("price")}>
               현재가 <SortIcon field="price" />
             </th>
@@ -93,32 +96,38 @@ export function StockTable({ stocks }: StockTableProps) {
             <th className={`${thClass} text-right`} onClick={() => handleSort("per")}>
               PER <SortIcon field="per" />
             </th>
-            <th className="pb-3 text-xs text-gray-500">시장</th>
+            <th className="pb-3 text-[10px] font-medium uppercase tracking-widest text-[var(--color-text-muted)]">
+              시장
+            </th>
           </tr>
         </thead>
         <tbody>
           {sorted.map((stock, index) => (
             <tr
               key={stock.ticker}
-              className="border-b border-gray-50 transition-colors hover:bg-gray-50"
+              className="table-row-hover border-b border-[var(--color-border-subtle)]"
             >
-              <td className="py-3 pr-4 text-gray-400">{index + 1}</td>
+              <td className="py-3 pr-4 text-xs tabular-nums text-[var(--color-text-muted)]">
+                {index + 1}
+              </td>
               <td className="py-3 pr-4">
                 <Link href={`/stock/${stock.ticker}`} className="group">
-                  <p className="font-medium text-gray-900 group-hover:text-blue-600">
+                  <p className="font-medium text-[var(--color-text-primary)] group-hover:text-[var(--color-accent-400)] transition-colors">
                     {stock.name}
                   </p>
-                  <p className="text-xs text-gray-400">{stock.ticker}</p>
+                  <p className="font-mono text-[10px] text-[var(--color-text-muted)]">
+                    {stock.ticker}
+                  </p>
                 </Link>
               </td>
               <td className="py-3 text-center">
                 {stock.aiScore !== null ? (
                   <ScoreBadge score={stock.aiScore} size="sm" />
                 ) : (
-                  <span className="text-xs text-gray-400">-</span>
+                  <span className="text-[10px] text-[var(--color-text-muted)]">--</span>
                 )}
               </td>
-              <td className="py-3 pr-4 text-right font-mono font-medium">
+              <td className="py-3 pr-4 text-right font-mono text-sm tabular-nums font-medium text-[var(--color-text-primary)]">
                 {formatCurrency(stock.price)}
               </td>
               <td className="py-3 pr-4 text-right">
@@ -128,14 +137,14 @@ export function StockTable({ stocks }: StockTableProps) {
                   showIcon={false}
                 />
               </td>
-              <td className="py-3 pr-4 text-right text-gray-500">
+              <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)]">
                 {formatVolume(stock.volume)}
               </td>
-              <td className="py-3 pr-4 text-right text-gray-500">
+              <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)]">
                 {formatMarketCap(stock.marketCap)}
               </td>
-              <td className="py-3 pr-4 text-right text-gray-500">
-                {stock.per ? stock.per.toFixed(1) : "-"}
+              <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)]">
+                {stock.per ? stock.per.toFixed(1) : "--"}
               </td>
               <td className="py-3">
                 <Badge variant={stock.market === "KOSPI" ? "blue" : "green"}>
@@ -148,8 +157,10 @@ export function StockTable({ stocks }: StockTableProps) {
       </table>
 
       {sorted.length === 0 && (
-        <div className="py-12 text-center text-sm text-gray-400">
-          조건에 맞는 종목이 없습니다.
+        <div className="py-16 text-center">
+          <p className="text-sm text-[var(--color-text-muted)]">
+            조건에 맞는 종목이 없습니다.
+          </p>
         </div>
       )}
     </div>

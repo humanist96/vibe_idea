@@ -18,27 +18,33 @@ export function ScoreExplanation({ score }: ScoreExplanationProps) {
         </span>
       </div>
 
-      <p className="text-sm font-medium text-gray-900">{score.keyInsight}</p>
+      <p className="text-sm font-medium text-[var(--color-text-primary)]">
+        {score.keyInsight}
+      </p>
 
-      <p className="text-sm leading-relaxed text-gray-600">{score.summary}</p>
+      <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
+        {score.summary}
+      </p>
 
       <div className="grid grid-cols-2 gap-2 text-sm">
-        <div className="rounded-lg bg-gray-50 p-2 text-center">
-          <p className="text-xs text-gray-500">기술</p>
-          <p className="font-semibold">{score.technicalScore.toFixed(1)}</p>
-        </div>
-        <div className="rounded-lg bg-gray-50 p-2 text-center">
-          <p className="text-xs text-gray-500">재무</p>
-          <p className="font-semibold">{score.fundamentalScore.toFixed(1)}</p>
-        </div>
-        <div className="rounded-lg bg-gray-50 p-2 text-center">
-          <p className="text-xs text-gray-500">심리</p>
-          <p className="font-semibold">{score.sentimentScore.toFixed(1)}</p>
-        </div>
-        <div className="rounded-lg bg-gray-50 p-2 text-center">
-          <p className="text-xs text-gray-500">리스크</p>
-          <p className="font-semibold">{score.riskScore.toFixed(1)}</p>
-        </div>
+        {[
+          { label: "기술", value: score.technicalScore },
+          { label: "재무", value: score.fundamentalScore },
+          { label: "심리", value: score.sentimentScore },
+          { label: "리스크", value: score.riskScore },
+        ].map((item) => (
+          <div
+            key={item.label}
+            className="rounded-xl bg-[var(--color-surface-50)] p-2.5 text-center ring-1 ring-[var(--color-border-subtle)]"
+          >
+            <p className="text-[10px] uppercase tracking-widest text-[var(--color-text-muted)]">
+              {item.label}
+            </p>
+            <p className="mt-0.5 font-semibold tabular-nums text-[var(--color-text-primary)]">
+              {item.value.toFixed(1)}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   )

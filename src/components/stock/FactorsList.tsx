@@ -9,21 +9,24 @@ interface FactorsListProps {
 const impactConfig = {
   positive: {
     icon: TrendingUp,
-    color: "text-green-600",
-    bg: "bg-green-50",
-    border: "border-green-100",
+    color: "text-emerald-600",
+    bg: "bg-emerald-50",
+    ring: "ring-emerald-100",
+    dotColor: "bg-emerald-500",
   },
   negative: {
     icon: TrendingDown,
     color: "text-red-600",
     bg: "bg-red-50",
-    border: "border-red-100",
+    ring: "ring-red-100",
+    dotColor: "bg-red-500",
   },
   neutral: {
     icon: Minus,
-    color: "text-gray-600",
-    bg: "bg-gray-50",
-    border: "border-gray-100",
+    color: "text-[var(--color-text-tertiary)]",
+    bg: "bg-[var(--color-surface-50)]",
+    ring: "ring-[var(--color-border-subtle)]",
+    dotColor: "bg-[var(--color-text-muted)]",
   },
 } as const
 
@@ -43,20 +46,22 @@ export function FactorsList({ factors }: FactorsListProps) {
           <div
             key={index}
             className={cn(
-              "flex items-center gap-3 rounded-lg border px-3 py-2",
+              "flex items-center gap-3 rounded-xl px-3 py-2 ring-1",
               config.bg,
-              config.border
+              config.ring
             )}
           >
             <Icon className={cn("h-4 w-4 shrink-0", config.color)} />
-            <span className="flex-1 text-sm text-gray-700">{factor.name}</span>
+            <span className="flex-1 text-sm text-[var(--color-text-secondary)]">
+              {factor.name}
+            </span>
             <div className="flex gap-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
                   className={cn(
                     "h-1.5 w-1.5 rounded-full",
-                    i < factor.strength ? config.color.replace("text-", "bg-") : "bg-gray-200"
+                    i < factor.strength ? config.dotColor : "bg-[var(--color-surface-200)]"
                   )}
                 />
               ))}

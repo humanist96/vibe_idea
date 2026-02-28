@@ -6,9 +6,9 @@ interface ScoreGaugeProps {
 }
 
 function getGaugeColor(score: number): string {
-  if (score >= 7) return "#22c55e"
-  if (score >= 4) return "#eab308"
-  return "#ef4444"
+  if (score >= 7) return "#16a34a"
+  if (score >= 4) return "#d97706"
+  return "#dc2626"
 }
 
 export function ScoreGauge({ score, size = 120 }: ScoreGaugeProps) {
@@ -25,7 +25,7 @@ export function ScoreGauge({ score, size = 120 }: ScoreGaugeProps) {
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="#f3f4f6"
+          stroke="#f1f5f9"
           strokeWidth="8"
         />
         <circle
@@ -42,10 +42,10 @@ export function ScoreGauge({ score, size = 120 }: ScoreGaugeProps) {
         />
       </svg>
       <div className="absolute flex flex-col items-center">
-        <span className="text-3xl font-bold" style={{ color }}>
+        <span className="text-3xl font-bold tabular-nums" style={{ color }}>
           {score.toFixed(1)}
         </span>
-        <span className="text-xs text-gray-500">/ 10</span>
+        <span className="text-xs text-[var(--color-text-muted)]">/ 10</span>
       </div>
     </div>
   )

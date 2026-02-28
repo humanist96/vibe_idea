@@ -21,18 +21,18 @@ export function PriceChange({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 font-medium",
-        isPositive && "text-green-600",
-        isNegative && "text-red-600",
-        !isPositive && !isNegative && "text-gray-500",
+        "inline-flex items-center gap-1 font-medium tabular-nums",
+        isPositive && "text-[var(--color-gain)]",
+        isNegative && "text-[var(--color-loss)]",
+        !isPositive && !isNegative && "text-[var(--color-text-tertiary)]",
         className
       )}
     >
       {showIcon && (
         <>
-          {isPositive && <TrendingUp className="h-4 w-4" />}
-          {isNegative && <TrendingDown className="h-4 w-4" />}
-          {!isPositive && !isNegative && <Minus className="h-4 w-4" />}
+          {isPositive && <TrendingUp className="h-3.5 w-3.5" />}
+          {isNegative && <TrendingDown className="h-3.5 w-3.5" />}
+          {!isPositive && !isNegative && <Minus className="h-3.5 w-3.5" />}
         </>
       )}
       <span>{formatPercent(changePercent)}</span>

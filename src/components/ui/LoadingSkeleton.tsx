@@ -7,16 +7,16 @@ interface LoadingSkeletonProps {
 
 export function LoadingSkeleton({ className }: LoadingSkeletonProps) {
   return (
-    <div className={cn("animate-pulse rounded-md bg-gray-200", className)} />
+    <div className={cn("rounded-lg skeleton-shimmer", className)} />
   )
 }
 
 export function CardSkeleton() {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-      <LoadingSkeleton className="mb-3 h-4 w-24" />
-      <LoadingSkeleton className="mb-2 h-8 w-32" />
-      <LoadingSkeleton className="h-4 w-20" />
+    <div className="glass-card p-5">
+      <LoadingSkeleton className="mb-3 h-3 w-20" />
+      <LoadingSkeleton className="mb-2 h-7 w-28" />
+      <LoadingSkeleton className="h-3 w-16" />
     </div>
   )
 }
@@ -24,10 +24,10 @@ export function CardSkeleton() {
 export function TableRowSkeleton() {
   return (
     <div className="flex items-center gap-4 py-3">
-      <LoadingSkeleton className="h-4 w-8" />
+      <LoadingSkeleton className="h-4 w-6" />
       <LoadingSkeleton className="h-4 w-20" />
       <LoadingSkeleton className="h-4 w-32" />
-      <LoadingSkeleton className="h-8 w-8 rounded-full" />
+      <LoadingSkeleton className="h-7 w-7 rounded-full" />
       <LoadingSkeleton className="h-4 w-24" />
       <LoadingSkeleton className="h-4 w-16" />
     </div>

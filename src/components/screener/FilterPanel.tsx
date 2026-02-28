@@ -22,12 +22,18 @@ export function FilterPanel({ filters, onFilterChange, sectors = [] }: FilterPan
     onFilterChange({ ...filters, [key]: value })
   }
 
+  const labelClass = "mb-1.5 block text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text-muted)]"
+  const inputClass =
+    "rounded-lg px-3 py-1.5 text-sm outline-none transition-all duration-200 " +
+    "bg-[var(--color-glass-2)] text-[var(--color-text-primary)] " +
+    "ring-1 ring-[var(--color-border-subtle)] " +
+    "placeholder:text-[var(--color-text-muted)] " +
+    "focus:ring-[var(--color-accent-400)]/40"
+
   return (
-    <div className="flex flex-wrap items-end gap-4">
+    <div className="flex flex-wrap items-end gap-5">
       <div>
-        <label className="mb-1 block text-xs font-medium text-gray-500">
-          시장
-        </label>
+        <label className={labelClass}>시장</label>
         <div className="flex gap-1">
           {(["ALL", "KOSPI", "KOSDAQ"] as const).map((market) => (
             <Button
@@ -43,13 +49,11 @@ export function FilterPanel({ filters, onFilterChange, sectors = [] }: FilterPan
       </div>
 
       <div>
-        <label className="mb-1 block text-xs font-medium text-gray-500">
-          섹터
-        </label>
+        <label className={labelClass}>섹터</label>
         <select
           value={filters.sector}
           onChange={(e) => updateFilter("sector", e.target.value)}
-          className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm outline-none focus:border-blue-500"
+          className={inputClass}
         >
           <option value="">전체</option>
           {sectors.map((sector) => (
@@ -61,9 +65,7 @@ export function FilterPanel({ filters, onFilterChange, sectors = [] }: FilterPan
       </div>
 
       <div>
-        <label className="mb-1 block text-xs font-medium text-gray-500">
-          AI 점수 범위
-        </label>
+        <label className={labelClass}>AI 점수</label>
         <div className="flex items-center gap-2">
           <input
             type="range"
@@ -72,9 +74,9 @@ export function FilterPanel({ filters, onFilterChange, sectors = [] }: FilterPan
             step={1}
             value={filters.minScore}
             onChange={(e) => updateFilter("minScore", Number(e.target.value))}
-            className="w-20"
+            className="w-20 accent-[var(--color-accent-400)]"
           />
-          <span className="text-xs text-gray-500">
+          <span className="text-xs tabular-nums text-[var(--color-text-secondary)]">
             {filters.minScore} - {filters.maxScore}
           </span>
           <input
@@ -84,30 +86,28 @@ export function FilterPanel({ filters, onFilterChange, sectors = [] }: FilterPan
             step={1}
             value={filters.maxScore}
             onChange={(e) => updateFilter("maxScore", Number(e.target.value))}
-            className="w-20"
+            className="w-20 accent-[var(--color-accent-400)]"
           />
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-xs font-medium text-gray-500">
-          가격 범위 (원)
-        </label>
+        <label className={labelClass}>가격 범위</label>
         <div className="flex items-center gap-2">
           <input
             type="text"
             value={filters.minPrice}
             onChange={(e) => updateFilter("minPrice", e.target.value)}
             placeholder="최소"
-            className="w-24 rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500"
+            className={`w-24 ${inputClass}`}
           />
-          <span className="text-gray-400">~</span>
+          <span className="text-[var(--color-text-muted)]">~</span>
           <input
             type="text"
             value={filters.maxPrice}
             onChange={(e) => updateFilter("maxPrice", e.target.value)}
             placeholder="최대"
-            className="w-24 rounded-lg border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500"
+            className={`w-24 ${inputClass}`}
           />
         </div>
       </div>

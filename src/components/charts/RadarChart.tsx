@@ -32,10 +32,10 @@ export function RadarChart({
   return (
     <ResponsiveContainer width="100%" height={200}>
       <ReRadarChart data={data}>
-        <PolarGrid stroke="#e5e7eb" />
+        <PolarGrid stroke="#e2e8f0" />
         <PolarAngleAxis
           dataKey="subject"
-          tick={{ fontSize: 12, fill: "#6b7280" }}
+          tick={{ fontSize: 11, fill: "#94a3b8" }}
         />
         <PolarRadiusAxis
           angle={90}
@@ -46,9 +46,9 @@ export function RadarChart({
         <Radar
           name="Score"
           dataKey="value"
-          stroke="#3b82f6"
-          fill="#3b82f6"
-          fillOpacity={0.2}
+          stroke="#d97706"
+          fill="#f59e0b"
+          fillOpacity={0.15}
           strokeWidth={2}
         />
       </ReRadarChart>
