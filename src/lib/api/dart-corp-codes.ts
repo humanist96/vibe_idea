@@ -1,7 +1,7 @@
 // Hardcoded mapping of stock_code (6-digit) → DART corp_code (8-digit)
 // Verified against DART corpCode.xml official data (2025-02).
-// TODO: Replace with ZIP download + XML parsing from DART corpCode API for full coverage.
-const STOCK_TO_CORP: ReadonlyMap<string, string> = new Map([
+// Used as fallback when DART ZIP download fails.
+export const FALLBACK_CORP_CODES: ReadonlyMap<string, string> = new Map([
   // 반도체
   ["005930", "00126380"], // 삼성전자
   ["000660", "00164779"], // SK하이닉스
@@ -90,5 +90,5 @@ const STOCK_TO_CORP: ReadonlyMap<string, string> = new Map([
 ])
 
 export function resolveCorpCode(stockCode: string): string | null {
-  return STOCK_TO_CORP.get(stockCode) ?? null
+  return FALLBACK_CORP_CODES.get(stockCode) ?? null
 }

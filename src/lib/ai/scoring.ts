@@ -1,7 +1,6 @@
 import { cache, ONE_HOUR } from "@/lib/cache/memory-cache"
 import { getQuote, getHistorical } from "@/lib/api/naver-finance"
 import { getCompanyOverview, getFinancialStatements } from "@/lib/api/dart"
-import { resolveCorpCode } from "@/lib/api/dart-corp-codes"
 import { getNaverNews } from "@/lib/api/naver-news"
 import { getGoogleNews } from "@/lib/api/google-news"
 import { generateAIAnalysis } from "@/lib/api/gemini"
@@ -18,7 +17,12 @@ import {
   type Factor,
 } from "./score-schema"
 import { buildScoringPrompt, type PromptData } from "./prompts"
-import { findStock } from "@/lib/constants/stocks"
+import {
+  ensureLoaded,
+  findStock as registryFindStock,
+} from "@/lib/data/stock-registry"
+import * as corpCodeRegistry from "@/lib/data/corp-code-registry"
+import { findStock as fallbackFindStock } from "@/lib/constants/stocks"
 import type { CompanyOverview, FinancialStatement } from "@/lib/api/dart"
 import type { NewsArticle } from "@/lib/api/news-types"
 import type { StockQuote, HistoricalData } from "@/lib/api/naver-finance"
@@ -47,7 +51,6 @@ interface CollectedData {
 async function fetchFinancialsWithFallback(
   corpCode: string
 ): Promise<readonly FinancialStatement[]> {
-  // Try recent years in order (latest annual report may not be filed yet)
   const currentYear = new Date().getFullYear()
   for (const year of [currentYear - 1, currentYear - 2]) {
     const result = await getFinancialStatements(corpCode, String(year))
@@ -57,9 +60,9 @@ async function fetchFinancialsWithFallback(
 }
 
 async function collectAllData(ticker: string, stockName: string): Promise<CollectedData> {
-  const corpCode = resolveCorpCode(ticker)
+  await corpCodeRegistry.ensureLoaded()
+  const corpCode = corpCodeRegistry.resolve(ticker)
 
-  // Collect all 6 data sources in parallel using Promise.allSettled
   const [
     quoteResult,
     historicalResult,
@@ -106,17 +109,17 @@ export async function getAIScore(ticker: string): Promise<AIScore | null> {
   const cached = cache.get<AIScore>(cacheKey)
   if (cached) return cached
 
-  const stock = findStock(ticker)
+  await ensureLoaded()
+  const stock = registryFindStock(ticker) ?? fallbackFindStock(ticker)
   if (!stock) return null
 
   try {
     const data = await collectAllData(stock.ticker, stock.name)
 
     if (!data.quote && data.historical.length === 0) {
-      return generateFallbackScore(ticker, null, undefined, null, data.sources)
+      return generateFallbackScore(ticker, stock.name, null, undefined, null, data.sources)
     }
 
-    // Calculate technical indicators
     const technicalIndicators =
       data.historical.length > 0
         ? calculateTechnicalIndicators(
@@ -129,11 +132,8 @@ export async function getAIScore(ticker: string): Promise<AIScore | null> {
           )
         : undefined
 
-    // Analyze news sentiment
     const allNews = [...data.naverNews, ...data.googleNews]
     const newsSentiment = allNews.length > 0 ? analyzeNewsSentiment(allNews) : null
-
-    // Build top news headlines
     const newsHeadlines = allNews.slice(0, 5).map((a) => a.title)
 
     try {
@@ -182,6 +182,7 @@ export async function getAIScore(ticker: string): Promise<AIScore | null> {
     } catch {
       return generateFallbackScore(
         ticker,
+        stock.name,
         data.quote,
         technicalIndicators,
         newsSentiment,
@@ -196,13 +197,12 @@ export async function getAIScore(ticker: string): Promise<AIScore | null> {
 
 function generateFallbackScore(
   ticker: string,
+  stockName: string,
   quote: StockQuote | null | undefined,
   technicalIndicators?: TechnicalIndicators,
   newsSentiment?: NewsSentiment | null,
   dataSources?: DataSources
 ): AIScore {
-  const stock = findStock(ticker)
-
   const techScore = technicalIndicators
     ? getTechnicalScore(technicalIndicators)
     : 5
@@ -291,7 +291,7 @@ function generateFallbackScore(
     sentimentScore,
     riskScore,
     factors,
-    summary: `${stock?.name ?? ticker} 종목에 대한 알고리즘 기반 분석 결과입니다. Gemini AI 분석이 불가하여 기술적/재무적 지표 기반으로 점수를 산출했습니다.`,
+    summary: `${stockName} 종목에 대한 알고리즘 기반 분석 결과입니다. Gemini AI 분석이 불가하여 기술적/재무적 지표 기반으로 점수를 산출했습니다.`,
     keyInsight:
       "AI 엔진 미연결 상태 - 알고리즘 기반 분석 점수입니다.",
     dataSources: dataSources ?? {

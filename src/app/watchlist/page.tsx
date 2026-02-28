@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/Badge"
 import { AddToWatchlist } from "@/components/watchlist/AddToWatchlist"
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
 import { useWatchlistStore } from "@/store/watchlist"
-import { findStock } from "@/lib/constants/stocks"
 import { formatCurrency } from "@/lib/utils/format"
 import { Star } from "lucide-react"
 
@@ -92,45 +91,38 @@ export default function WatchlistPage() {
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {stocks.map((stock) => {
-            const info = findStock(stock.ticker)
-            return (
-              <Card key={stock.ticker}>
-                <div className="flex items-start justify-between">
-                  <Link href={`/stock/${stock.ticker}`} className="group flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-gray-900 group-hover:text-blue-600">
-                        {info?.name ?? stock.name}
-                      </p>
-                      <Badge
-                        variant={
-                          (info?.market ?? stock.market) === "KOSPI"
-                            ? "blue"
-                            : "green"
-                        }
-                      >
-                        {info?.market ?? stock.market}
-                      </Badge>
-                    </div>
-                    <p className="mt-0.5 text-xs text-gray-400">
-                      {stock.ticker}
+          {stocks.map((stock) => (
+            <Card key={stock.ticker}>
+              <div className="flex items-start justify-between">
+                <Link href={`/stock/${stock.ticker}`} className="group flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-gray-900 group-hover:text-blue-600">
+                      {stock.name}
                     </p>
-                  </Link>
-                  <AddToWatchlist ticker={stock.ticker} />
-                </div>
-                <div className="mt-3 flex items-baseline gap-2">
-                  <span className="text-xl font-bold text-gray-900">
-                    {formatCurrency(stock.price)}
-                  </span>
-                  <PriceChange
-                    change={stock.change}
-                    changePercent={stock.changePercent}
-                    className="text-sm"
-                  />
-                </div>
-              </Card>
-            )
-          })}
+                    <Badge
+                      variant={stock.market === "KOSPI" ? "blue" : "green"}
+                    >
+                      {stock.market}
+                    </Badge>
+                  </div>
+                  <p className="mt-0.5 text-xs text-gray-400">
+                    {stock.ticker}
+                  </p>
+                </Link>
+                <AddToWatchlist ticker={stock.ticker} />
+              </div>
+              <div className="mt-3 flex items-baseline gap-2">
+                <span className="text-xl font-bold text-gray-900">
+                  {formatCurrency(stock.price)}
+                </span>
+                <PriceChange
+                  change={stock.change}
+                  changePercent={stock.changePercent}
+                  className="text-sm"
+                />
+              </div>
+            </Card>
+          ))}
         </div>
       )}
     </div>

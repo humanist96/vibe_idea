@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardHeader, CardTitle } from "@/components/ui/Card"
-import { findStock } from "@/lib/constants/stocks"
 import type { CompanyOverview } from "@/lib/api/dart"
 
 interface CompanyInfoProps {
   readonly ticker: string
+  readonly stockName: string
+  readonly market: string
+  readonly sector: string
 }
 
 function formatEstDate(est_dt: string | undefined): string {
@@ -14,8 +16,7 @@ function formatEstDate(est_dt: string | undefined): string {
   return `${est_dt.slice(0, 4)}.${est_dt.slice(4, 6)}.${est_dt.slice(6, 8)}`
 }
 
-export function CompanyInfo({ ticker }: CompanyInfoProps) {
-  const stock = findStock(ticker)
+export function CompanyInfo({ ticker, stockName, market, sector }: CompanyInfoProps) {
   const [dartInfo, setDartInfo] = useState<CompanyOverview | null>(null)
 
   useEffect(() => {
@@ -36,8 +37,6 @@ export function CompanyInfo({ ticker }: CompanyInfoProps) {
     fetchCompanyInfo()
   }, [ticker])
 
-  if (!stock) return null
-
   return (
     <Card>
       <CardHeader>
@@ -46,15 +45,15 @@ export function CompanyInfo({ ticker }: CompanyInfoProps) {
       <div className="grid gap-3 text-sm sm:grid-cols-2">
         <div>
           <span className="text-gray-500">종목코드</span>
-          <p className="font-medium text-gray-900">{stock.ticker}</p>
+          <p className="font-medium text-gray-900">{ticker}</p>
         </div>
         <div>
           <span className="text-gray-500">시장</span>
-          <p className="font-medium text-gray-900">{stock.market}</p>
+          <p className="font-medium text-gray-900">{market}</p>
         </div>
         <div>
           <span className="text-gray-500">섹터</span>
-          <p className="font-medium text-gray-900">{stock.sector}</p>
+          <p className="font-medium text-gray-900">{sector}</p>
         </div>
         {dartInfo ? (
           <>
@@ -101,8 +100,8 @@ export function CompanyInfo({ ticker }: CompanyInfoProps) {
           </>
         ) : (
           <div>
-            <span className="text-gray-500">데이터 소스</span>
-            <p className="font-medium text-gray-900">Naver Finance</p>
+            <span className="text-gray-500">종목명</span>
+            <p className="font-medium text-gray-900">{stockName}</p>
           </div>
         )}
       </div>

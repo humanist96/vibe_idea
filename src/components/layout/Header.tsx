@@ -3,33 +3,33 @@
 import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Search } from "lucide-react"
-import { searchStocks, type StockInfo } from "@/lib/constants/stocks"
+import { useDebouncedSearch } from "@/hooks/use-debounced-search"
 import { MobileNav } from "./MobileNav"
 
 export function Header() {
   const router = useRouter()
-  const [query, setQuery] = useState("")
-  const [results, setResults] = useState<StockInfo[]>([])
+  const { query, setQuery, results, clear } = useDebouncedSearch(300)
   const [showResults, setShowResults] = useState(false)
 
-  const handleSearch = useCallback((value: string) => {
-    setQuery(value)
-    if (value.length >= 1) {
-      setResults(searchStocks(value).slice(0, 8))
-      setShowResults(true)
-    } else {
-      setResults([])
-      setShowResults(false)
-    }
-  }, [])
+  const handleChange = useCallback(
+    (value: string) => {
+      setQuery(value)
+      if (value.length >= 1) {
+        setShowResults(true)
+      } else {
+        setShowResults(false)
+      }
+    },
+    [setQuery]
+  )
 
   const handleSelect = useCallback(
     (ticker: string) => {
-      setQuery("")
+      clear()
       setShowResults(false)
       router.push(`/stock/${ticker}`)
     },
-    [router]
+    [router, clear]
   )
 
   return (
@@ -41,7 +41,7 @@ export function Header() {
         <input
           type="text"
           value={query}
-          onChange={(e) => handleSearch(e.target.value)}
+          onChange={(e) => handleChange(e.target.value)}
           onFocus={() => query.length >= 1 && setShowResults(true)}
           onBlur={() => setTimeout(() => setShowResults(false), 200)}
           placeholder="종목명 또는 코드 검색..."

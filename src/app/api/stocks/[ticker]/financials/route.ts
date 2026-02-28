@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server"
-import { getFinancialStatements, stockCodeToCorpCode } from "@/lib/api/dart"
-import { findStock } from "@/lib/constants/stocks"
+import { getFinancialStatements } from "@/lib/api/dart"
+import { ensureLoaded, findStock } from "@/lib/data/stock-registry"
+import * as corpCodeRegistry from "@/lib/data/corp-code-registry"
 
 export async function GET(
   request: NextRequest,
@@ -11,6 +12,7 @@ export async function GET(
     const searchParams = request.nextUrl.searchParams
     const yearParam = searchParams.get("year")
 
+    await ensureLoaded()
     const stock = findStock(ticker)
     if (!stock) {
       return NextResponse.json(
@@ -19,14 +21,18 @@ export async function GET(
       )
     }
 
-    const corpCode = stockCodeToCorpCode(ticker)
+    await corpCodeRegistry.ensureLoaded()
+    const corpCode = corpCodeRegistry.resolve(ticker)
+    if (!corpCode) {
+      return NextResponse.json({ success: true, data: [] })
+    }
 
     if (yearParam) {
       const data = await getFinancialStatements(corpCode, yearParam)
       return NextResponse.json({ success: true, data })
     }
 
-    // Try recent years in order (latest annual report may not be filed yet)
+    // Try recent years in order
     const currentYear = new Date().getFullYear()
     for (const year of [currentYear - 1, currentYear - 2]) {
       const data = await getFinancialStatements(corpCode, String(year))

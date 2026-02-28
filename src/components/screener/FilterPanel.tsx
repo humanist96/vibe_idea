@@ -1,7 +1,6 @@
 "use client"
 
 import { Button } from "@/components/ui/Button"
-import { SECTORS } from "@/lib/constants/stocks"
 
 export interface Filters {
   readonly market: "ALL" | "KOSPI" | "KOSDAQ"
@@ -15,9 +14,10 @@ export interface Filters {
 interface FilterPanelProps {
   readonly filters: Filters
   readonly onFilterChange: (filters: Filters) => void
+  readonly sectors?: readonly string[]
 }
 
-export function FilterPanel({ filters, onFilterChange }: FilterPanelProps) {
+export function FilterPanel({ filters, onFilterChange, sectors = [] }: FilterPanelProps) {
   const updateFilter = <K extends keyof Filters>(key: K, value: Filters[K]) => {
     onFilterChange({ ...filters, [key]: value })
   }
@@ -52,7 +52,7 @@ export function FilterPanel({ filters, onFilterChange }: FilterPanelProps) {
           className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm outline-none focus:border-blue-500"
         >
           <option value="">전체</option>
-          {SECTORS.map((sector) => (
+          {sectors.map((sector) => (
             <option key={sector} value={sector}>
               {sector}
             </option>

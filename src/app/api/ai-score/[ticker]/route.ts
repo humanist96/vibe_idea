@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { getAIScore } from "@/lib/ai/scoring"
-import { findStock } from "@/lib/constants/stocks"
+import { ensureLoaded, findStock } from "@/lib/data/stock-registry"
 
 export async function GET(
   _request: NextRequest,
@@ -9,6 +9,7 @@ export async function GET(
   try {
     const { ticker } = await params
 
+    await ensureLoaded()
     const stock = findStock(ticker)
     if (!stock) {
       return NextResponse.json(

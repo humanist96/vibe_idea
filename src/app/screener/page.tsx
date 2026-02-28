@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+import { Suspense, useEffect, useState, useCallback } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Card } from "@/components/ui/Card"
 import { FilterPanel, type Filters } from "@/components/screener/FilterPanel"
 import { StockTable } from "@/components/screener/StockTable"
@@ -20,27 +21,125 @@ interface StockData {
   readonly sector: string
 }
 
-const defaultFilters: Filters = {
-  market: "ALL",
-  sector: "",
-  minScore: 1,
-  maxScore: 10,
-  minPrice: "",
-  maxPrice: "",
+interface Meta {
+  readonly total: number
+  readonly page: number
+  readonly limit: number
+  readonly totalPages: number
 }
 
-export default function ScreenerPage() {
+function ScreenerContent() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const [stocks, setStocks] = useState<StockData[]>([])
+  const [sectors, setSectors] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
-  const [filters, setFilters] = useState<Filters>(defaultFilters)
+  const [meta, setMeta] = useState<Meta>({
+    total: 0,
+    page: 1,
+    limit: 50,
+    totalPages: 1,
+  })
 
+  const currentPage = Number(searchParams.get("page")) || 1
+  const currentMarket =
+    (searchParams.get("market") as "ALL" | "KOSPI" | "KOSDAQ") || "ALL"
+  const currentSector = searchParams.get("sector") ?? ""
+  const currentSort = searchParams.get("sort") ?? "marketCap"
+  const currentOrder = (searchParams.get("order") as "asc" | "desc") || "desc"
+
+  const filters: Filters = {
+    market: currentMarket,
+    sector: currentSector,
+    minScore: 1,
+    maxScore: 10,
+    minPrice: searchParams.get("minPrice") ?? "",
+    maxPrice: searchParams.get("maxPrice") ?? "",
+  }
+
+  const updateUrl = useCallback(
+    (updates: Record<string, string>) => {
+      const params = new URLSearchParams(searchParams.toString())
+      for (const [key, value] of Object.entries(updates)) {
+        if (value) {
+          params.set(key, value)
+        } else {
+          params.delete(key)
+        }
+      }
+      router.push(`/screener?${params.toString()}`)
+    },
+    [searchParams, router]
+  )
+
+  const handleFilterChange = useCallback(
+    (newFilters: Filters) => {
+      updateUrl({
+        page: "1",
+        market: newFilters.market === "ALL" ? "" : newFilters.market,
+        sector: newFilters.sector,
+        minPrice: newFilters.minPrice,
+        maxPrice: newFilters.maxPrice,
+      })
+    },
+    [updateUrl]
+  )
+
+  const handlePageChange = useCallback(
+    (page: number) => {
+      updateUrl({ page: String(page) })
+    },
+    [updateUrl]
+  )
+
+  // Fetch sectors once
   useEffect(() => {
-    async function fetchData() {
+    async function fetchSectors() {
       try {
-        const res = await fetch("/api/stocks")
+        const res = await fetch("/api/sectors")
         const json = await res.json()
         if (json.success) {
-          setStocks(json.data)
+          setSectors(json.data)
+        }
+      } catch {
+        // use empty array
+      }
+    }
+    fetchSectors()
+  }, [])
+
+  // Fetch stocks whenever URL params change
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true)
+      try {
+        const params = new URLSearchParams()
+        params.set("page", String(currentPage))
+        params.set("limit", "50")
+        if (currentMarket !== "ALL") params.set("market", currentMarket)
+        if (currentSector) params.set("sector", currentSector)
+        params.set("sort", currentSort)
+        params.set("order", currentOrder)
+
+        const minPrice = searchParams.get("minPrice")
+        const maxPrice = searchParams.get("maxPrice")
+
+        const res = await fetch(`/api/stocks?${params.toString()}`)
+        const json = await res.json()
+        if (json.success) {
+          let data: StockData[] = json.data
+          if (minPrice) {
+            const min = Number(minPrice)
+            if (!isNaN(min)) data = data.filter((s) => s.price >= min)
+          }
+          if (maxPrice) {
+            const max = Number(maxPrice)
+            if (!isNaN(max)) data = data.filter((s) => s.price <= max)
+          }
+          setStocks(data)
+          if (json.meta) {
+            setMeta(json.meta)
+          }
         }
       } catch {
         // silently fail
@@ -49,39 +148,16 @@ export default function ScreenerPage() {
       }
     }
     fetchData()
-  }, [])
-
-  const filtered = useMemo(() => {
-    return stocks.filter((stock) => {
-      if (filters.market !== "ALL" && stock.market !== filters.market) {
-        return false
-      }
-      if (filters.sector && stock.sector !== filters.sector) {
-        return false
-      }
-      if (filters.minPrice) {
-        const min = Number(filters.minPrice)
-        if (!isNaN(min) && stock.price < min) return false
-      }
-      if (filters.maxPrice) {
-        const max = Number(filters.maxPrice)
-        if (!isNaN(max) && stock.price > max) return false
-      }
-      return true
-    })
-  }, [stocks, filters])
+  }, [currentPage, currentMarket, currentSector, currentSort, currentOrder, searchParams])
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">스크리너</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          AI 점수 기반 종목 필터링 및 비교
-        </p>
-      </div>
-
+    <>
       <Card>
-        <FilterPanel filters={filters} onFilterChange={setFilters} />
+        <FilterPanel
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          sectors={sectors}
+        />
       </Card>
 
       <Card className="p-0">
@@ -95,13 +171,64 @@ export default function ScreenerPage() {
           ) : (
             <>
               <div className="mb-4 text-sm text-gray-500">
-                {filtered.length}개 종목
+                총 {meta.total.toLocaleString()}개 종목 중 {stocks.length}개 표시
+                (페이지 {meta.page}/{meta.totalPages})
               </div>
-              <StockTable stocks={filtered} />
+              <StockTable stocks={stocks} />
+              {meta.totalPages > 1 && (
+                <div className="mt-6 flex items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    disabled={meta.page <= 1}
+                    onClick={() => handlePageChange(meta.page - 1)}
+                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    이전
+                  </button>
+                  <span className="px-4 text-sm text-gray-500">
+                    {meta.page} / {meta.totalPages}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={meta.page >= meta.totalPages}
+                    onClick={() => handlePageChange(meta.page + 1)}
+                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    다음
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>
       </Card>
+    </>
+  )
+}
+
+export default function ScreenerPage() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">스크리너</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          전 종목 필터링 및 비교
+        </p>
+      </div>
+
+      <Suspense
+        fallback={
+          <Card className="p-0">
+            <div className="space-y-3 p-5">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <LoadingSkeleton key={i} className="h-12 w-full" />
+              ))}
+            </div>
+          </Card>
+        }
+      >
+        <ScreenerContent />
+      </Suspense>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server"
-import { getCompanyOverview, stockCodeToCorpCode } from "@/lib/api/dart"
-import { findStock } from "@/lib/constants/stocks"
+import { getCompanyOverview } from "@/lib/api/dart"
+import { ensureLoaded, findStock } from "@/lib/data/stock-registry"
+import * as corpCodeRegistry from "@/lib/data/corp-code-registry"
 
 export async function GET(
   _request: NextRequest,
@@ -9,6 +10,7 @@ export async function GET(
   try {
     const { ticker } = await params
 
+    await ensureLoaded()
     const stock = findStock(ticker)
     if (!stock) {
       return NextResponse.json(
@@ -17,7 +19,15 @@ export async function GET(
       )
     }
 
-    const corpCode = stockCodeToCorpCode(ticker)
+    await corpCodeRegistry.ensureLoaded()
+    const corpCode = corpCodeRegistry.resolve(ticker)
+    if (!corpCode) {
+      return NextResponse.json(
+        { success: false, error: "기업 정보를 불러올 수 없습니다." },
+        { status: 404 }
+      )
+    }
+
     const data = await getCompanyOverview(corpCode)
 
     if (!data) {

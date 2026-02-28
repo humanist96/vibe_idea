@@ -104,7 +104,12 @@ export function StockDetailClient({ ticker, stockName }: StockDetailClientProps)
 
       <FundamentalsTable ticker={ticker} />
 
-      <CompanyInfo ticker={ticker} />
+      <CompanyInfo
+        ticker={ticker}
+        stockName={stockName}
+        market={stock.market}
+        sector={stock.sector}
+      />
     </div>
   )
 }
