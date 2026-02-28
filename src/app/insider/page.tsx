@@ -1,17 +1,37 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import Link from "next/link"
 import { Card, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Badge } from "@/components/ui/Badge"
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
-import { UserCheck } from "lucide-react"
+import { UserCheck, ChevronUp, ChevronDown } from "lucide-react"
+import { cn } from "@/lib/utils/cn"
 import { useWatchlistStore } from "@/store/watchlist"
 import type { InsiderActivity } from "@/lib/api/dart-insider-types"
 
 interface TickerActivity {
   readonly ticker: string
   readonly activity: InsiderActivity
+}
+
+type SortKey = "date" | "ticker" | "name" | "position" | "type" | "shares" | "ratio"
+type SortDir = "asc" | "desc"
+
+const TYPE_ORDER: Record<string, number> = { buy: 0, sell: 1, other: 2 }
+
+function compareItems(a: TickerActivity, b: TickerActivity, key: SortKey, dir: SortDir): number {
+  let cmp = 0
+  switch (key) {
+    case "date": cmp = a.activity.date.localeCompare(b.activity.date); break
+    case "ticker": cmp = a.ticker.localeCompare(b.ticker); break
+    case "name": cmp = a.activity.name.localeCompare(b.activity.name); break
+    case "position": cmp = a.activity.position.localeCompare(b.activity.position); break
+    case "type": cmp = (TYPE_ORDER[a.activity.type] ?? 2) - (TYPE_ORDER[b.activity.type] ?? 2); break
+    case "shares": cmp = a.activity.shares - b.activity.shares; break
+    case "ratio": cmp = a.activity.ratio - b.activity.ratio; break
+  }
+  return dir === "asc" ? cmp : -cmp
 }
 
 function formatShares(shares: number): string {
@@ -21,10 +41,44 @@ function formatShares(shares: number): string {
   return abs.toLocaleString("ko-KR")
 }
 
+function SortIcon({ active, dir }: { readonly active: boolean; readonly dir: SortDir }) {
+  if (!active) return <ChevronDown className="h-3 w-3 text-[var(--color-text-muted)]" />
+  return dir === "asc"
+    ? <ChevronUp className="h-3 w-3 text-[var(--color-accent-500)]" />
+    : <ChevronDown className="h-3 w-3 text-[var(--color-accent-500)]" />
+}
+
+interface SortableThProps {
+  readonly label: string
+  readonly sortKey: SortKey
+  readonly currentKey: SortKey
+  readonly currentDir: SortDir
+  readonly onSort: (key: SortKey) => void
+  readonly align?: "left" | "center" | "right"
+}
+
+function SortableTh({ label, sortKey, currentKey, currentDir, onSort, align = "left" }: SortableThProps) {
+  const alignClass = align === "right" ? "justify-end" : align === "center" ? "justify-center" : "justify-start"
+  return (
+    <th className={cn("pb-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]", align === "right" ? "text-right" : align === "center" ? "text-center" : "text-left")}>
+      <button
+        type="button"
+        onClick={() => onSort(sortKey)}
+        className={cn("inline-flex items-center gap-0.5 transition-colors hover:text-[var(--color-text-secondary)]", alignClass)}
+      >
+        {label}
+        <SortIcon active={currentKey === sortKey} dir={currentDir} />
+      </button>
+    </th>
+  )
+}
+
 export default function InsiderPage() {
   const tickers = useWatchlistStore((s) => s.tickers)
   const [items, setItems] = useState<TickerActivity[]>([])
   const [loading, setLoading] = useState(true)
+  const [sortKey, setSortKey] = useState<SortKey>("date")
+  const [sortDir, setSortDir] = useState<SortDir>("desc")
 
   useEffect(() => {
     if (tickers.length === 0) {
@@ -49,7 +103,7 @@ export default function InsiderPage() {
           }
         }
 
-        setItems(all.sort((a, b) => b.activity.date.localeCompare(a.activity.date)))
+        setItems(all)
       } catch {
         // silently fail
       } finally {
@@ -59,6 +113,22 @@ export default function InsiderPage() {
     fetchAll()
   }, [tickers])
 
+  const handleSort = useCallback((key: SortKey) => {
+    setSortKey((prev) => {
+      if (prev === key) {
+        setSortDir((d) => (d === "asc" ? "desc" : "asc"))
+        return key
+      }
+      setSortDir("desc")
+      return key
+    })
+  }, [])
+
+  const sorted = useMemo(
+    () => [...items].sort((a, b) => compareItems(a, b, sortKey, sortDir)),
+    [items, sortKey, sortDir]
+  )
+
   return (
     <div className="space-y-6">
       <div className="animate-fade-up">
@@ -66,7 +136,7 @@ export default function InsiderPage() {
           내부자 거래
         </h1>
         <p className="mt-1 text-sm text-[var(--color-text-tertiary)]">
-          관심종목의 최근 내부자 거래 현황
+          관심종목의 최근 내부자 거래 현황 (임원·최대주주 지분 변동)
         </p>
       </div>
 
@@ -109,31 +179,17 @@ export default function InsiderPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[var(--color-border-subtle)]">
-                  <th className="pb-2 text-left text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">
-                    날짜
-                  </th>
-                  <th className="pb-2 text-left text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">
-                    종목
-                  </th>
-                  <th className="pb-2 text-left text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">
-                    이름
-                  </th>
-                  <th className="pb-2 text-left text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">
-                    직위
-                  </th>
-                  <th className="pb-2 text-center text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">
-                    구분
-                  </th>
-                  <th className="pb-2 text-right text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">
-                    변동
-                  </th>
-                  <th className="pb-2 text-right text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">
-                    지분율
-                  </th>
+                  <SortableTh label="날짜" sortKey="date" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
+                  <SortableTh label="종목" sortKey="ticker" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
+                  <SortableTh label="이름" sortKey="name" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
+                  <SortableTh label="직위" sortKey="position" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
+                  <SortableTh label="구분" sortKey="type" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} align="center" />
+                  <SortableTh label="변동" sortKey="shares" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} align="right" />
+                  <SortableTh label="지분율" sortKey="ratio" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} align="right" />
                 </tr>
               </thead>
               <tbody>
-                {items.map((item) => (
+                {sorted.map((item) => (
                   <tr
                     key={`${item.ticker}-${item.activity.id}`}
                     className="table-row-hover border-b border-[var(--color-border-subtle)] last:border-0"
