@@ -14,7 +14,7 @@ export function Sidebar({ className }: SidebarProps) {
       className={cn(
         "fixed left-0 top-0 z-30 hidden h-screen w-64 flex-col lg:flex",
         "border-r border-[var(--color-border-subtle)]",
-        "bg-[var(--color-sidebar)] backdrop-blur-xl",
+        "bg-[#0f172a]",
         className
       )}
     >

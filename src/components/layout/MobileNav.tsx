@@ -113,7 +113,7 @@ export function MobileNav() {
           />
 
           {/* Drawer panel */}
-          <div className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-[var(--color-sidebar)] shadow-2xl shadow-black/30 animate-slide-in-left">
+          <div className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-[#0f172a] shadow-2xl shadow-black/30 animate-slide-in-left">
             {/* Header */}
             <div className="flex h-16 shrink-0 items-center justify-between px-5">
               <div className="flex items-center gap-3">
