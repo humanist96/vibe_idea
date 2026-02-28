@@ -9,7 +9,7 @@ export async function GET(
   try {
     const { ticker } = await params
     const searchParams = request.nextUrl.searchParams
-    const year = searchParams.get("year") ?? String(new Date().getFullYear() - 1)
+    const yearParam = searchParams.get("year")
 
     const stock = findStock(ticker)
     if (!stock) {
@@ -20,9 +20,22 @@ export async function GET(
     }
 
     const corpCode = stockCodeToCorpCode(ticker)
-    const data = await getFinancialStatements(corpCode, year)
 
-    return NextResponse.json({ success: true, data })
+    if (yearParam) {
+      const data = await getFinancialStatements(corpCode, yearParam)
+      return NextResponse.json({ success: true, data })
+    }
+
+    // Try recent years in order (latest annual report may not be filed yet)
+    const currentYear = new Date().getFullYear()
+    for (const year of [currentYear - 1, currentYear - 2]) {
+      const data = await getFinancialStatements(corpCode, String(year))
+      if (data.length > 0) {
+        return NextResponse.json({ success: true, data, year })
+      }
+    }
+
+    return NextResponse.json({ success: true, data: [] })
   } catch (error) {
     console.error("Financials API error:", error)
     return NextResponse.json(

@@ -8,6 +8,8 @@ export interface FinancialStatement {
   readonly bsns_year: string
   readonly stock_code: string
   readonly reprt_code: string
+  readonly sj_div: string
+  readonly sj_nm: string
   readonly account_nm: string
   readonly thstrm_nm: string
   readonly thstrm_amount: string
