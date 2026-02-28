@@ -291,7 +291,7 @@ function generateFallbackScore(
     sentimentScore,
     riskScore,
     factors,
-    summary: `${stockName} 종목에 대한 알고리즘 기반 분석 결과입니다. Gemini AI 분석이 불가하여 기술적/재무적 지표 기반으로 점수를 산출했습니다.`,
+    summary: `${stockName} 종목에 대한 알고리즘 기반 분석 결과입니다. AI 분석이 불가하여 기술적/재무적 지표 기반으로 점수를 산출했습니다.`,
     keyInsight:
       "AI 엔진 미연결 상태 - 알고리즘 기반 분석 점수입니다.",
     dataSources: dataSources ?? {

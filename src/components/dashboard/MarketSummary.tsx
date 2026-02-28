@@ -6,7 +6,7 @@ import { Sparkles, Brain, BarChart3, Shield } from "lucide-react"
 const features = [
   {
     icon: Brain,
-    title: "Gemini AI 분석",
+    title: "AI 분석",
     desc: "기술적/재무/심리 분석을 종합한 1-10 AI 점수",
     color: "text-purple-600",
     bg: "bg-purple-50",
@@ -66,7 +66,7 @@ export function MarketSummary() {
       <div className="mt-4 rounded-xl bg-[var(--color-surface-50)] p-3 ring-1 ring-[var(--color-border-subtle)]">
         <p className="text-xs leading-relaxed text-[var(--color-text-tertiary)]">
           개별 종목 페이지에서 &quot;AI 분석&quot; 버튼을 클릭하여 AI 점수를 확인할 수 있습니다.
-          분석에는 GEMINI_API_KEY 설정이 필요합니다.
+          분석에는 API 키 설정이 필요합니다.
         </p>
       </div>
     </Card>
