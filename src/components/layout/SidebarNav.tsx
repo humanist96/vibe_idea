@@ -3,12 +3,13 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils/cn"
-import { LayoutDashboard, Search, Star } from "lucide-react"
+import { LayoutDashboard, Search, Star, UserCheck } from "lucide-react"
 
 const navItems = [
   { href: "/", label: "대시보드", icon: LayoutDashboard },
   { href: "/screener", label: "스크리너", icon: Search },
   { href: "/watchlist", label: "관심종목", icon: Star },
+  { href: "/insider", label: "내부자 거래", icon: UserCheck },
 ] as const
 
 export function SidebarNav() {
@@ -24,13 +25,13 @@ export function SidebarNav() {
             key={item.href}
             href={item.href}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+              "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
               isActive
-                ? "bg-blue-600/20 text-blue-400"
-                : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                ? "bg-[var(--color-accent-400)]/10 text-[var(--color-accent-300)] shadow-sm shadow-amber-500/5"
+                : "text-[var(--color-text-tertiary)] hover:bg-[var(--color-glass-2)] hover:text-[var(--color-text-primary)]"
             )}
           >
-            <Icon className="h-5 w-5" />
+            <Icon className={cn("h-[18px] w-[18px]", isActive && "text-[var(--color-accent-400)]")} />
             {item.label}
           </Link>
         )

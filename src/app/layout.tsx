@@ -1,8 +1,11 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
+import { Urbanist } from "next/font/google"
 import "./globals.css"
 import { Sidebar } from "@/components/layout/Sidebar"
 import { Header } from "@/components/layout/Header"
+import { ToastContainer } from "@/components/ui/ToastContainer"
+import { InsiderPollingProvider } from "@/components/layout/InsiderPollingProvider"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,6 +15,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+})
+
+const urbanist = Urbanist({
+  variable: "--font-urbanist",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 })
 
 export const metadata: Metadata = {
@@ -27,10 +36,12 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
+        className={`${geistSans.variable} ${geistMono.variable} ${urbanist.variable} antialiased`}
       >
+        <ToastContainer />
+        <InsiderPollingProvider />
         <Sidebar />
-        <div className="lg:pl-60">
+        <div className="lg:pl-64">
           <Header />
           <main className="p-4 lg:p-6">{children}</main>
         </div>

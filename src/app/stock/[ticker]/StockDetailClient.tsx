@@ -5,6 +5,7 @@ import { StockHeader } from "@/components/stock/StockHeader"
 import { PriceChart } from "@/components/stock/PriceChart"
 import { StockMetrics } from "@/components/stock/StockMetrics"
 import { FundamentalsTable } from "@/components/stock/FundamentalsTable"
+import { InsiderActivityTable } from "@/components/stock/InsiderActivityTable"
 import { CompanyInfo } from "@/components/stock/CompanyInfo"
 import { AIScorePanel } from "@/components/stock/AIScorePanel"
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
@@ -64,7 +65,7 @@ export function StockDetailClient({ ticker, stockName }: StockDetailClientProps)
 
   if (!stock) {
     return (
-      <div className="py-20 text-center text-gray-500">
+      <div className="py-20 text-center text-[var(--color-text-tertiary)]">
         종목 데이터를 불러올 수 없습니다.
       </div>
     )
@@ -83,10 +84,10 @@ export function StockDetailClient({ ticker, stockName }: StockDetailClientProps)
       />
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 animate-fade-up stagger-2">
           <PriceChart ticker={ticker} />
         </div>
-        <div>
+        <div className="animate-fade-up stagger-3">
           <AIScorePanel ticker={ticker} />
         </div>
       </div>
@@ -103,6 +104,8 @@ export function StockDetailClient({ ticker, stockName }: StockDetailClientProps)
       />
 
       <FundamentalsTable ticker={ticker} />
+
+      <InsiderActivityTable ticker={ticker} />
 
       <CompanyInfo
         ticker={ticker}
