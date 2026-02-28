@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils/cn"
@@ -65,33 +65,63 @@ export function MobileNav() {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
+  const close = useCallback(() => setOpen(false), [])
+
+  // Close on Escape key
+  useEffect(() => {
+    if (!open) return
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false)
+    }
+    document.addEventListener("keydown", handleKey)
+    return () => document.removeEventListener("keydown", handleKey)
+  }, [open])
+
+  // Lock body scroll when open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [open])
+
   return (
     <div className="lg:hidden">
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded-xl p-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-glass-2)]"
+        className="rounded-xl p-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-100)] transition-colors"
+        aria-label="메뉴 열기"
       >
         <Menu className="h-5 w-5" />
       </button>
 
       {open && (
         <>
+          {/* Backdrop overlay */}
           <div
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
-            onClick={() => setOpen(false)}
-            onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
+            className="fixed inset-0 z-40 bg-black/50 animate-overlay-fade-in"
+            onClick={close}
             role="button"
             tabIndex={0}
+            aria-label="메뉴 닫기"
+            onKeyDown={(e) => e.key === "Escape" && close()}
           />
-          <div className="fixed inset-y-0 left-0 z-50 w-72 bg-[var(--color-midnight-900)] border-r border-[var(--color-border-subtle)] p-5">
-            <div className="mb-8 flex items-center justify-between">
+
+          {/* Drawer panel */}
+          <div className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-[var(--color-sidebar)] shadow-2xl shadow-black/30 animate-slide-in-left">
+            {/* Header */}
+            <div className="flex h-16 shrink-0 items-center justify-between px-5">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg shadow-amber-500/20">
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
-                    className="h-5 w-5 text-midnight-950"
+                    className="h-5 w-5 text-[#0f172a]"
                     stroke="currentColor"
                     strokeWidth={2.5}
                     strokeLinecap="round"
@@ -101,24 +131,29 @@ export function MobileNav() {
                     <polyline points="16 7 22 7 22 13" />
                   </svg>
                 </div>
-                <span className="font-display text-lg font-bold text-[var(--color-text-primary)]">
+                <span className="font-display text-lg font-bold text-white">
                   KoreaStock<span className="text-[var(--color-accent-400)]">AI</span>
                 </span>
               </div>
               <button
                 type="button"
-                onClick={() => setOpen(false)}
-                className="rounded-lg p-1 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+                onClick={close}
+                className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+                aria-label="메뉴 닫기"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <nav className="space-y-4">
+            {/* Divider */}
+            <div className="mx-5 border-t border-white/10" />
+
+            {/* Navigation */}
+            <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
               {navSections.map((section, sIdx) => (
                 <div key={section.title ?? sIdx}>
                   {section.title && (
-                    <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+                    <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
                       {section.title}
                     </p>
                   )}
@@ -130,15 +165,20 @@ export function MobileNav() {
                         <Link
                           key={item.href}
                           href={item.href}
-                          onClick={() => setOpen(false)}
+                          onClick={close}
                           className={cn(
-                            "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200",
+                            "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                             isActive
-                              ? "bg-[var(--color-accent-400)]/10 text-[var(--color-accent-300)]"
-                              : "text-[var(--color-text-tertiary)] hover:bg-[var(--color-glass-2)] hover:text-[var(--color-text-primary)]"
+                              ? "bg-[var(--color-accent-400)]/15 text-[var(--color-accent-300)]"
+                              : "text-slate-400 hover:bg-white/8 hover:text-slate-200"
                           )}
                         >
-                          <Icon className={cn("h-[18px] w-[18px] shrink-0", isActive && "text-[var(--color-accent-400)]")} />
+                          <Icon
+                            className={cn(
+                              "h-[18px] w-[18px] shrink-0",
+                              isActive ? "text-[var(--color-accent-400)]" : "text-slate-500"
+                            )}
+                          />
                           {item.label}
                         </Link>
                       )
@@ -147,6 +187,15 @@ export function MobileNav() {
                 </div>
               ))}
             </nav>
+
+            {/* Footer */}
+            <div className="shrink-0 border-t border-white/10 px-5 py-4">
+              <p className="text-[10px] leading-relaxed text-slate-600">
+                AI 분석은 투자 참고용이며
+                <br />
+                투자 책임은 본인에게 있습니다.
+              </p>
+            </div>
           </div>
         </>
       )}
