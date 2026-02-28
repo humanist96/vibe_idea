@@ -13,18 +13,18 @@ export function Sidebar({ className }: SidebarProps) {
     <aside
       className={cn(
         "fixed left-0 top-0 z-30 hidden h-screen w-64 flex-col lg:flex",
-        "border-r border-[var(--color-border-subtle)]",
-        "bg-[#0f172a]",
+        "border-r border-[var(--color-border-default)]",
+        "bg-white",
         className
       )}
     >
       {/* Logo */}
-      <div className="flex h-16 items-center gap-3 px-6">
+      <div className="flex h-16 items-center gap-3 px-6 border-b border-[var(--color-border-subtle)]">
         <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg shadow-amber-500/20">
           <svg
             viewBox="0 0 24 24"
             fill="none"
-            className="h-5 w-5 text-midnight-950"
+            className="h-5 w-5 text-white"
             stroke="currentColor"
             strokeWidth={2.5}
             strokeLinecap="round"
@@ -35,7 +35,7 @@ export function Sidebar({ className }: SidebarProps) {
           </svg>
         </div>
         <Link href="/" className="font-display text-lg font-bold tracking-tight text-[var(--color-text-primary)]">
-          KoreaStock<span className="text-[var(--color-accent-400)]">AI</span>
+          KoreaStock<span className="text-[var(--color-accent-500)]">AI</span>
         </Link>
       </div>
 

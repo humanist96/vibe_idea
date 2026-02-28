@@ -41,7 +41,7 @@ export function ScoreExplanation({ score }: ScoreExplanationProps) {
               {item.label}
             </p>
             <p className="mt-0.5 font-semibold tabular-nums text-[var(--color-text-primary)]">
-              {item.value.toFixed(1)}
+              {item.value != null ? item.value.toFixed(1) : "--"}
             </p>
           </div>
         ))}

@@ -22,7 +22,8 @@ function formatMetricValue(value: number | null, decimals = 2): string {
   return value.toFixed(decimals)
 }
 
-function formatLargeNumber(value: number): string {
+function formatLargeNumber(value: number | null | undefined): string {
+  if (value == null) return "--"
   if (value >= 1_000_000_000_000) {
     return `${(value / 1_000_000_000_000).toFixed(1)}조`
   }
@@ -51,14 +52,14 @@ export function StockMetrics({
       value: dividendYield ? `${dividendYield.toFixed(2)}%` : "--",
     },
     { label: "시가총액", value: formatLargeNumber(marketCap) },
-    { label: "거래량", value: volume.toLocaleString("ko-KR") },
+    { label: "거래량", value: volume != null ? volume.toLocaleString("ko-KR") : "--" },
     {
       label: "52주 최고",
-      value: `${fiftyTwoWeekHigh.toLocaleString("ko-KR")}`,
+      value: fiftyTwoWeekHigh != null ? `${fiftyTwoWeekHigh.toLocaleString("ko-KR")}` : "--",
     },
     {
       label: "52주 최저",
-      value: `${fiftyTwoWeekLow.toLocaleString("ko-KR")}`,
+      value: fiftyTwoWeekLow != null ? `${fiftyTwoWeekLow.toLocaleString("ko-KR")}` : "--",
     },
   ]
 

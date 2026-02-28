@@ -43,7 +43,7 @@ export function ScoreGauge({ score, size = 120 }: ScoreGaugeProps) {
       </svg>
       <div className="absolute flex flex-col items-center">
         <span className="text-3xl font-bold tabular-nums" style={{ color }}>
-          {score.toFixed(1)}
+          {score != null ? score.toFixed(1) : "--"}
         </span>
         <span className="text-xs text-[var(--color-text-muted)]">/ 10</span>
       </div>

@@ -10,12 +10,14 @@ export function formatCurrency(value: number): string {
   }).format(value)
 }
 
-export function formatPercent(value: number, decimals = 2): string {
+export function formatPercent(value: number | null | undefined, decimals = 2): string {
+  if (value === null || value === undefined || isNaN(value)) return "--"
   const sign = value > 0 ? "+" : ""
   return `${sign}${value.toFixed(decimals)}%`
 }
 
-export function formatVolume(value: number): string {
+export function formatVolume(value: number | null | undefined): string {
+  if (value === null || value === undefined || isNaN(value)) return "--"
   if (value >= 1_000_000_000) {
     return `${(value / 1_000_000_000).toFixed(1)}B`
   }
@@ -28,7 +30,8 @@ export function formatVolume(value: number): string {
   return formatNumber(value)
 }
 
-export function formatMarketCap(value: number): string {
+export function formatMarketCap(value: number | null | undefined): string {
+  if (value === null || value === undefined || isNaN(value)) return "--"
   if (value >= 1_000_000_000_000) {
     return `${(value / 1_000_000_000_000).toFixed(1)}조`
   }

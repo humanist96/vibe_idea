@@ -89,9 +89,11 @@ export function MarketOverview() {
               </div>
 
               <p className="font-display text-2xl font-bold tabular-nums text-[var(--color-text-primary)]">
-                {index.name === "USD/KRW"
-                  ? `${formatNumber(Math.round(index.value))}`
-                  : formatNumber(Number(index.value.toFixed(2)))}
+                {index.value != null
+                  ? index.name === "USD/KRW"
+                    ? `${formatNumber(Math.round(index.value))}`
+                    : formatNumber(Number(index.value.toFixed(2)))
+                  : "--"}
               </p>
 
               <PriceChange

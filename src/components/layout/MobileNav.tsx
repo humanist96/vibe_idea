@@ -67,7 +67,6 @@ export function MobileNav() {
 
   const close = useCallback(() => setOpen(false), [])
 
-  // Close on Escape key
   useEffect(() => {
     if (!open) return
     function handleKey(e: KeyboardEvent) {
@@ -77,7 +76,6 @@ export function MobileNav() {
     return () => document.removeEventListener("keydown", handleKey)
   }, [open])
 
-  // Lock body scroll when open
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden"
@@ -104,7 +102,7 @@ export function MobileNav() {
         <>
           {/* Backdrop overlay */}
           <div
-            className="fixed inset-0 z-40 bg-black/50 animate-overlay-fade-in"
+            className="fixed inset-0 z-40 bg-black/30 animate-overlay-fade-in"
             onClick={close}
             role="button"
             tabIndex={0}
@@ -113,15 +111,15 @@ export function MobileNav() {
           />
 
           {/* Drawer panel */}
-          <div className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-[#0f172a] shadow-2xl shadow-black/30 animate-slide-in-left">
+          <div className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-white shadow-2xl shadow-black/10 animate-slide-in-left">
             {/* Header */}
-            <div className="flex h-16 shrink-0 items-center justify-between px-5">
+            <div className="flex h-16 shrink-0 items-center justify-between px-5 border-b border-[var(--color-border-subtle)]">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg shadow-amber-500/20">
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
-                    className="h-5 w-5 text-[#0f172a]"
+                    className="h-5 w-5 text-white"
                     stroke="currentColor"
                     strokeWidth={2.5}
                     strokeLinecap="round"
@@ -131,29 +129,26 @@ export function MobileNav() {
                     <polyline points="16 7 22 7 22 13" />
                   </svg>
                 </div>
-                <span className="font-display text-lg font-bold text-white">
-                  KoreaStock<span className="text-[var(--color-accent-400)]">AI</span>
+                <span className="font-display text-lg font-bold text-[var(--color-text-primary)]">
+                  KoreaStock<span className="text-[var(--color-accent-500)]">AI</span>
                 </span>
               </div>
               <button
                 type="button"
                 onClick={close}
-                className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+                className="rounded-lg p-1.5 text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-100)] hover:text-[var(--color-text-primary)]"
                 aria-label="메뉴 닫기"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            {/* Divider */}
-            <div className="mx-5 border-t border-white/10" />
-
             {/* Navigation */}
             <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
               {navSections.map((section, sIdx) => (
                 <div key={section.title ?? sIdx}>
                   {section.title && (
-                    <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                    <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text-muted)]">
                       {section.title}
                     </p>
                   )}
@@ -169,14 +164,14 @@ export function MobileNav() {
                           className={cn(
                             "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                             isActive
-                              ? "bg-[var(--color-accent-400)]/15 text-[var(--color-accent-300)]"
-                              : "text-slate-400 hover:bg-white/8 hover:text-slate-200"
+                              ? "bg-amber-50 text-amber-700 shadow-sm shadow-amber-100"
+                              : "text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-50)] hover:text-[var(--color-text-primary)]"
                           )}
                         >
                           <Icon
                             className={cn(
                               "h-[18px] w-[18px] shrink-0",
-                              isActive ? "text-[var(--color-accent-400)]" : "text-slate-500"
+                              isActive ? "text-amber-500" : "text-[var(--color-text-muted)]"
                             )}
                           />
                           {item.label}
@@ -189,8 +184,8 @@ export function MobileNav() {
             </nav>
 
             {/* Footer */}
-            <div className="shrink-0 border-t border-white/10 px-5 py-4">
-              <p className="text-[10px] leading-relaxed text-slate-600">
+            <div className="shrink-0 border-t border-[var(--color-border-subtle)] px-5 py-4">
+              <p className="text-[10px] leading-relaxed text-[var(--color-text-muted)]">
                 AI 분석은 투자 참고용이며
                 <br />
                 투자 책임은 본인에게 있습니다.

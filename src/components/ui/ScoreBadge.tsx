@@ -38,7 +38,7 @@ export function ScoreBadge({ score, size = "md", className }: ScoreBadgeProps) {
         className
       )}
     >
-      {score.toFixed(1)}
+      {score != null ? score.toFixed(1) : "--"}
     </div>
   )
 }

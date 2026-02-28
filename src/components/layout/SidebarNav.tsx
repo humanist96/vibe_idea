@@ -62,11 +62,11 @@ export function SidebarNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="flex-1 space-y-4 overflow-y-auto px-3 py-4">
+    <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
       {navSections.map((section, sIdx) => (
         <div key={section.title ?? sIdx}>
           {section.title && (
-            <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+            <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-widest text-[var(--color-text-muted)]">
               {section.title}
             </p>
           )}
@@ -81,11 +81,16 @@ export function SidebarNav() {
                   className={cn(
                     "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200",
                     isActive
-                      ? "bg-[var(--color-accent-400)]/10 text-[var(--color-accent-300)] shadow-sm shadow-amber-500/5"
-                      : "text-[var(--color-text-tertiary)] hover:bg-[var(--color-glass-2)] hover:text-[var(--color-text-primary)]"
+                      ? "bg-amber-50 text-amber-700 shadow-sm shadow-amber-100"
+                      : "text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-50)] hover:text-[var(--color-text-primary)]"
                   )}
                 >
-                  <Icon className={cn("h-[18px] w-[18px] shrink-0", isActive && "text-[var(--color-accent-400)]")} />
+                  <Icon
+                    className={cn(
+                      "h-[18px] w-[18px] shrink-0",
+                      isActive ? "text-amber-500" : "text-[var(--color-text-muted)]"
+                    )}
+                  />
                   {item.label}
                 </Link>
               )
