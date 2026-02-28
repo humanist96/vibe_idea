@@ -17,6 +17,8 @@ import {
   Bell,
   Globe,
   Grid3X3,
+  TrendingUp,
+  Layers,
 } from "lucide-react"
 
 interface NavItem {
@@ -36,21 +38,23 @@ const navSections: readonly NavSection[] = [
       { href: "/", label: "대시보드", icon: LayoutDashboard },
       { href: "/screener", label: "스크리너", icon: Search },
       { href: "/watchlist", label: "관심종목", icon: Star },
+      { href: "/events", label: "기업 이벤트", icon: Bell },
     ],
   },
   {
-    title: "투자 데이터",
+    title: "My 투자 데이터",
     items: [
       { href: "/flow", label: "투자자 동향", icon: ArrowLeftRight },
       { href: "/insider", label: "내부자 거래", icon: UserCheck },
       { href: "/dividends", label: "배당", icon: Banknote },
       { href: "/block-holdings", label: "대량보유", icon: Building2 },
-      { href: "/events", label: "기업 이벤트", icon: Bell },
     ],
   },
   {
     title: "시장",
     items: [
+      { href: "/ranking", label: "랭킹", icon: TrendingUp },
+      { href: "/themes", label: "테마", icon: Layers },
       { href: "/macro", label: "매크로", icon: Globe },
       { href: "/valuation", label: "밸류에이션", icon: Grid3X3 },
     ],

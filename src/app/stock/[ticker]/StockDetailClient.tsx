@@ -9,6 +9,7 @@ import { InvestorFlowPanel } from "@/components/stock/InvestorFlowPanel"
 import { InsiderActivityTable } from "@/components/stock/InsiderActivityTable"
 import { CompanyInfo } from "@/components/stock/CompanyInfo"
 import { AIScorePanel } from "@/components/stock/AIScorePanel"
+import { ConsensusPanel } from "@/components/stock/ConsensusPanel"
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
 
 interface StockData {
@@ -103,6 +104,8 @@ export function StockDetailClient({ ticker, stockName }: StockDetailClientProps)
         fiftyTwoWeekHigh={stock.fiftyTwoWeekHigh}
         fiftyTwoWeekLow={stock.fiftyTwoWeekLow}
       />
+
+      <ConsensusPanel ticker={ticker} currentPrice={stock.price} />
 
       <FundamentalsTable ticker={ticker} />
 

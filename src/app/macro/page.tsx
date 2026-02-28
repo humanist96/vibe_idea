@@ -98,7 +98,7 @@ export default function MacroPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-fade-up stagger-2">
+        <div className="grid gap-4 sm:grid-cols-2 animate-fade-up stagger-2">
           <LoadingSkeleton className="h-40 w-full rounded-xl" />
           <LoadingSkeleton className="h-40 w-full rounded-xl" />
           <LoadingSkeleton className="h-40 w-full rounded-xl" />
@@ -111,7 +111,7 @@ export default function MacroPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-fade-up stagger-2">
+        <div className="grid gap-4 sm:grid-cols-2 animate-fade-up stagger-2">
           {indicators.map((ind) => (
             <IndicatorCard
               key={ind.name}

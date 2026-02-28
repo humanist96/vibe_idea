@@ -6,22 +6,32 @@ import {
   getTopStocksFromRegistry,
 } from "@/lib/data/stock-registry"
 import type { KrxStockEntry, ScreenerParams } from "@/lib/data/krx-types"
+import { getQuote } from "@/lib/api/naver-finance"
 
-function enrichEntry(entry: KrxStockEntry) {
-  return {
-    ...entry,
-    per: null as number | null,
-    pbr: null as number | null,
-    eps: null as number | null,
-    dividendYield: null as number | null,
-    foreignRate: null as number | null,
-    previousClose: 0,
-    dayHigh: 0,
-    dayLow: 0,
-    fiftyTwoWeekHigh: 0,
-    fiftyTwoWeekLow: 0,
-    aiScore: null as number | null,
-  }
+interface EnrichedEntry extends KrxStockEntry {
+  readonly per: number | null
+  readonly pbr: number | null
+  readonly eps: number | null
+  readonly dividendYield: number | null
+  readonly foreignRate: number | null
+}
+
+async function enrichEntries(entries: readonly KrxStockEntry[]): Promise<EnrichedEntry[]> {
+  const quotes = await Promise.all(
+    entries.map((e) => getQuote(e.ticker).catch(() => null))
+  )
+
+  return entries.map((entry, i) => {
+    const q = quotes[i]
+    return {
+      ...entry,
+      per: q?.per ?? null,
+      pbr: q?.pbr ?? null,
+      eps: q?.eps ?? null,
+      dividendYield: q?.dividendYield ?? null,
+      foreignRate: q?.foreignRate ?? null,
+    }
+  })
 }
 
 export async function GET(request: NextRequest) {
@@ -39,7 +49,8 @@ export async function GET(request: NextRequest) {
       sp.has("search")
 
     if (!hasParams) {
-      const stocks = getTopStocksFromRegistry(50).map(enrichEntry)
+      const raw = getTopStocksFromRegistry(50)
+      const stocks = await enrichEntries(raw)
       return NextResponse.json({
         success: true,
         data: stocks,
@@ -63,9 +74,11 @@ export async function GET(request: NextRequest) {
     }
 
     const result = getScreenerStocks(params)
+    const stocks = await enrichEntries(result.data)
+
     return NextResponse.json({
       success: true,
-      data: result.data.map(enrichEntry),
+      data: stocks,
       meta: result.meta,
     })
   } catch (error) {

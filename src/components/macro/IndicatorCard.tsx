@@ -1,10 +1,14 @@
 "use client"
 
+import { useId } from "react"
 import { cn } from "@/lib/utils/cn"
 import { TrendingUp, TrendingDown, Minus } from "lucide-react"
 import {
   AreaChart,
   Area,
+  XAxis,
+  YAxis,
+  Tooltip,
   ResponsiveContainer,
 } from "recharts"
 
@@ -27,6 +31,16 @@ function formatValue(value: number, unit: string): string {
   return value.toFixed(2)
 }
 
+function formatTickDate(dateStr: string): string {
+  if (!dateStr) return ""
+  // "2024-01" or "2024-01-15" → "24.01"
+  const parts = dateStr.split("-")
+  if (parts.length >= 2) {
+    return `${parts[0].slice(2)}.${parts[1]}`
+  }
+  return dateStr.slice(2)
+}
+
 export function IndicatorCard({
   name,
   value,
@@ -36,6 +50,7 @@ export function IndicatorCard({
   date,
   history,
 }: IndicatorCardProps) {
+  const gradientId = useId()
   const isUp = change > 0
   const isDown = change < 0
 
@@ -73,30 +88,53 @@ export function IndicatorCard({
       </div>
 
       {history.length > 2 && (
-        <div className="h-12">
+        <div className="h-36">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={[...history]}>
+            <AreaChart data={[...history]} margin={{ top: 4, right: 4, bottom: 0, left: -12 }}>
               <defs>
-                <linearGradient id={`grad-${name}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="0%"
-                    stopColor={isDown ? "var(--color-loss)" : "var(--color-accent-400)"}
-                    stopOpacity={0.3}
-                  />
-                  <stop
-                    offset="100%"
-                    stopColor={isDown ? "var(--color-loss)" : "var(--color-accent-400)"}
-                    stopOpacity={0}
-                  />
+                <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="#f59e0b" stopOpacity={0} />
                 </linearGradient>
               </defs>
+              <XAxis
+                dataKey="date"
+                tickFormatter={formatTickDate}
+                tick={{ fontSize: 10, fill: "var(--color-text-muted)" }}
+                axisLine={false}
+                tickLine={false}
+                interval="preserveStartEnd"
+                minTickGap={40}
+              />
+              <YAxis
+                domain={["auto", "auto"]}
+                tick={{ fontSize: 10, fill: "var(--color-text-muted)" }}
+                axisLine={false}
+                tickLine={false}
+                tickCount={4}
+                tickFormatter={(v: number) =>
+                  unit === "%" ? `${v.toFixed(1)}` : v.toLocaleString()
+                }
+              />
+              <Tooltip
+                contentStyle={{
+                  background: "var(--color-surface-200)",
+                  border: "1px solid var(--color-border-subtle)",
+                  borderRadius: "8px",
+                  fontSize: "11px",
+                  color: "var(--color-text-primary)",
+                }}
+                labelFormatter={(label: string) => label}
+                formatter={(v: number) => [formatValue(v, unit), name]}
+              />
               <Area
                 type="monotone"
                 dataKey="value"
-                stroke={isDown ? "var(--color-loss)" : "var(--color-accent-400)"}
+                stroke="#f59e0b"
                 strokeWidth={1.5}
-                fill={`url(#grad-${name})`}
+                fill={`url(#${gradientId})`}
                 dot={false}
+                activeDot={{ r: 3, strokeWidth: 0 }}
               />
             </AreaChart>
           </ResponsiveContainer>

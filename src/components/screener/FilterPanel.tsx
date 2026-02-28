@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/Button"
 export interface Filters {
   readonly market: "ALL" | "KOSPI" | "KOSDAQ"
   readonly sector: string
-  readonly minScore: number
-  readonly maxScore: number
   readonly minPrice: string
   readonly maxPrice: string
+  readonly minPer: string
+  readonly maxPer: string
 }
 
 interface FilterPanelProps {
@@ -65,33 +65,6 @@ export function FilterPanel({ filters, onFilterChange, sectors = [] }: FilterPan
       </div>
 
       <div>
-        <label className={labelClass}>AI 점수</label>
-        <div className="flex items-center gap-2">
-          <input
-            type="range"
-            min={1}
-            max={10}
-            step={1}
-            value={filters.minScore}
-            onChange={(e) => updateFilter("minScore", Number(e.target.value))}
-            className="w-20 accent-[var(--color-accent-400)]"
-          />
-          <span className="text-xs tabular-nums text-[var(--color-text-secondary)]">
-            {filters.minScore} - {filters.maxScore}
-          </span>
-          <input
-            type="range"
-            min={1}
-            max={10}
-            step={1}
-            value={filters.maxScore}
-            onChange={(e) => updateFilter("maxScore", Number(e.target.value))}
-            className="w-20 accent-[var(--color-accent-400)]"
-          />
-        </div>
-      </div>
-
-      <div>
         <label className={labelClass}>가격 범위</label>
         <div className="flex items-center gap-2">
           <input
@@ -108,6 +81,27 @@ export function FilterPanel({ filters, onFilterChange, sectors = [] }: FilterPan
             onChange={(e) => updateFilter("maxPrice", e.target.value)}
             placeholder="최대"
             className={`w-24 ${inputClass}`}
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className={labelClass}>PER 범위</label>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={filters.minPer}
+            onChange={(e) => updateFilter("minPer", e.target.value)}
+            placeholder="최소"
+            className={`w-20 ${inputClass}`}
+          />
+          <span className="text-[var(--color-text-muted)]">~</span>
+          <input
+            type="text"
+            value={filters.maxPer}
+            onChange={(e) => updateFilter("maxPer", e.target.value)}
+            placeholder="최대"
+            className={`w-20 ${inputClass}`}
           />
         </div>
       </div>

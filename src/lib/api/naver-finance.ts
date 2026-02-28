@@ -97,7 +97,7 @@ export async function getQuote(ticker: string): Promise<StockQuote | null> {
     const perStr = findTotalInfoValue(totalInfos, "per")
     const pbrStr = findTotalInfoValue(totalInfos, "pbr")
     const epsStr = findTotalInfoValue(totalInfos, "eps")
-    const dividendYieldStr = findTotalInfoValue(totalInfos, "dividendYield")
+    const dividendYieldStr = findTotalInfoValue(totalInfos, "dividendYieldRatio") ?? findTotalInfoValue(totalInfos, "dividendYield")
 
     const high52 = parseKoreanNumber(findTotalInfoValue(totalInfos, "high52wPrice"))
     const low52 = parseKoreanNumber(findTotalInfoValue(totalInfos, "low52wPrice"))

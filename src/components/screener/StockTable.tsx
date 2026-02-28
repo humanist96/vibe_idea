@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
-import { ScoreBadge } from "@/components/ui/ScoreBadge"
 import { PriceChange } from "@/components/ui/PriceChange"
 import { Badge } from "@/components/ui/Badge"
 import { formatCurrency, formatVolume, formatMarketCap } from "@/lib/utils/format"
@@ -17,12 +16,13 @@ interface StockRow {
   readonly volume: number
   readonly marketCap: number
   readonly per: number | null
-  readonly aiScore: number | null
+  readonly pbr: number | null
+  readonly dividendYield: number | null
   readonly market: "KOSPI" | "KOSDAQ"
   readonly sector: string
 }
 
-type SortField = "name" | "price" | "changePercent" | "volume" | "marketCap" | "per" | "aiScore"
+type SortField = "name" | "price" | "changePercent" | "volume" | "marketCap" | "per" | "pbr" | "dividendYield"
 type SortDirection = "asc" | "desc"
 
 interface StockTableProps {
@@ -44,8 +44,8 @@ export function StockTable({ stocks }: StockTableProps) {
 
   const sorted = useMemo(() => {
     return [...stocks].sort((a, b) => {
-      const aVal = a[sortField] ?? 0
-      const bVal = b[sortField] ?? 0
+      const aVal = a[sortField] ?? -Infinity
+      const bVal = b[sortField] ?? -Infinity
       if (typeof aVal === "string" && typeof bVal === "string") {
         return sortDir === "asc"
           ? aVal.localeCompare(bVal)
@@ -80,7 +80,6 @@ export function StockTable({ stocks }: StockTableProps) {
             <th className={thClass} onClick={() => handleSort("name")}>
               종목 <SortIcon field="name" />
             </th>
-            <th className={`${thClass} text-center`}>AI</th>
             <th className={`${thClass} text-right`} onClick={() => handleSort("price")}>
               현재가 <SortIcon field="price" />
             </th>
@@ -95,6 +94,12 @@ export function StockTable({ stocks }: StockTableProps) {
             </th>
             <th className={`${thClass} text-right`} onClick={() => handleSort("per")}>
               PER <SortIcon field="per" />
+            </th>
+            <th className={`${thClass} text-right`} onClick={() => handleSort("pbr")}>
+              PBR <SortIcon field="pbr" />
+            </th>
+            <th className={`${thClass} text-right hidden lg:table-cell`} onClick={() => handleSort("dividendYield")}>
+              배당률 <SortIcon field="dividendYield" />
             </th>
             <th className="pb-3 text-[10px] font-medium uppercase tracking-widest text-[var(--color-text-muted)]">
               시장
@@ -120,13 +125,6 @@ export function StockTable({ stocks }: StockTableProps) {
                   </p>
                 </Link>
               </td>
-              <td className="py-3 text-center">
-                {stock.aiScore !== null ? (
-                  <ScoreBadge score={stock.aiScore} size="sm" />
-                ) : (
-                  <span className="text-[10px] text-[var(--color-text-muted)]">--</span>
-                )}
-              </td>
               <td className="py-3 pr-4 text-right font-mono text-sm tabular-nums font-medium text-[var(--color-text-primary)]">
                 {formatCurrency(stock.price)}
               </td>
@@ -144,7 +142,13 @@ export function StockTable({ stocks }: StockTableProps) {
                 {formatMarketCap(stock.marketCap)}
               </td>
               <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)]">
-                {stock.per ? stock.per.toFixed(1) : "--"}
+                {stock.per !== null ? stock.per.toFixed(1) : "--"}
+              </td>
+              <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)]">
+                {stock.pbr !== null ? stock.pbr.toFixed(2) : "--"}
+              </td>
+              <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)] hidden lg:table-cell">
+                {stock.dividendYield !== null ? `${stock.dividendYield.toFixed(2)}%` : "--"}
               </td>
               <td className="py-3">
                 <Badge variant={stock.market === "KOSPI" ? "blue" : "green"}>

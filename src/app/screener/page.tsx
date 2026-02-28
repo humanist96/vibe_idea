@@ -16,7 +16,8 @@ interface StockData {
   readonly volume: number
   readonly marketCap: number
   readonly per: number | null
-  readonly aiScore: number | null
+  readonly pbr: number | null
+  readonly dividendYield: number | null
   readonly market: "KOSPI" | "KOSDAQ"
   readonly sector: string
 }
@@ -51,10 +52,10 @@ function ScreenerContent() {
   const filters: Filters = {
     market: currentMarket,
     sector: currentSector,
-    minScore: 1,
-    maxScore: 10,
     minPrice: searchParams.get("minPrice") ?? "",
     maxPrice: searchParams.get("maxPrice") ?? "",
+    minPer: searchParams.get("minPer") ?? "",
+    maxPer: searchParams.get("maxPer") ?? "",
   }
 
   const updateUrl = useCallback(
@@ -80,6 +81,8 @@ function ScreenerContent() {
         sector: newFilters.sector,
         minPrice: newFilters.minPrice,
         maxPrice: newFilters.maxPrice,
+        minPer: newFilters.minPer,
+        maxPer: newFilters.maxPer,
       })
     },
     [updateUrl]
@@ -121,6 +124,8 @@ function ScreenerContent() {
 
         const minPrice = searchParams.get("minPrice")
         const maxPrice = searchParams.get("maxPrice")
+        const minPer = searchParams.get("minPer")
+        const maxPer = searchParams.get("maxPer")
 
         const res = await fetch(`/api/stocks?${params.toString()}`)
         const json = await res.json()
@@ -133,6 +138,14 @@ function ScreenerContent() {
           if (maxPrice) {
             const max = Number(maxPrice)
             if (!isNaN(max)) data = data.filter((s) => s.price <= max)
+          }
+          if (minPer) {
+            const min = Number(minPer)
+            if (!isNaN(min)) data = data.filter((s) => s.per !== null && s.per >= min)
+          }
+          if (maxPer) {
+            const max = Number(maxPer)
+            if (!isNaN(max)) data = data.filter((s) => s.per !== null && s.per <= max)
           }
           setStocks(data)
           if (json.meta) {
