@@ -12,7 +12,7 @@ export async function GET() {
     const start = Date.now()
     const res = await fetch(
       `https://opendart.fss.or.kr/api/elestock.json?crtfc_key=${dartKey}&corp_code=00126380`,
-      { signal: AbortSignal.timeout(10000) }
+      { signal: AbortSignal.timeout(30000) }
     )
     const data = await res.json()
     results.elestock = {
