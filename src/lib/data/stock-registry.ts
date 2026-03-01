@@ -270,6 +270,25 @@ export function getScreenerStocks(
     )
   }
 
+  if (params.minPrice !== undefined) {
+    entries = entries.filter((e) => e.price >= params.minPrice!)
+  }
+  if (params.maxPrice !== undefined) {
+    entries = entries.filter((e) => e.price <= params.maxPrice!)
+  }
+  if (params.minChangePercent !== undefined) {
+    entries = entries.filter((e) => e.changePercent >= params.minChangePercent!)
+  }
+  if (params.maxChangePercent !== undefined) {
+    entries = entries.filter((e) => e.changePercent <= params.maxChangePercent!)
+  }
+  if (params.minMarketCap !== undefined) {
+    entries = entries.filter((e) => e.marketCap >= params.minMarketCap!)
+  }
+  if (params.maxMarketCap !== undefined) {
+    entries = entries.filter((e) => e.marketCap <= params.maxMarketCap!)
+  }
+
   const sorted = sortEntries(entries, params.sort || "marketCap", params.order)
 
   const total = sorted.length

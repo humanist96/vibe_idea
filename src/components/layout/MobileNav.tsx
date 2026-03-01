@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react"
 import { createPortal } from "react-dom"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useSession, signOut } from "next-auth/react"
+import Image from "next/image"
 import { cn } from "@/lib/utils/cn"
 import {
   Menu,
@@ -20,6 +22,9 @@ import {
   Grid3X3,
   TrendingUp,
   Layers,
+  LogIn,
+  LogOut,
+  User,
 } from "lucide-react"
 
 interface NavItem {
@@ -65,6 +70,7 @@ const navSections: readonly NavSection[] = [
 export function MobileNav() {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
+  const { data: session } = useSession()
 
   const close = useCallback(() => setOpen(false), [])
 
@@ -219,6 +225,61 @@ export function MobileNav() {
                   </div>
                 ))}
               </nav>
+
+              {/* User section */}
+              <div
+                style={{
+                  flexShrink: 0,
+                  borderTop: "1px solid #e2e8f0",
+                  padding: "12px 16px",
+                }}
+              >
+                {session ? (
+                  <div className="flex items-center gap-3">
+                    {session.user.image ? (
+                      <Image
+                        src={session.user.image}
+                        alt={session.user.name ?? "User"}
+                        width={32}
+                        height={32}
+                        className="h-8 w-8 shrink-0 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600">
+                        <User className="h-4 w-4" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-slate-900">
+                        {session.user.name}
+                      </p>
+                      <p className="truncate text-[11px] text-slate-400">
+                        {session.user.email}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        close()
+                        signOut({ callbackUrl: "/" })
+                      }}
+                      className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+                      title="로그아웃"
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <Link
+                    href="/login"
+                    onClick={close}
+                    className="flex items-center gap-2.5 rounded-xl px-2 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    로그인
+                  </Link>
+                )}
+              </div>
 
               {/* Footer */}
               <div

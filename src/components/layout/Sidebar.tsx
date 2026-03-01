@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils/cn"
 import { SidebarNav } from "./SidebarNav"
+import { SidebarUser } from "./SidebarUser"
 import Link from "next/link"
 
 interface SidebarProps {
@@ -40,6 +41,8 @@ export function Sidebar({ className }: SidebarProps) {
       </div>
 
       <SidebarNav />
+
+      <SidebarUser />
 
       {/* Footer disclaimer */}
       <div className="mt-auto border-t border-[var(--color-border-subtle)] px-6 py-4">

@@ -30,6 +30,12 @@ export interface ScreenerParams {
   readonly sort: string
   readonly order: "asc" | "desc"
   readonly search: string
+  readonly minPrice?: number
+  readonly maxPrice?: number
+  readonly minChangePercent?: number
+  readonly maxChangePercent?: number
+  readonly minMarketCap?: number
+  readonly maxMarketCap?: number
 }
 
 export interface PaginatedResult<T> {

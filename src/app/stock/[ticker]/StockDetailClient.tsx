@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRecentlyViewedStore } from "@/store/recently-viewed"
 import { StockHeader } from "@/components/stock/StockHeader"
 import { PriceChart } from "@/components/stock/PriceChart"
 import { StockMetrics } from "@/components/stock/StockMetrics"
@@ -38,6 +39,11 @@ interface StockDetailClientProps {
 export function StockDetailClient({ ticker, stockName }: StockDetailClientProps) {
   const [stock, setStock] = useState<StockData | null>(null)
   const [loading, setLoading] = useState(true)
+  const addRecentlyViewed = useRecentlyViewedStore((s) => s.addStock)
+
+  useEffect(() => {
+    addRecentlyViewed(ticker, stockName)
+  }, [ticker, stockName, addRecentlyViewed])
 
   useEffect(() => {
     async function fetchData() {

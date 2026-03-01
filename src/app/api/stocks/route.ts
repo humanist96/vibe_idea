@@ -34,6 +34,47 @@ async function enrichEntries(entries: readonly KrxStockEntry[]): Promise<Enriche
   })
 }
 
+function parseOptionalNumber(value: string | null): number | undefined {
+  if (!value) return undefined
+  const n = Number(value)
+  return isNaN(n) ? undefined : n
+}
+
+interface Tier2Filters {
+  readonly minPer?: number
+  readonly maxPer?: number
+  readonly minPbr?: number
+  readonly maxPbr?: number
+  readonly minDividendYield?: number
+  readonly maxDividendYield?: number
+  readonly minForeignRate?: number
+}
+
+function hasTier2Filters(t2: Tier2Filters): boolean {
+  return (
+    t2.minPer !== undefined ||
+    t2.maxPer !== undefined ||
+    t2.minPbr !== undefined ||
+    t2.maxPbr !== undefined ||
+    t2.minDividendYield !== undefined ||
+    t2.maxDividendYield !== undefined ||
+    t2.minForeignRate !== undefined
+  )
+}
+
+function applyTier2(stocks: EnrichedEntry[], t2: Tier2Filters): EnrichedEntry[] {
+  return stocks.filter((s) => {
+    if (t2.minPer !== undefined && (s.per === null || s.per < t2.minPer)) return false
+    if (t2.maxPer !== undefined && (s.per === null || s.per > t2.maxPer)) return false
+    if (t2.minPbr !== undefined && (s.pbr === null || s.pbr < t2.minPbr)) return false
+    if (t2.maxPbr !== undefined && (s.pbr === null || s.pbr > t2.maxPbr)) return false
+    if (t2.minDividendYield !== undefined && (s.dividendYield === null || s.dividendYield < t2.minDividendYield)) return false
+    if (t2.maxDividendYield !== undefined && (s.dividendYield === null || s.dividendYield > t2.maxDividendYield)) return false
+    if (t2.minForeignRate !== undefined && (s.foreignRate === null || s.foreignRate < t2.minForeignRate)) return false
+    return true
+  })
+}
+
 export async function GET(request: NextRequest) {
   try {
     await ensureLoaded()
@@ -63,14 +104,53 @@ export async function GET(request: NextRequest) {
       })
     }
 
+    const tier2: Tier2Filters = {
+      minPer: parseOptionalNumber(sp.get("minPer")),
+      maxPer: parseOptionalNumber(sp.get("maxPer")),
+      minPbr: parseOptionalNumber(sp.get("minPbr")),
+      maxPbr: parseOptionalNumber(sp.get("maxPbr")),
+      minDividendYield: parseOptionalNumber(sp.get("minDividendYield")),
+      maxDividendYield: parseOptionalNumber(sp.get("maxDividendYield")),
+      minForeignRate: parseOptionalNumber(sp.get("minForeignRate")),
+    }
+
+    const requestedLimit = Math.min(100, Math.max(1, Number(sp.get("limit")) || 50))
+    const useTier2 = hasTier2Filters(tier2)
+    const fetchLimit = useTier2 ? requestedLimit * 3 : requestedLimit
+
     const params: ScreenerParams = {
       page: Math.max(1, Number(sp.get("page")) || 1),
-      limit: Math.min(100, Math.max(1, Number(sp.get("limit")) || 50)),
+      limit: fetchLimit,
       market: (sp.get("market") as "ALL" | "KOSPI" | "KOSDAQ") || "ALL",
       sector: sp.get("sector") ?? "",
       sort: sp.get("sort") ?? "marketCap",
       order: (sp.get("order") as "asc" | "desc") || "desc",
       search: sp.get("search") ?? "",
+      minPrice: parseOptionalNumber(sp.get("minPrice")),
+      maxPrice: parseOptionalNumber(sp.get("maxPrice")),
+      minChangePercent: parseOptionalNumber(sp.get("minChangePercent")),
+      maxChangePercent: parseOptionalNumber(sp.get("maxChangePercent")),
+      minMarketCap: parseOptionalNumber(sp.get("minMarketCap")),
+      maxMarketCap: parseOptionalNumber(sp.get("maxMarketCap")),
+    }
+
+    if (useTier2) {
+      const overFetchParams = { ...params, page: 1, limit: fetchLimit }
+      const result = getScreenerStocks(overFetchParams)
+      const enriched = await enrichEntries(result.data)
+      const filtered = applyTier2(enriched, tier2)
+      const total = filtered.length
+      const totalPages = Math.max(1, Math.ceil(total / requestedLimit))
+      const requestedPage = Math.max(1, Number(sp.get("page")) || 1)
+      const page = Math.min(requestedPage, totalPages)
+      const start = (page - 1) * requestedLimit
+      const sliced = filtered.slice(start, start + requestedLimit)
+
+      return NextResponse.json({
+        success: true,
+        data: sliced,
+        meta: { total, page, limit: requestedLimit, totalPages },
+      })
     }
 
     const result = getScreenerStocks(params)

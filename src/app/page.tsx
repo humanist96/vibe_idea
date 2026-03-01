@@ -2,6 +2,7 @@ import { MarketOverview } from "@/components/dashboard/MarketOverview"
 import { TopStocksTable } from "@/components/dashboard/TopStocksTable"
 import { MarketSummary } from "@/components/dashboard/MarketSummary"
 import { InsiderActivityFeed } from "@/components/dashboard/InsiderActivityFeed"
+import { RecentlyViewedStocks } from "@/components/dashboard/RecentlyViewedStocks"
 
 export default function DashboardPage() {
   return (
@@ -18,6 +19,9 @@ export default function DashboardPage() {
 
       {/* Market indices */}
       <MarketOverview />
+
+      {/* Recently viewed stocks */}
+      <RecentlyViewedStocks />
 
       {/* Main content grid */}
       <div className="grid gap-6 lg:grid-cols-3">

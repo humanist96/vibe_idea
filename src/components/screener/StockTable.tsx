@@ -5,7 +5,8 @@ import Link from "next/link"
 import { PriceChange } from "@/components/ui/PriceChange"
 import { Badge } from "@/components/ui/Badge"
 import { formatCurrency, formatVolume, formatMarketCap } from "@/lib/utils/format"
-import { ChevronUp, ChevronDown } from "lucide-react"
+import { ChevronUp, ChevronDown, Star } from "lucide-react"
+import { useWatchlistStore } from "@/store/watchlist"
 
 interface StockRow {
   readonly ticker: string
@@ -32,6 +33,7 @@ interface StockTableProps {
 export function StockTable({ stocks }: StockTableProps) {
   const [sortField, setSortField] = useState<SortField>("marketCap")
   const [sortDir, setSortDir] = useState<SortDirection>("desc")
+  const { tickers: watchlist, addTicker, removeTicker } = useWatchlistStore()
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -39,6 +41,14 @@ export function StockTable({ stocks }: StockTableProps) {
     } else {
       setSortField(field)
       setSortDir("desc")
+    }
+  }
+
+  const toggleWatchlist = (ticker: string) => {
+    if (watchlist.includes(ticker)) {
+      removeTicker(ticker)
+    } else {
+      addTicker(ticker)
     }
   }
 
@@ -74,6 +84,9 @@ export function StockTable({ stocks }: StockTableProps) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-[var(--color-border-subtle)] text-left">
+            <th className="pb-3 pr-2 text-[10px] font-medium uppercase tracking-widest text-[var(--color-text-muted)]">
+              {/* Star column */}
+            </th>
             <th className="pb-3 pr-4 text-[10px] font-medium uppercase tracking-widest text-[var(--color-text-muted)]">
               #
             </th>
@@ -107,56 +120,74 @@ export function StockTable({ stocks }: StockTableProps) {
           </tr>
         </thead>
         <tbody>
-          {sorted.map((stock, index) => (
-            <tr
-              key={stock.ticker}
-              className="table-row-hover border-b border-[var(--color-border-subtle)]"
-            >
-              <td className="py-3 pr-4 text-xs tabular-nums text-[var(--color-text-muted)]">
-                {index + 1}
-              </td>
-              <td className="py-3 pr-4">
-                <Link href={`/stock/${stock.ticker}`} className="group">
-                  <p className="font-medium text-[var(--color-text-primary)] group-hover:text-[var(--color-accent-400)] transition-colors">
-                    {stock.name}
-                  </p>
-                  <p className="font-mono text-[10px] text-[var(--color-text-muted)]">
-                    {stock.ticker}
-                  </p>
-                </Link>
-              </td>
-              <td className="py-3 pr-4 text-right font-mono text-sm tabular-nums font-medium text-[var(--color-text-primary)]">
-                {formatCurrency(stock.price)}
-              </td>
-              <td className="py-3 pr-4 text-right">
-                <PriceChange
-                  change={stock.change}
-                  changePercent={stock.changePercent}
-                  showIcon={false}
-                />
-              </td>
-              <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)]">
-                {formatVolume(stock.volume)}
-              </td>
-              <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)]">
-                {formatMarketCap(stock.marketCap)}
-              </td>
-              <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)]">
-                {stock.per !== null ? stock.per.toFixed(1) : "--"}
-              </td>
-              <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)]">
-                {stock.pbr !== null ? stock.pbr.toFixed(2) : "--"}
-              </td>
-              <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)] hidden lg:table-cell">
-                {stock.dividendYield !== null ? `${stock.dividendYield.toFixed(2)}%` : "--"}
-              </td>
-              <td className="py-3">
-                <Badge variant={stock.market === "KOSPI" ? "blue" : "green"}>
-                  {stock.market}
-                </Badge>
-              </td>
-            </tr>
-          ))}
+          {sorted.map((stock, index) => {
+            const isWatched = watchlist.includes(stock.ticker)
+            return (
+              <tr
+                key={stock.ticker}
+                className="table-row-hover border-b border-[var(--color-border-subtle)]"
+              >
+                <td className="py-3 pr-2">
+                  <button
+                    type="button"
+                    onClick={() => toggleWatchlist(stock.ticker)}
+                    className="rounded p-0.5 transition-colors hover:text-yellow-400"
+                  >
+                    <Star
+                      className={`h-4 w-4 ${
+                        isWatched
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-[var(--color-text-muted)]"
+                      }`}
+                    />
+                  </button>
+                </td>
+                <td className="py-3 pr-4 text-xs tabular-nums text-[var(--color-text-muted)]">
+                  {index + 1}
+                </td>
+                <td className="py-3 pr-4">
+                  <Link href={`/stock/${stock.ticker}`} className="group">
+                    <p className="font-medium text-[var(--color-text-primary)] group-hover:text-[var(--color-accent-400)] transition-colors">
+                      {stock.name}
+                    </p>
+                    <p className="font-mono text-[10px] text-[var(--color-text-muted)]">
+                      {stock.ticker}
+                    </p>
+                  </Link>
+                </td>
+                <td className="py-3 pr-4 text-right font-mono text-sm tabular-nums font-medium text-[var(--color-text-primary)]">
+                  {formatCurrency(stock.price)}
+                </td>
+                <td className="py-3 pr-4 text-right">
+                  <PriceChange
+                    change={stock.change}
+                    changePercent={stock.changePercent}
+                    showIcon={false}
+                  />
+                </td>
+                <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)]">
+                  {formatVolume(stock.volume)}
+                </td>
+                <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)]">
+                  {formatMarketCap(stock.marketCap)}
+                </td>
+                <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)]">
+                  {stock.per !== null ? stock.per.toFixed(1) : "--"}
+                </td>
+                <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)]">
+                  {stock.pbr !== null ? stock.pbr.toFixed(2) : "--"}
+                </td>
+                <td className="py-3 pr-4 text-right font-mono text-xs tabular-nums text-[var(--color-text-secondary)] hidden lg:table-cell">
+                  {stock.dividendYield !== null ? `${stock.dividendYield.toFixed(2)}%` : "--"}
+                </td>
+                <td className="py-3">
+                  <Badge variant={stock.market === "KOSPI" ? "blue" : "green"}>
+                    {stock.market}
+                  </Badge>
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
 

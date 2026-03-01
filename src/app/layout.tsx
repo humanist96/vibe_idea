@@ -6,6 +6,8 @@ import { Sidebar } from "@/components/layout/Sidebar"
 import { Header } from "@/components/layout/Header"
 import { ToastContainer } from "@/components/ui/ToastContainer"
 import { InsiderPollingProvider } from "@/components/layout/InsiderPollingProvider"
+import { AuthProvider } from "@/components/providers/AuthProvider"
+import { SyncProvider } from "@/components/providers/SyncProvider"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,13 +40,17 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${urbanist.variable} antialiased`}
       >
-        <ToastContainer />
-        <InsiderPollingProvider />
-        <Sidebar />
-        <div className="lg:pl-64">
-          <Header />
-          <main className="p-4 lg:p-6">{children}</main>
-        </div>
+        <AuthProvider>
+          <SyncProvider>
+            <ToastContainer />
+            <InsiderPollingProvider />
+            <Sidebar />
+            <div className="lg:pl-64">
+              <Header />
+              <main className="p-4 lg:p-6">{children}</main>
+            </div>
+          </SyncProvider>
+        </AuthProvider>
       </body>
     </html>
   )

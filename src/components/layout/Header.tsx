@@ -6,6 +6,7 @@ import { Search, Bell } from "lucide-react"
 import { useDebouncedSearch } from "@/hooks/use-debounced-search"
 import { useNotificationStore } from "@/store/notifications"
 import { MobileNav } from "./MobileNav"
+import { UserMenu } from "@/components/auth/UserMenu"
 
 export function Header() {
   const router = useRouter()
@@ -197,6 +198,8 @@ export function Header() {
           </div>
         )}
       </div>
+
+      <UserMenu />
     </header>
   )
 }

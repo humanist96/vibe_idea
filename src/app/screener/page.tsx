@@ -1,11 +1,14 @@
 "use client"
 
-import { Suspense, useEffect, useState, useCallback } from "react"
+import { Suspense, useEffect, useState, useCallback, useRef } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Card } from "@/components/ui/Card"
-import { FilterPanel, type Filters } from "@/components/screener/FilterPanel"
+import { FilterPanel, type Filters, EMPTY_FILTERS } from "@/components/screener/FilterPanel"
+import { QuickPresets } from "@/components/screener/QuickPresets"
+import { SavedPresets } from "@/components/screener/SavedPresets"
 import { StockTable } from "@/components/screener/StockTable"
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
+import { useScreenerDefaultsStore } from "@/store/screener-defaults"
 
 interface StockData {
   readonly ticker: string
@@ -29,6 +32,64 @@ interface Meta {
   readonly totalPages: number
 }
 
+const FILTER_KEYS: readonly (keyof Filters)[] = [
+  "market", "sector", "minPrice", "maxPrice", "minPer", "maxPer",
+  "minPbr", "maxPbr", "minDividendYield", "maxDividendYield",
+  "minChangePercent", "maxChangePercent", "minMarketCap", "maxMarketCap",
+  "minForeignRate",
+]
+
+function filtersFromSearchParams(sp: URLSearchParams, defaults: Record<string, string>): Filters {
+  const hasAnyParam = FILTER_KEYS.some((k) => sp.has(k)) || sp.has("page") || sp.has("sort") || sp.has("order")
+
+  if (hasAnyParam) {
+    return {
+      market: (sp.get("market") as Filters["market"]) || "ALL",
+      sector: sp.get("sector") ?? "",
+      minPrice: sp.get("minPrice") ?? "",
+      maxPrice: sp.get("maxPrice") ?? "",
+      minPer: sp.get("minPer") ?? "",
+      maxPer: sp.get("maxPer") ?? "",
+      minPbr: sp.get("minPbr") ?? "",
+      maxPbr: sp.get("maxPbr") ?? "",
+      minDividendYield: sp.get("minDividendYield") ?? "",
+      maxDividendYield: sp.get("maxDividendYield") ?? "",
+      minChangePercent: sp.get("minChangePercent") ?? "",
+      maxChangePercent: sp.get("maxChangePercent") ?? "",
+      minMarketCap: sp.get("minMarketCap") ?? "",
+      maxMarketCap: sp.get("maxMarketCap") ?? "",
+      minForeignRate: sp.get("minForeignRate") ?? "",
+    }
+  }
+
+  return {
+    ...EMPTY_FILTERS,
+    market: (defaults.market as Filters["market"]) || "ALL",
+    sector: defaults.sector || "",
+    minPrice: defaults.minPrice || "",
+    maxPrice: defaults.maxPrice || "",
+    minPer: defaults.minPer || "",
+    maxPer: defaults.maxPer || "",
+    minPbr: defaults.minPbr || "",
+    maxPbr: defaults.maxPbr || "",
+    minDividendYield: defaults.minDividendYield || "",
+    maxDividendYield: defaults.maxDividendYield || "",
+    minChangePercent: defaults.minChangePercent || "",
+    maxChangePercent: defaults.maxChangePercent || "",
+    minMarketCap: defaults.minMarketCap || "",
+    maxMarketCap: defaults.maxMarketCap || "",
+    minForeignRate: defaults.minForeignRate || "",
+  }
+}
+
+function filtersToRecord(filters: Filters): Record<string, string> {
+  const record: Record<string, string> = {}
+  for (const [key, value] of Object.entries(filters)) {
+    if (value && value !== "ALL") record[key] = value
+  }
+  return record
+}
+
 function ScreenerContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -42,21 +103,34 @@ function ScreenerContent() {
     totalPages: 1,
   })
 
-  const currentPage = Number(searchParams.get("page")) || 1
-  const currentMarket =
-    (searchParams.get("market") as "ALL" | "KOSPI" | "KOSDAQ") || "ALL"
-  const currentSector = searchParams.get("sector") ?? ""
-  const currentSort = searchParams.get("sort") ?? "marketCap"
-  const currentOrder = (searchParams.get("order") as "asc" | "desc") || "desc"
+  const { lastFilters, lastSort, lastOrder, saveDefaults } = useScreenerDefaultsStore()
+  const defaultsRestoredRef = useRef(false)
 
-  const filters: Filters = {
-    market: currentMarket,
-    sector: currentSector,
-    minPrice: searchParams.get("minPrice") ?? "",
-    maxPrice: searchParams.get("maxPrice") ?? "",
-    minPer: searchParams.get("minPer") ?? "",
-    maxPer: searchParams.get("maxPer") ?? "",
-  }
+  const currentSort = searchParams.get("sort") ?? lastSort
+  const currentOrder = (searchParams.get("order") as "asc" | "desc") || lastOrder
+
+  const filters = filtersFromSearchParams(searchParams, lastFilters)
+
+  const currentPage = Number(searchParams.get("page")) || 1
+
+  // Restore defaults on first mount if no URL params
+  useEffect(() => {
+    if (defaultsRestoredRef.current) return
+    defaultsRestoredRef.current = true
+
+    const hasUrlParams = Array.from(searchParams.keys()).length > 0
+    if (!hasUrlParams && Object.keys(lastFilters).length > 0) {
+      const params = new URLSearchParams()
+      for (const [key, value] of Object.entries(lastFilters)) {
+        if (value) params.set(key, value)
+      }
+      if (lastSort !== "marketCap") params.set("sort", lastSort)
+      if (lastOrder !== "desc") params.set("order", lastOrder)
+      if (params.toString()) {
+        router.replace(`/screener?${params.toString()}`)
+      }
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateUrl = useCallback(
     (updates: Record<string, string>) => {
@@ -75,17 +149,16 @@ function ScreenerContent() {
 
   const handleFilterChange = useCallback(
     (newFilters: Filters) => {
-      updateUrl({
-        page: "1",
-        market: newFilters.market === "ALL" ? "" : newFilters.market,
-        sector: newFilters.sector,
-        minPrice: newFilters.minPrice,
-        maxPrice: newFilters.maxPrice,
-        minPer: newFilters.minPer,
-        maxPer: newFilters.maxPer,
-      })
+      const record = filtersToRecord(newFilters)
+      saveDefaults(record, currentSort, currentOrder)
+
+      const updates: Record<string, string> = { page: "1" }
+      for (const key of FILTER_KEYS) {
+        updates[key] = key === "market" && newFilters[key] === "ALL" ? "" : newFilters[key]
+      }
+      updateUrl(updates)
     },
-    [updateUrl]
+    [updateUrl, saveDefaults, currentSort, currentOrder]
   )
 
   const handlePageChange = useCallback(
@@ -117,37 +190,33 @@ function ScreenerContent() {
         const params = new URLSearchParams()
         params.set("page", String(currentPage))
         params.set("limit", "50")
-        if (currentMarket !== "ALL") params.set("market", currentMarket)
-        if (currentSector) params.set("sector", currentSector)
+
+        if (filters.market !== "ALL") params.set("market", filters.market)
+        if (filters.sector) params.set("sector", filters.sector)
         params.set("sort", currentSort)
         params.set("order", currentOrder)
 
-        const minPrice = searchParams.get("minPrice")
-        const maxPrice = searchParams.get("maxPrice")
-        const minPer = searchParams.get("minPer")
-        const maxPer = searchParams.get("maxPer")
+        // Tier 1 params (server-side in registry)
+        if (filters.minPrice) params.set("minPrice", filters.minPrice)
+        if (filters.maxPrice) params.set("maxPrice", filters.maxPrice)
+        if (filters.minChangePercent) params.set("minChangePercent", filters.minChangePercent)
+        if (filters.maxChangePercent) params.set("maxChangePercent", filters.maxChangePercent)
+        if (filters.minMarketCap) params.set("minMarketCap", filters.minMarketCap)
+        if (filters.maxMarketCap) params.set("maxMarketCap", filters.maxMarketCap)
+
+        // Tier 2 params (server-side post-enrichment)
+        if (filters.minPer) params.set("minPer", filters.minPer)
+        if (filters.maxPer) params.set("maxPer", filters.maxPer)
+        if (filters.minPbr) params.set("minPbr", filters.minPbr)
+        if (filters.maxPbr) params.set("maxPbr", filters.maxPbr)
+        if (filters.minDividendYield) params.set("minDividendYield", filters.minDividendYield)
+        if (filters.maxDividendYield) params.set("maxDividendYield", filters.maxDividendYield)
+        if (filters.minForeignRate) params.set("minForeignRate", filters.minForeignRate)
 
         const res = await fetch(`/api/stocks?${params.toString()}`)
         const json = await res.json()
         if (json.success) {
-          let data: StockData[] = json.data
-          if (minPrice) {
-            const min = Number(minPrice)
-            if (!isNaN(min)) data = data.filter((s) => s.price >= min)
-          }
-          if (maxPrice) {
-            const max = Number(maxPrice)
-            if (!isNaN(max)) data = data.filter((s) => s.price <= max)
-          }
-          if (minPer) {
-            const min = Number(minPer)
-            if (!isNaN(min)) data = data.filter((s) => s.per !== null && s.per >= min)
-          }
-          if (maxPer) {
-            const max = Number(maxPer)
-            if (!isNaN(max)) data = data.filter((s) => s.per !== null && s.per <= max)
-          }
-          setStocks(data)
+          setStocks(json.data)
           if (json.meta) {
             setMeta(json.meta)
           }
@@ -159,16 +228,29 @@ function ScreenerContent() {
       }
     }
     fetchData()
-  }, [currentPage, currentMarket, currentSector, currentSort, currentOrder, searchParams])
+    // Save current filter state
+    saveDefaults(filtersToRecord(filters), currentSort, currentOrder)
+  }, [currentPage, filters.market, filters.sector, currentSort, currentOrder,
+      filters.minPrice, filters.maxPrice, filters.minPer, filters.maxPer,
+      filters.minPbr, filters.maxPbr, filters.minDividendYield, filters.maxDividendYield,
+      filters.minChangePercent, filters.maxChangePercent,
+      filters.minMarketCap, filters.maxMarketCap, filters.minForeignRate]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
       <Card className="animate-fade-up stagger-2">
-        <FilterPanel
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          sectors={sectors}
-        />
+        <div className="space-y-3">
+          <FilterPanel
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            sectors={sectors}
+          />
+          <div className="flex flex-wrap items-center gap-4 border-t border-[var(--color-border-subtle)] pt-3">
+            <QuickPresets onApply={handleFilterChange} />
+            <div className="h-4 w-px bg-[var(--color-border-subtle)] hidden sm:block" />
+            <SavedPresets currentFilters={filters} onLoad={handleFilterChange} />
+          </div>
+        </div>
       </Card>
 
       <Card className="p-0 animate-fade-up stagger-3">
