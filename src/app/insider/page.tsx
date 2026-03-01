@@ -213,6 +213,7 @@ export default function InsiderPage() {
   const tickers = useWatchlistStore((s) => s.tickers)
   const [items, setItems] = useState<readonly TickerActivity[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [period, setPeriod] = useState<PeriodDays>(30)
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null)
   const [sortKey, setSortKey] = useState<SortKey>("date")
@@ -226,13 +227,17 @@ export default function InsiderPage() {
 
     async function fetchAll() {
       try {
+        setError(null)
         const res = await fetch("/api/insider/watchlist", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ tickers }),
         })
         const json = await res.json()
-        if (!json.success || !json.data || typeof json.data !== "object") return
+        if (!json.success || !json.data || typeof json.data !== "object") {
+          setError(json.error ?? "데이터를 불러오는데 실패했습니다")
+          return
+        }
 
         const all: TickerActivity[] = []
         for (const [ticker, activities] of Object.entries(json.data)) {
@@ -243,8 +248,9 @@ export default function InsiderPage() {
         }
 
         setItems(all)
-      } catch {
-        // silently fail
+      } catch (err) {
+        console.error("[insider page] fetch failed:", err)
+        setError("서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.")
       } finally {
         setLoading(false)
       }
@@ -338,6 +344,25 @@ export default function InsiderPage() {
           <LoadingSkeleton className="h-10 w-full" />
           <LoadingSkeleton className="h-10 w-full" />
         </div>
+      ) : error ? (
+        <Card className="animate-fade-up stagger-2">
+          <div className="py-12 text-center">
+            <p className="text-sm text-red-500">{error}</p>
+            <button
+              type="button"
+              onClick={() => {
+                setLoading(true)
+                setError(null)
+                setItems([])
+                // re-trigger useEffect by forcing re-render
+                window.location.reload()
+              }}
+              className="mt-3 inline-block text-sm font-medium text-[var(--color-accent-500)] transition-colors hover:text-[var(--color-accent-400)]"
+            >
+              다시 시도 →
+            </button>
+          </div>
+        </Card>
       ) : tickers.length === 0 ? (
         <Card className="animate-fade-up stagger-2">
           <div className="py-12 text-center">

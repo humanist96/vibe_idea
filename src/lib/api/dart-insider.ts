@@ -55,6 +55,7 @@ async function fetchExecutiveStock(
     const data = await res.json()
 
     if (data.status !== "000") {
+      console.error(`[DART] elestock status=${data.status} message=${data.message} corp=${corpCode}`)
       return []
     }
 
@@ -87,6 +88,7 @@ async function fetchMajorShareholderChanges(
     const data = await res.json()
 
     if (data.status !== "000") {
+      console.error(`[DART] hyslrChgSttus status=${data.status} message=${data.message} corp=${corpCode}`)
       return []
     }
 
@@ -149,7 +151,10 @@ export async function getInsiderActivities(
 
   await corpCodeRegistry.ensureLoaded()
   const corpCode = corpCodeRegistry.resolve(stockCode)
-  if (!corpCode) return []
+  if (!corpCode) {
+    console.error(`[DART] no corp code mapping for stockCode=${stockCode}`)
+    return []
+  }
 
   const [executives, majorChanges] = await Promise.all([
     fetchExecutiveStock(corpCode),

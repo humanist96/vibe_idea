@@ -81,19 +81,24 @@ function SortableTh({ label, sortKey, currentKey, currentDir, onSort, align = "l
 export function InsiderActivityTable({ ticker }: InsiderActivityTableProps) {
   const [activities, setActivities] = useState<InsiderActivity[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [sortKey, setSortKey] = useState<SortKey>("date")
   const [sortDir, setSortDir] = useState<SortDir>("desc")
 
   useEffect(() => {
     async function fetchInsider() {
       try {
+        setError(null)
         const res = await fetch(`/api/stocks/${ticker}/insider`)
         const json = await res.json()
         if (json.success) {
           setActivities(json.data)
+        } else {
+          setError(json.error ?? "데이터를 불러오는데 실패했습니다")
         }
-      } catch {
-        // silently fail
+      } catch (err) {
+        console.error("[InsiderActivityTable] fetch failed:", err)
+        setError("서버 연결에 실패했습니다")
       } finally {
         setLoading(false)
       }
@@ -148,7 +153,11 @@ export function InsiderActivityTable({ ticker }: InsiderActivityTableProps) {
         </CardTitle>
       </CardHeader>
 
-      {activities.length === 0 ? (
+      {error ? (
+        <p className="py-8 text-center text-sm text-red-500">
+          {error}
+        </p>
+      ) : activities.length === 0 ? (
         <p className="py-8 text-center text-sm text-[var(--color-text-tertiary)]">
           내부자 거래 내역이 없습니다
         </p>
