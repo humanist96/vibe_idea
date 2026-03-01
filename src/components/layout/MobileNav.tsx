@@ -161,7 +161,7 @@ export function MobileNav() {
                     </svg>
                   </div>
                   <span className="font-display text-lg font-bold text-slate-900">
-                    KoreaStock<span className="text-amber-500">AI</span>
+                    <span className="text-slate-400">&gt;koscom</span>{" "}Invest<span className="text-amber-500">Hub</span>
                   </span>
                 </div>
                 <button
@@ -229,9 +229,9 @@ export function MobileNav() {
                 }}
               >
                 <p className="text-[10px] leading-relaxed text-slate-400">
-                  AI 분석은 투자 참고용이며
+                  &copy; 2026 Koscom. All rights reserved.
                   <br />
-                  투자 책임은 본인에게 있습니다.
+                  AI 분석은 투자 참고용이며 투자 책임은 본인에게 있습니다.
                 </p>
               </div>
             </div>

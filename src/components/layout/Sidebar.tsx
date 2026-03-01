@@ -35,7 +35,7 @@ export function Sidebar({ className }: SidebarProps) {
           </svg>
         </div>
         <Link href="/" className="font-display text-lg font-bold tracking-tight text-[var(--color-text-primary)]">
-          KoreaStock<span className="text-[var(--color-accent-500)]">AI</span>
+          <span className="text-[var(--color-text-muted)]">&gt;koscom</span>{" "}Invest<span className="text-[var(--color-accent-500)]">Hub</span>
         </Link>
       </div>
 
@@ -44,9 +44,9 @@ export function Sidebar({ className }: SidebarProps) {
       {/* Footer disclaimer */}
       <div className="mt-auto border-t border-[var(--color-border-subtle)] px-6 py-4">
         <p className="text-[10px] leading-relaxed text-[var(--color-text-muted)]">
-          AI 분석은 투자 참고용이며
+          &copy; 2026 Koscom. All rights reserved.
           <br />
-          투자 책임은 본인에게 있습니다.
+          AI 분석은 투자 참고용이며 투자 책임은 본인에게 있습니다.
         </p>
       </div>
     </aside>

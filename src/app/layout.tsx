@@ -24,8 +24,8 @@ const urbanist = Urbanist({
 })
 
 export const metadata: Metadata = {
-  title: "KoreaStockAI - AI 한국 주식 분석",
-  description: "AI 기반 한국 주식(KOSPI/KOSDAQ) 분석 및 스코어링 서비스",
+  title: ">koscom InvestHub - AI 투자정보서비스",
+  description: "코스콤이 만든 AI 기반 한국 주식(KOSPI/KOSDAQ) 투자정보 서비스",
 }
 
 export default function RootLayout({

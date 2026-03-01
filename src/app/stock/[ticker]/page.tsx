@@ -13,8 +13,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const stock = findStock(ticker)
   return {
     title: stock
-      ? `${stock.name} (${stock.ticker}) - KoreaStockAI`
-      : "종목 상세 - KoreaStockAI",
+      ? `${stock.name} (${stock.ticker}) - >koscom InvestHub`
+      : "종목 상세 - >koscom InvestHub",
   }
 }
 
