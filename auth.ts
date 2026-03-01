@@ -1,33 +1,61 @@
 import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import Google from "next-auth/providers/google"
-import Kakao from "next-auth/providers/kakao"
+import Credentials from "next-auth/providers/credentials"
+import bcrypt from "bcryptjs"
+import { z } from "zod"
 import { prisma } from "@/lib/db/prisma"
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+})
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
+  session: { strategy: "jwt" },
   providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    }),
-    Kakao({
-      clientId: process.env.KAKAO_CLIENT_ID,
-      clientSecret: process.env.KAKAO_CLIENT_SECRET,
+    Credentials({
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      authorize: async (credentials) => {
+        const parsed = loginSchema.safeParse(credentials)
+        if (!parsed.success) return null
+
+        const { email, password } = parsed.data
+
+        const user = await prisma.user.findUnique({ where: { email } })
+        if (!user || !user.password) return null
+
+        const isValid = await bcrypt.compare(password, user.password)
+        if (!isValid) return null
+
+        return { id: user.id, name: user.name, email: user.email }
+      },
     }),
   ],
   pages: {
     signIn: "/login",
   },
   callbacks: {
-    session({ session, user }) {
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          id: user.id,
-        },
+    jwt({ token, user }) {
+      if (user?.id) {
+        token.sub = user.id
       }
+      return token
+    },
+    session({ session, token }) {
+      if (token.sub) {
+        return {
+          ...session,
+          user: {
+            ...session.user,
+            id: token.sub,
+          },
+        }
+      }
+      return session
     },
   },
 })

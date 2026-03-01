@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from "next/server"
 export function middleware(req: NextRequest) {
   const sessionCookie =
     req.cookies.get("authjs.session-token") ??
-    req.cookies.get("__Secure-authjs.session-token")
+    req.cookies.get("__Secure-authjs.session-token") ??
+    req.cookies.get("authjs.callback-url")
 
   if (!sessionCookie) {
     return NextResponse.json(
