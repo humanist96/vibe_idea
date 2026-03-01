@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs"
 import { z } from "zod"
 import { prisma } from "@/lib/db/prisma"
 
+export const runtime = "nodejs"
+
 const registerSchema = z.object({
   name: z.string().min(1, "이름을 입력해주세요"),
   email: z.string().email("올바른 이메일을 입력해주세요"),
@@ -36,9 +38,11 @@ export async function POST(req: Request) {
     })
 
     return NextResponse.json({ success: true })
-  } catch {
+  } catch (error) {
+    console.error("[register] error:", error)
+    const message = error instanceof Error ? error.message : "서버 오류가 발생했습니다"
     return NextResponse.json(
-      { success: false, error: "서버 오류가 발생했습니다" },
+      { success: false, error: message },
       { status: 500 }
     )
   }
