@@ -108,8 +108,9 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error("Chat API error:", error)
+    const detail = error instanceof Error ? error.message : String(error)
     return new Response(
-      JSON.stringify({ error: "채팅 처리 중 오류가 발생했습니다." }),
+      JSON.stringify({ error: "채팅 처리 중 오류가 발생했습니다.", detail }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     )
   }
