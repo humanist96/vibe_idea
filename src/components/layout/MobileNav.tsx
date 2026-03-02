@@ -22,6 +22,7 @@ import {
   Grid3X3,
   TrendingUp,
   Layers,
+  MessageCircle,
   LogIn,
   LogOut,
   User,
@@ -42,6 +43,7 @@ const navSections: readonly NavSection[] = [
   {
     items: [
       { href: "/", label: "대시보드", icon: LayoutDashboard },
+      { href: "/chat", label: "AI 어시스턴트", icon: MessageCircle },
       { href: "/screener", label: "스크리너", icon: Search },
       { href: "/watchlist", label: "관심종목", icon: Star },
       { href: "/events", label: "기업 이벤트", icon: Bell },
