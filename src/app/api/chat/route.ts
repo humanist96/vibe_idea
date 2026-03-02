@@ -13,6 +13,64 @@ interface ChatRequestBody {
   readonly watchlistTickers?: readonly string[]
 }
 
+/** Gemini 스트리밍 호출 — 429 시 최대 2회 재시도 */
+async function callGeminiWithRetry(
+  apiKey: string,
+  systemPrompt: string,
+  history: readonly { role: "user" | "model"; parts: { text: string }[] }[],
+  userMessage: string,
+  maxRetries = 2
+) {
+  const genAI = new GoogleGenerativeAI(apiKey)
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash",
+    systemInstruction: {
+      role: "user",
+      parts: [{ text: systemPrompt }],
+    },
+  })
+
+  let lastError: unknown = null
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const chat = model.startChat({ history: [...history] })
+      return await chat.sendMessageStream(userMessage)
+    } catch (error) {
+      lastError = error
+      const errMsg = error instanceof Error ? error.message : String(error)
+
+      // 429 Rate Limit — 재시도 가능
+      if (errMsg.includes("429") && attempt < maxRetries) {
+        const waitSec = Math.min(5 * (attempt + 1), 20)
+        console.warn(`Gemini 429 rate limit, retrying in ${waitSec}s (attempt ${attempt + 1}/${maxRetries})`)
+        await new Promise((resolve) => setTimeout(resolve, waitSec * 1000))
+        continue
+      }
+
+      throw error
+    }
+  }
+
+  throw lastError
+}
+
+/** 에러 메시지에서 사용자 친화적 메시지 추출 */
+function getUserFriendlyError(error: unknown): string {
+  const msg = error instanceof Error ? error.message : String(error)
+
+  if (msg.includes("429")) {
+    return "AI 서비스 요청 한도에 도달했습니다. 잠시 후 다시 시도해주세요."
+  }
+  if (msg.includes("API_KEY") || msg.includes("401") || msg.includes("403")) {
+    return "AI 서비스 인증에 문제가 발생했습니다."
+  }
+  if (msg.includes("timeout") || msg.includes("ETIMEDOUT")) {
+    return "AI 서비스 응답 시간이 초과되었습니다. 다시 시도해주세요."
+  }
+  return "채팅 처리 중 오류가 발생했습니다."
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as ChatRequestBody
@@ -64,23 +122,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-      systemInstruction: {
-        role: "user",
-        parts: [{ text: systemPrompt }],
-      },
-    })
-
     // 대화 이력 구성
     const history = messages.slice(0, -1).map((m) => ({
       role: m.role === "assistant" ? ("model" as const) : ("user" as const),
       parts: [{ text: m.content }],
     }))
 
-    const chat = model.startChat({ history })
-    const streamResult = await chat.sendMessageStream(lastMessage.content)
+    const streamResult = await callGeminiWithRetry(
+      apiKey,
+      systemPrompt,
+      history,
+      lastMessage.content
+    )
 
     // ReadableStream으로 변환
     const stream = new ReadableStream({
@@ -108,9 +161,8 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error("Chat API error:", error)
-    const detail = error instanceof Error ? error.message : String(error)
     return new Response(
-      JSON.stringify({ error: "채팅 처리 중 오류가 발생했습니다.", detail }),
+      JSON.stringify({ error: getUserFriendlyError(error) }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     )
   }
