@@ -25,6 +25,13 @@ export default function DashboardPage() {
       {/* Market Bar: indices + ticker tape */}
       <MarketBar />
 
+      {/* AI 핵심 카드: 관심종목 + 뉴스 임팩트 + 리스크 레이더 */}
+      <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 animate-fade-up stagger-2">
+        <WatchlistQuickView />
+        <NewsImpactCard />
+        <RiskRadarCard />
+      </div>
+
       {/* Recently viewed stocks */}
       <RecentlyViewedStocks />
 
@@ -35,10 +42,7 @@ export default function DashboardPage() {
         </div>
         <div className="space-y-6 animate-fade-up stagger-5">
           <FearGreedGauge />
-          <WatchlistQuickView />
-          <NewsImpactCard />
           <MarketSummary />
-          <RiskRadarCard />
           <IpoWidget />
           <InsiderActivityFeed />
         </div>
