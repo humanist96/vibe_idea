@@ -1,11 +1,15 @@
 "use client"
 
 import { useRef, useEffect, useCallback, useState } from "react"
-import { Bot, RotateCcw } from "lucide-react"
+import { Bot, RotateCcw, History, Trash2 } from "lucide-react"
 import { ChatMessage } from "./ChatMessage"
 import { ChatInput } from "./ChatInput"
 import { QuickActions } from "./QuickActions"
 import { useWatchlistStore } from "@/store/watchlist"
+import { useChatHistoryStore } from "@/store/chat-history"
+import { useMarketMode } from "@/store/market-mode"
+import type { ChatMessage as ChatMsg } from "@/store/chat-history"
+import { cn } from "@/lib/utils/cn"
 
 interface Message {
   readonly id: string
@@ -16,10 +20,31 @@ interface Message {
 export function ChatWindow() {
   const scrollRef = useRef<HTMLDivElement>(null)
   const tickers = useWatchlistStore((s) => s.tickers)
+  const marketMode = useMarketMode((s) => s.mode)
   const [messages, setMessages] = useState<Message[]>([])
   const [isStreaming, setIsStreaming] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
 
-  // 자동 스크롤
+  const {
+    sessions,
+    activeSessionId,
+    createSession,
+    setActiveSession,
+    addMessage: addToHistory,
+    updateMessage: updateInHistory,
+    deleteSession,
+    getActiveSession,
+  } = useChatHistoryStore()
+
+  // Load messages from active session on mount / session change
+  useEffect(() => {
+    const session = getActiveSession()
+    if (session) {
+      setMessages(session.messages.map((m) => ({ ...m })))
+    }
+  }, [activeSessionId, getActiveSession])
+
+  // Auto scroll
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
@@ -30,6 +55,11 @@ export function ChatWindow() {
     async (message: string) => {
       if (isStreaming) return
 
+      let sessionId = activeSessionId
+      if (!sessionId) {
+        sessionId = createSession()
+      }
+
       const userMsg: Message = {
         id: `user-${Date.now()}`,
         role: "user",
@@ -38,6 +68,7 @@ export function ChatWindow() {
 
       const updatedMessages = [...messages, userMsg]
       setMessages(updatedMessages)
+      addToHistory(sessionId, userMsg as ChatMsg)
       setIsStreaming(true)
 
       try {
@@ -50,6 +81,7 @@ export function ChatWindow() {
               content: m.content,
             })),
             watchlistTickers: tickers,
+            marketMode,
           }),
         })
 
@@ -59,23 +91,22 @@ export function ChatWindow() {
 
         const contentType = res.headers.get("content-type")
 
-        // 컴플라이언스 차단 응답 (JSON)
+        // Compliance blocked response (JSON)
         if (contentType?.includes("application/json")) {
           const json = await res.json()
           if (json.blocked) {
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: `blocked-${Date.now()}`,
-                role: "assistant",
-                content: json.message,
-              },
-            ])
+            const blockedMsg: Message = {
+              id: `blocked-${Date.now()}`,
+              role: "assistant",
+              content: json.message,
+            }
+            setMessages((prev) => [...prev, blockedMsg])
+            addToHistory(sessionId!, blockedMsg as ChatMsg)
             return
           }
         }
 
-        // 스트리밍 응답 처리
+        // Streaming response
         if (!res.body) {
           throw new Error("No response body")
         }
@@ -85,11 +116,9 @@ export function ChatWindow() {
         const assistantId = `assistant-${Date.now()}`
         let accumulated = ""
 
-        // 빈 assistant 메시지 추가
-        setMessages((prev) => [
-          ...prev,
-          { id: assistantId, role: "assistant", content: "" },
-        ])
+        const emptyAssistant: Message = { id: assistantId, role: "assistant", content: "" }
+        setMessages((prev) => [...prev, emptyAssistant])
+        addToHistory(sessionId!, emptyAssistant as ChatMsg)
 
         while (true) {
           const { done, value } = await reader.read()
@@ -104,22 +133,23 @@ export function ChatWindow() {
             )
           )
         }
-      } catch (error) {
-        console.error("Chat error:", error)
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `error-${Date.now()}`,
-            role: "assistant",
-            content:
-              "죄송합니다. 응답 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
-          },
-        ])
+
+        // Save final accumulated content
+        updateInHistory(sessionId!, assistantId, accumulated)
+      } catch {
+        const errorMsg: Message = {
+          id: `error-${Date.now()}`,
+          role: "assistant",
+          content:
+            "죄송합니다. 응답 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+        }
+        setMessages((prev) => [...prev, errorMsg])
+        addToHistory(sessionId!, errorMsg as ChatMsg)
       } finally {
         setIsStreaming(false)
       }
     },
-    [isStreaming, messages, tickers]
+    [isStreaming, messages, tickers, marketMode, activeSessionId, createSession, addToHistory, updateInHistory]
   )
 
   const handleQuickAction = useCallback(
@@ -131,7 +161,16 @@ export function ChatWindow() {
 
   const handleReset = useCallback(() => {
     setMessages([])
-  }, [])
+    setActiveSession(null)
+  }, [setActiveSession])
+
+  const handleLoadSession = useCallback(
+    (sessionId: string) => {
+      setActiveSession(sessionId)
+      setShowHistory(false)
+    },
+    [setActiveSession]
+  )
 
   const isEmpty = messages.length === 0
 
@@ -140,7 +179,7 @@ export function ChatWindow() {
       {/* Messages area */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6">
         {isEmpty ? (
-          <EmptyState onQuickAction={handleQuickAction} />
+          <EmptyState onQuickAction={handleQuickAction} marketMode={marketMode} />
         ) : (
           <div className="mx-auto max-w-3xl space-y-6">
             {messages.map((message, i) => (
@@ -168,16 +207,76 @@ export function ChatWindow() {
         <div className="mx-auto max-w-3xl space-y-3">
           {!isEmpty && (
             <div className="flex items-center justify-between">
-              <QuickActions onSelect={handleQuickAction} />
+              <QuickActions onSelect={handleQuickAction} marketMode={marketMode} />
+              <div className="flex items-center gap-2">
+                {sessions.length > 0 && (
+                  <button
+                    onClick={() => setShowHistory((v) => !v)}
+                    className="flex items-center gap-1 text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
+                  >
+                    <History size={12} />
+                    이전 대화
+                  </button>
+                )}
+                <button
+                  onClick={handleReset}
+                  className="flex items-center gap-1 text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
+                >
+                  <RotateCcw size={12} />
+                  새 대화
+                </button>
+              </div>
+            </div>
+          )}
+          {isEmpty && sessions.length > 0 && (
+            <div className="flex justify-end">
               <button
-                onClick={handleReset}
+                onClick={() => setShowHistory((v) => !v)}
                 className="flex items-center gap-1 text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
               >
-                <RotateCcw size={12} />
-                새 대화
+                <History size={12} />
+                이전 대화 ({sessions.length})
               </button>
             </div>
           )}
+
+          {/* History panel */}
+          {showHistory && (
+            <div className="glass-card max-h-48 overflow-y-auto rounded-xl p-2">
+              {sessions.slice(0, 20).map((session) => (
+                <div
+                  key={session.id}
+                  className={cn(
+                    "flex items-center justify-between rounded-lg px-3 py-2 transition-colors",
+                    session.id === activeSessionId
+                      ? "bg-[var(--color-accent-400)]/10"
+                      : "hover:bg-[var(--color-surface-50)]"
+                  )}
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleLoadSession(session.id)}
+                    className="min-w-0 flex-1 text-left"
+                  >
+                    <p className="truncate text-xs font-medium text-[var(--color-text-primary)]">
+                      {session.title}
+                    </p>
+                    <p className="text-[10px] text-[var(--color-text-tertiary)]">
+                      {new Date(session.updatedAt).toLocaleDateString("ko-KR")} · {session.messages.length}개 메시지
+                    </p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deleteSession(session.id)}
+                    className="ml-2 shrink-0 rounded p-1 text-[var(--color-text-muted)] hover:text-[var(--color-gain)]"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <ChatInput onSend={handleSend} disabled={isStreaming} />
           <p className="text-center text-[10px] text-[var(--color-text-tertiary)]">
             AI 분석은 투자 참고용이며 투자 권유가 아닙니다. 투자 손실의 책임은
@@ -191,8 +290,10 @@ export function ChatWindow() {
 
 function EmptyState({
   onQuickAction,
+  marketMode,
 }: {
   readonly onQuickAction: (message: string) => void
+  readonly marketMode: "kr" | "us"
 }) {
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center justify-center py-20 animate-fade-up">
@@ -203,11 +304,13 @@ function EmptyState({
         InvestHub AI
       </h2>
       <p className="mb-8 text-center text-sm text-[var(--color-text-secondary)]">
-        한국 주식 시장 AI 투자정보 어시스턴트입니다.
+        {marketMode === "us"
+          ? "미국 주식 시장 AI 투자정보 어시스턴트입니다."
+          : "한국 주식 시장 AI 투자정보 어시스턴트입니다."}
         <br />
         종목 분석, 시장 동향, 투자 교육 등을 도와드립니다.
       </p>
-      <QuickActions onSelect={onQuickAction} />
+      <QuickActions onSelect={onQuickAction} marketMode={marketMode} />
     </div>
   )
 }

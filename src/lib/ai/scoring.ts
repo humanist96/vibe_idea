@@ -3,7 +3,7 @@ import { getQuote, getHistorical } from "@/lib/api/naver-finance"
 import { getCompanyOverview, getFinancialStatements } from "@/lib/api/dart"
 import { getNaverNews } from "@/lib/api/naver-news"
 import { getGoogleNews } from "@/lib/api/google-news"
-import { generateAIAnalysis } from "@/lib/api/gemini"
+import { generateAIAnalysis } from "@/lib/api/openai"
 import {
   calculateTechnicalIndicators,
   getTechnicalScore,

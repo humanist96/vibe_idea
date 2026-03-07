@@ -8,8 +8,10 @@ import { Badge } from "@/components/ui/Badge"
 import { AddToWatchlist } from "@/components/watchlist/AddToWatchlist"
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
 import { useWatchlistStore } from "@/store/watchlist"
+import { useUSWatchlistStore } from "@/store/us-watchlist"
+import { useMarketMode } from "@/store/market-mode"
 import { formatCurrency } from "@/lib/utils/format"
-import { Star, ArrowRight } from "lucide-react"
+import { EmptyWatchlist } from "@/components/ui/EmptyWatchlist"
 
 interface StockData {
   readonly ticker: string
@@ -21,42 +23,91 @@ interface StockData {
   readonly sector: string
 }
 
+interface USStockData {
+  readonly symbol: string
+  readonly name: string
+  readonly nameKr: string
+  readonly price: number
+  readonly change: number
+  readonly changePercent: number
+  readonly sector: string
+  readonly exchange: string
+}
+
 export default function WatchlistPage() {
-  const { tickers } = useWatchlistStore()
-  const [stocks, setStocks] = useState<StockData[]>([])
+  const { mode } = useMarketMode()
+  const krTickers = useWatchlistStore((s) => s.tickers)
+  const usTickers = useUSWatchlistStore((s) => s.tickers)
+
+  const tickers = mode === "us" ? usTickers : krTickers
+  const isUS = mode === "us"
+
+  const [krStocks, setKrStocks] = useState<StockData[]>([])
+  const [usStocks, setUsStocks] = useState<USStockData[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchData() {
       if (tickers.length === 0) {
-        setStocks([])
+        setKrStocks([])
+        setUsStocks([])
         setLoading(false)
         return
       }
 
       try {
-        const results = await Promise.all(
-          tickers.map(async (ticker) => {
-            try {
-              const res = await fetch(`/api/stocks/${ticker}`)
-              const json = await res.json()
-              if (json.success) return json.data as StockData
-              return null
-            } catch {
-              return null
-            }
-          })
-        )
-
-        setStocks(results.filter((s): s is StockData => s !== null))
+        if (isUS) {
+          const results = await Promise.all(
+            tickers.map(async (ticker) => {
+              try {
+                const res = await fetch(`/api/us-stocks/${ticker}`)
+                const json = await res.json()
+                if (json.success) {
+                  const d = json.data
+                  const q = d.quote ?? {}
+                  return {
+                    symbol: d.symbol,
+                    name: d.name,
+                    nameKr: d.nameKr ?? d.name,
+                    price: q.price ?? 0,
+                    change: q.change ?? 0,
+                    changePercent: q.changePercent ?? 0,
+                    sector: d.sector ?? "",
+                    exchange: d.exchange ?? "",
+                  } as USStockData
+                }
+                return null
+              } catch {
+                return null
+              }
+            })
+          )
+          setUsStocks(results.filter((s): s is USStockData => s !== null))
+        } else {
+          const results = await Promise.all(
+            tickers.map(async (ticker) => {
+              try {
+                const res = await fetch(`/api/stocks/${ticker}`)
+                const json = await res.json()
+                if (json.success) return json.data as StockData
+                return null
+              } catch {
+                return null
+              }
+            })
+          )
+          setKrStocks(results.filter((s): s is StockData => s !== null))
+        }
       } catch {
         // silently fail
       } finally {
         setLoading(false)
       }
     }
+
+    setLoading(true)
     fetchData()
-  }, [tickers])
+  }, [tickers, isUS])
 
   return (
     <div className="space-y-6">
@@ -65,7 +116,7 @@ export default function WatchlistPage() {
           관심종목
         </h1>
         <p className="mt-1 text-sm text-[var(--color-text-tertiary)]">
-          관심 등록한 종목 모아보기 ({tickers.length}개)
+          관심 등록한 {isUS ? "해외" : "국내"} 종목 모아보기 ({tickers.length}개)
         </p>
       </div>
 
@@ -77,28 +128,46 @@ export default function WatchlistPage() {
         </div>
       ) : tickers.length === 0 ? (
         <Card className="animate-fade-up stagger-2">
-          <div className="flex flex-col items-center gap-3 py-16">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-glass-2)]">
-              <Star className="h-7 w-7 text-[var(--color-text-muted)]" />
-            </div>
-            <p className="text-sm text-[var(--color-text-secondary)]">
-              관심종목이 없습니다.
-            </p>
-            <p className="text-xs text-[var(--color-text-muted)]">
-              종목 페이지에서 별표를 클릭하여 추가하세요.
-            </p>
-            <Link
-              href="/screener"
-              className="group mt-2 flex items-center gap-1 text-sm font-medium text-[var(--color-accent-400)] hover:text-[var(--color-accent-300)] transition-colors"
-            >
-              스크리너에서 종목 찾기
-              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </div>
+          <EmptyWatchlist />
         </Card>
+      ) : isUS ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {usStocks.map((stock, i) => (
+            <Card
+              key={stock.symbol}
+              className={`animate-fade-up glass-card-hover stagger-${Math.min(i + 1, 6)}`}
+            >
+              <div className="flex items-start justify-between">
+                <Link href={`/us-stocks/${stock.symbol}`} className="group flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-[var(--color-text-primary)] group-hover:text-[var(--color-accent-400)] transition-colors">
+                      {stock.nameKr}
+                    </p>
+                    <Badge variant="blue">
+                      {stock.exchange}
+                    </Badge>
+                  </div>
+                  <p className="mt-0.5 font-mono text-[10px] text-[var(--color-text-muted)]">
+                    {stock.symbol}
+                  </p>
+                </Link>
+              </div>
+              <div className="mt-3 flex items-baseline gap-2">
+                <span className="font-display text-xl font-bold tabular-nums text-[var(--color-text-primary)]">
+                  ${stock.price.toFixed(2)}
+                </span>
+                <PriceChange
+                  change={stock.change}
+                  changePercent={stock.changePercent}
+                  className="text-sm"
+                />
+              </div>
+            </Card>
+          ))}
+        </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {stocks.map((stock, i) => (
+          {krStocks.map((stock, i) => (
             <Card
               key={stock.ticker}
               className={`animate-fade-up glass-card-hover stagger-${Math.min(i + 1, 6)}`}

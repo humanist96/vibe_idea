@@ -28,6 +28,9 @@ const GLOBAL_INDICATORS: readonly FredSeriesConfig[] = [
   { name: "Dollar Index", nameKr: "달러 인덱스", seriesId: "DTWEXBGS", unit: "지수" },
   { name: "WTI Crude Oil", nameKr: "WTI 유가", seriesId: "DCOILWTICO", unit: "$/barrel" },
   { name: "Gold Price", nameKr: "금 가격", seriesId: "GOLDAMGBD228NLBM", unit: "$/oz" },
+  { name: "Silver Price", nameKr: "은 가격", seriesId: "SLRNUSS", unit: "$/oz" },
+  { name: "Copper Price", nameKr: "구리 가격", seriesId: "PCOPPUSDM", unit: "$/lb" },
+  { name: "Natural Gas", nameKr: "천연가스", seriesId: "DHHNGSP", unit: "$/MMBtu" },
 ]
 
 async function fetchFredSeries(

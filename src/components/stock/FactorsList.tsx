@@ -9,17 +9,17 @@ interface FactorsListProps {
 const impactConfig = {
   positive: {
     icon: TrendingUp,
-    color: "text-emerald-600",
-    bg: "bg-emerald-50",
-    ring: "ring-emerald-100",
-    dotColor: "bg-emerald-500",
-  },
-  negative: {
-    icon: TrendingDown,
     color: "text-red-600",
     bg: "bg-red-50",
     ring: "ring-red-100",
     dotColor: "bg-red-500",
+  },
+  negative: {
+    icon: TrendingDown,
+    color: "text-blue-600",
+    bg: "bg-blue-50",
+    ring: "ring-blue-100",
+    dotColor: "bg-blue-500",
   },
   neutral: {
     icon: Minus,

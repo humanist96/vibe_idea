@@ -38,6 +38,11 @@ const KOREAN_INDICATORS: readonly EcosSeriesConfig[] = [
   { name: "원/달러 환율", nameEn: "USD/KRW", statCode: "731Y001", itemCode: "0000001", unit: "원", freq: "D" },
   { name: "소비자물가지수", nameEn: "CPI", statCode: "901Y009", itemCode: "0", unit: "지수", freq: "M" },
   { name: "M2 통화량", nameEn: "M2", statCode: "101Y018", itemCode: "BBGA00", unit: "십억원", freq: "M" },
+  { name: "GDP 성장률", nameEn: "GDP Growth", statCode: "200Y002", itemCode: "10111", unit: "%", freq: "M" },
+  { name: "실업률", nameEn: "Unemployment Rate", statCode: "901Y027", itemCode: "3734000", unit: "%", freq: "M" },
+  { name: "수출금액", nameEn: "Exports", statCode: "403Y003", itemCode: "0000000", unit: "백만달러", freq: "M" },
+  { name: "소비자심리지수", nameEn: "Consumer Sentiment", statCode: "511Y002", itemCode: "FME/AM/CSDI", unit: "지수", freq: "M" },
+  { name: "생산자물가지수", nameEn: "PPI", statCode: "901Y010", itemCode: "0", unit: "지수", freq: "M" },
 ]
 
 async function fetchEcosSeries(

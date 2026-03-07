@@ -1,8 +1,11 @@
-import { MarketOverview } from "@/components/dashboard/MarketOverview"
+import { MarketBar } from "@/components/dashboard/MarketBar"
 import { TopStocksTable } from "@/components/dashboard/TopStocksTable"
 import { MarketSummary } from "@/components/dashboard/MarketSummary"
 import { InsiderActivityFeed } from "@/components/dashboard/InsiderActivityFeed"
 import { RecentlyViewedStocks } from "@/components/dashboard/RecentlyViewedStocks"
+import { FearGreedGauge } from "@/components/dashboard/FearGreedGauge"
+import { WatchlistQuickView } from "@/components/dashboard/WatchlistQuickView"
+import { IpoWidget } from "@/components/dashboard/IpoWidget"
 
 export default function DashboardPage() {
   return (
@@ -17,8 +20,8 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Market indices */}
-      <MarketOverview />
+      {/* Market Bar: indices + ticker tape */}
+      <MarketBar />
 
       {/* Recently viewed stocks */}
       <RecentlyViewedStocks />
@@ -29,7 +32,10 @@ export default function DashboardPage() {
           <TopStocksTable />
         </div>
         <div className="space-y-6 animate-fade-up stagger-5">
+          <FearGreedGauge />
+          <WatchlistQuickView />
           <MarketSummary />
+          <IpoWidget />
           <InsiderActivityFeed />
         </div>
       </div>

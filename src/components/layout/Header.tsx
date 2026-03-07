@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Search, Bell } from "lucide-react"
+import type { NotificationType } from "@/store/notifications"
 import { useDebouncedSearch } from "@/hooks/use-debounced-search"
 import { useNotificationStore } from "@/store/notifications"
 import { MobileNav } from "./MobileNav"
@@ -52,13 +53,24 @@ export function Header() {
   )
 
   const handleNotificationClick = useCallback(
-    (id: string, ticker: string) => {
+    (id: string, ticker: string, type: NotificationType) => {
       markAsRead(id)
       setShowNotifications(false)
-      router.push(`/stock/${ticker}`)
+      if (ticker) {
+        router.push(`/stock/${ticker}`)
+      } else if (type === "market_alert") {
+        router.push("/")
+      }
     },
     [router, markAsRead]
   )
+
+  const dotColorMap: Record<NotificationType, string> = {
+    price_surge: "bg-emerald-500",
+    price_drop: "bg-[var(--color-loss)]",
+    market_alert: "bg-orange-500",
+    earnings_alert: "bg-blue-500",
+  }
 
   return (
     <header
@@ -169,16 +181,14 @@ export function Header() {
                   <button
                     key={n.id}
                     type="button"
-                    onClick={() => handleNotificationClick(n.id, n.ticker)}
+                    onClick={() => handleNotificationClick(n.id, n.ticker, n.type)}
                     className={
                       "flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--color-surface-50)] " +
                       (n.read ? "" : "bg-[var(--color-surface-50)]/50")
                     }
                   >
                     <span
-                      className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
-                        n.type === "insider_buy" ? "bg-[var(--color-gain)]" : "bg-[var(--color-loss)]"
-                      }`}
+                      className={`mt-1 h-2 w-2 shrink-0 rounded-full ${dotColorMap[n.type]}`}
                     />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm text-[var(--color-text-primary)]">

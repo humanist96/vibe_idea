@@ -45,29 +45,29 @@ export function getRatingFromScore(score: number): AIScore["rating"] {
 export function getRatingColor(rating: AIScore["rating"]): string {
   switch (rating) {
     case "Strong Buy":
-      return "text-emerald-600"
+      return "text-red-600"
     case "Buy":
-      return "text-emerald-500"
+      return "text-red-500"
     case "Hold":
       return "text-amber-600"
     case "Sell":
-      return "text-red-500"
+      return "text-blue-500"
     case "Strong Sell":
-      return "text-red-600"
+      return "text-blue-600"
   }
 }
 
 export function getRatingBadgeVariant(
   rating: AIScore["rating"]
-): "green" | "yellow" | "red" {
+): "red" | "yellow" | "blue" {
   switch (rating) {
     case "Strong Buy":
     case "Buy":
-      return "green"
+      return "red"
     case "Hold":
       return "yellow"
     case "Sell":
     case "Strong Sell":
-      return "red"
+      return "blue"
   }
 }

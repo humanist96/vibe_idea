@@ -11,7 +11,9 @@ import { InsiderActivityTable } from "@/components/stock/InsiderActivityTable"
 import { CompanyInfo } from "@/components/stock/CompanyInfo"
 import { AIScorePanel } from "@/components/stock/AIScorePanel"
 import { ConsensusPanel } from "@/components/stock/ConsensusPanel"
+
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
+import { RecentlyViewedBar } from "@/components/stock/RecentlyViewedBar"
 
 interface StockData {
   readonly ticker: string
@@ -81,6 +83,8 @@ export function StockDetailClient({ ticker, stockName }: StockDetailClientProps)
 
   return (
     <div className="space-y-6">
+      <RecentlyViewedBar currentTicker={ticker} />
+
       <StockHeader
         ticker={stock.ticker}
         name={stockName}
@@ -91,13 +95,12 @@ export function StockDetailClient({ ticker, stockName }: StockDetailClientProps)
         sector={stock.sector}
       />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 animate-fade-up stagger-2">
-          <PriceChart ticker={ticker} />
-        </div>
-        <div className="animate-fade-up stagger-3">
-          <AIScorePanel ticker={ticker} />
-        </div>
+      <div className="animate-fade-up stagger-2">
+        <PriceChart ticker={ticker} />
+      </div>
+
+      <div className="animate-fade-up stagger-3">
+        <AIScorePanel ticker={ticker} />
       </div>
 
       <StockMetrics

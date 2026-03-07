@@ -94,7 +94,7 @@ function AnalyzedTime({ analyzedAt }: { readonly analyzedAt?: string }) {
   })
 
   return (
-    <p className="flex items-center justify-center gap-1 text-xs text-[var(--color-text-muted)]">
+    <p className="flex items-center gap-1 text-xs text-[var(--color-text-muted)]">
       <Clock className="h-3 w-3" />
       분석 시간: {timeStr}
     </p>
@@ -149,55 +149,72 @@ export function AIScorePanel({ ticker }: AIScorePanelProps) {
       )}
 
       {loading && (
-        <div className="space-y-4 py-4">
-          <div className="flex justify-center">
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="flex flex-col items-center gap-4 py-4">
             <LoadingSkeleton className="h-[120px] w-[120px] rounded-full" />
+            <LoadingSkeleton className="h-4 w-3/4" />
           </div>
-          <LoadingSkeleton className="h-4 w-3/4 mx-auto" />
-          <LoadingSkeleton className="h-4 w-1/2 mx-auto" />
-          <LoadingSkeleton className="h-[200px] w-full" />
+          <div className="space-y-3 py-4">
+            <LoadingSkeleton className="h-4 w-full" />
+            <LoadingSkeleton className="h-4 w-3/4" />
+            <LoadingSkeleton className="h-[160px] w-full" />
+          </div>
+          <div className="space-y-3 py-4">
+            <LoadingSkeleton className="h-4 w-1/2" />
+            <LoadingSkeleton className="h-[200px] w-full" />
+          </div>
         </div>
       )}
 
       {score && (
-        <div className="space-y-5">
-          <div className="flex justify-center">
-            <ScoreGauge score={score.aiScore} />
+        <>
+          {/* PC: 3컬럼 가로 레이아웃 / 모바일: 세로 */}
+          <div className="grid gap-6 lg:grid-cols-3">
+            {/* 좌측: 게이지 + 평가 요약 */}
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <ScoreGauge score={score.aiScore} />
+              </div>
+              <ScoreExplanation score={score} />
+            </div>
+
+            {/* 중앙: 레이더 차트 + 주요 요인 */}
+            <div className="space-y-4">
+              <RadarChart
+                technical={score.technicalScore}
+                fundamental={score.fundamentalScore}
+                sentiment={score.sentimentScore}
+                risk={score.riskScore}
+              />
+              <div>
+                <h4 className="mb-2 text-sm font-semibold text-[var(--color-text-secondary)]">
+                  주요 요인
+                </h4>
+                <FactorsList factors={score.factors} />
+              </div>
+            </div>
+
+            {/* 우측: 뉴스 + 데이터 소스 + 메타 */}
+            <div className="space-y-4">
+              {score.newsHeadlines && score.newsHeadlines.length > 0 && (
+                <NewsHeadlines headlines={score.newsHeadlines} />
+              )}
+
+              <DataSourcesStatus dataSources={score.dataSources} />
+
+              <div className="flex items-center justify-between">
+                <AnalyzedTime analyzedAt={score.analyzedAt} />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={fetchScore}
+                >
+                  재분석
+                </Button>
+              </div>
+            </div>
           </div>
-
-          <ScoreExplanation score={score} />
-
-          <RadarChart
-            technical={score.technicalScore}
-            fundamental={score.fundamentalScore}
-            sentiment={score.sentimentScore}
-            risk={score.riskScore}
-          />
-
-          <div>
-            <h4 className="mb-2 text-sm font-semibold text-[var(--color-text-secondary)]">
-              주요 요인
-            </h4>
-            <FactorsList factors={score.factors} />
-          </div>
-
-          <DataSourcesStatus dataSources={score.dataSources} />
-
-          {score.newsHeadlines && score.newsHeadlines.length > 0 && (
-            <NewsHeadlines headlines={score.newsHeadlines} />
-          )}
-
-          <AnalyzedTime analyzedAt={score.analyzedAt} />
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={fetchScore}
-            className="w-full"
-          >
-            재분석
-          </Button>
-        </div>
+        </>
       )}
     </Card>
   )

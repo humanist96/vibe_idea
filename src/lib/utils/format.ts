@@ -41,6 +41,44 @@ export function formatMarketCap(value: number | null | undefined): string {
   return formatNumber(value)
 }
 
+export function formatUSD(value: number | null | undefined): string {
+  if (value === null || value === undefined || isNaN(value)) return "--"
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value)
+}
+
+export function formatMarketCapUSD(value: number | null | undefined): string {
+  if (value === null || value === undefined || isNaN(value)) return "--"
+  if (value >= 1_000_000_000_000) {
+    return `$${(value / 1_000_000_000_000).toFixed(2)}T`
+  }
+  if (value >= 1_000_000_000) {
+    return `$${(value / 1_000_000_000).toFixed(1)}B`
+  }
+  if (value >= 1_000_000) {
+    return `$${(value / 1_000_000).toFixed(1)}M`
+  }
+  return `$${formatNumber(value)}`
+}
+
+export function formatLargeNumber(value: number | null | undefined): string {
+  if (value === null || value === undefined || isNaN(value)) return "--"
+  if (value >= 1_000_000_000) {
+    return `${(value / 1_000_000_000).toFixed(1)}B`
+  }
+  if (value >= 1_000_000) {
+    return `${(value / 1_000_000).toFixed(1)}M`
+  }
+  if (value >= 1_000) {
+    return `${(value / 1_000).toFixed(1)}K`
+  }
+  return formatNumber(value)
+}
+
 export function formatDate(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date
   return new Intl.DateTimeFormat("ko-KR", {

@@ -7,6 +7,7 @@ import { useScreenerPresetsStore } from "@/store/screener-presets"
 import { useScreenerDefaultsStore } from "@/store/screener-defaults"
 import { useRecentlyViewedStore } from "@/store/recently-viewed"
 import { useNotificationStore } from "@/store/notifications"
+import type { NotificationType } from "@/store/notifications"
 
 interface UserData {
   watchlist: string[]
@@ -207,7 +208,7 @@ export function SyncProvider({ children }: SyncProviderProps) {
           useNotificationStore.setState({
             notifications: data.notifications.map((n) => ({
               id: n.id,
-              type: n.type as "insider_buy" | "insider_sell",
+              type: n.type as NotificationType,
               ticker: n.ticker,
               stockName: n.stockName,
               message: n.message,

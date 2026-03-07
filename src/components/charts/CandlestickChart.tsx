@@ -52,12 +52,12 @@ export function CandlestickChart({ data, height = 400 }: CandlestickChartProps) 
     })
 
     const candleSeries = chart.addCandlestickSeries({
-      upColor: "#16a34a",
-      downColor: "#dc2626",
-      borderUpColor: "#16a34a",
-      borderDownColor: "#dc2626",
-      wickUpColor: "#16a34a",
-      wickDownColor: "#dc2626",
+      upColor: "#dc2626",
+      downColor: "#2563eb",
+      borderUpColor: "#dc2626",
+      borderDownColor: "#2563eb",
+      wickUpColor: "#dc2626",
+      wickDownColor: "#2563eb",
     })
 
     const volumeSeries = chart.addHistogramSeries({
@@ -104,7 +104,7 @@ export function CandlestickChart({ data, height = 400 }: CandlestickChartProps) 
     const volumeData = data.map((d) => ({
       time: d.date,
       value: d.volume,
-      color: d.close >= d.open ? "rgba(22,163,74,0.2)" : "rgba(220,38,38,0.2)",
+      color: d.close >= d.open ? "rgba(220,38,38,0.2)" : "rgba(37,99,235,0.2)",
     }))
 
     candleSeriesRef.current.setData(candleData)

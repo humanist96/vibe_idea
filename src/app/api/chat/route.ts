@@ -1,7 +1,19 @@
-import { GoogleGenerativeAI } from "@google/generative-ai"
+import OpenAI from "openai"
 import { NextRequest } from "next/server"
-import { orchestrate } from "@/lib/chat/orchestrator"
+import { orchestrate, type Intent } from "@/lib/chat/orchestrator"
 import { getDisclaimer } from "@/lib/chat/compliance"
+
+/** 분석적 intent에는 GPT-4o, 단순 intent에는 GPT-4o-mini 사용 */
+const ANALYTICAL_INTENTS = new Set<Intent>([
+  "stock_analysis",
+  "us_stock_analysis",
+  "comparison",
+  "watchlist_review",
+])
+
+function selectModel(intent: Intent): string {
+  return ANALYTICAL_INTENTS.has(intent) ? "gpt-4o" : "gpt-4o-mini"
+}
 
 export const maxDuration = 60
 
@@ -11,39 +23,43 @@ interface ChatRequestBody {
     readonly content: string
   }[]
   readonly watchlistTickers?: readonly string[]
+  readonly marketMode?: "kr" | "us"
 }
 
-/** Gemini 스트리밍 호출 — 429 시 최대 2회 재시도 */
-async function callGeminiWithRetry(
-  apiKey: string,
+/** OpenAI 스트리밍 호출 — 429 시 최대 2회 재시도 */
+async function callOpenAIWithRetry(
+  client: OpenAI,
   systemPrompt: string,
-  history: readonly { role: "user" | "model"; parts: { text: string }[] }[],
+  history: readonly { role: "user" | "assistant"; content: string }[],
   userMessage: string,
+  model = "gpt-4o-mini",
   maxRetries = 2
 ) {
-  const genAI = new GoogleGenerativeAI(apiKey)
-  const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
-    systemInstruction: {
-      role: "user",
-      parts: [{ text: systemPrompt }],
-    },
-  })
-
   let lastError: unknown = null
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      const chat = model.startChat({ history: [...history] })
-      return await chat.sendMessageStream(userMessage)
+      const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+        { role: "system", content: systemPrompt },
+        ...history.map((m) => ({
+          role: m.role as "user" | "assistant",
+          content: m.content,
+        })),
+        { role: "user" as const, content: userMessage },
+      ]
+
+      return await client.chat.completions.create({
+        model,
+        messages,
+        stream: true,
+      })
     } catch (error) {
       lastError = error
       const errMsg = error instanceof Error ? error.message : String(error)
 
-      // 429 Rate Limit — 재시도 가능
       if (errMsg.includes("429") && attempt < maxRetries) {
         const waitSec = Math.min(5 * (attempt + 1), 20)
-        console.warn(`Gemini 429 rate limit, retrying in ${waitSec}s (attempt ${attempt + 1}/${maxRetries})`)
+        console.warn(`OpenAI 429 rate limit, retrying in ${waitSec}s (attempt ${attempt + 1}/${maxRetries})`)
         await new Promise((resolve) => setTimeout(resolve, waitSec * 1000))
         continue
       }
@@ -74,7 +90,7 @@ function getUserFriendlyError(error: unknown): string {
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as ChatRequestBody
-    const { messages, watchlistTickers = [] } = body
+    const { messages, watchlistTickers = [], marketMode = "kr" } = body
 
     if (!messages || messages.length === 0) {
       return new Response(
@@ -92,7 +108,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 오케스트레이터로 의도 분류 + 데이터 수집
-    const result = await orchestrate(lastMessage.content, watchlistTickers)
+    const result = await orchestrate(lastMessage.content, watchlistTickers, marketMode)
 
     // 컴플라이언스 차단 시 — 스트리밍 없이 즉시 응답
     if (result.blocked && result.redirectMessage) {
@@ -113,34 +129,39 @@ export async function POST(request: NextRequest) {
       ? `${result.systemPrompt}\n\n---\n아래는 사용자 질문에 관련된 실시간 데이터입니다. 이 데이터를 기반으로 응답하세요:\n${result.contextData}`
       : result.systemPrompt
 
-    // Gemini API 직접 스트리밍
-    const apiKey = process.env.GEMINI_API_KEY
+    // OpenAI API 키 확인
+    const apiKey = process.env.OPENAI_API_KEY
     if (!apiKey) {
       return new Response(
-        JSON.stringify({ error: "GEMINI_API_KEY가 설정되지 않았습니다." }),
+        JSON.stringify({ error: "OPENAI_API_KEY가 설정되지 않았습니다." }),
         { status: 500, headers: { "Content-Type": "application/json" } }
       )
     }
 
+    const client = new OpenAI({ apiKey })
+
     // 대화 이력 구성
     const history = messages.slice(0, -1).map((m) => ({
-      role: m.role === "assistant" ? ("model" as const) : ("user" as const),
-      parts: [{ text: m.content }],
+      role: m.role as "user" | "assistant",
+      content: m.content,
     }))
 
-    const streamResult = await callGeminiWithRetry(
-      apiKey,
+    const model = selectModel(result.intent)
+
+    const streamResult = await callOpenAIWithRetry(
+      client,
       systemPrompt,
       history,
-      lastMessage.content
+      lastMessage.content,
+      model
     )
 
     // ReadableStream으로 변환
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const chunk of streamResult.stream) {
-            const text = chunk.text()
+          for await (const chunk of streamResult) {
+            const text = chunk.choices[0]?.delta?.content
             if (text) {
               controller.enqueue(new TextEncoder().encode(text))
             }

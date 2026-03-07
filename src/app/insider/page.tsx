@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/Badge"
 import { Button } from "@/components/ui/Button"
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
 import { UserCheck, ChevronUp, ChevronDown, TrendingUp, TrendingDown } from "lucide-react"
+import { EmptyWatchlist } from "@/components/ui/EmptyWatchlist"
 import { cn } from "@/lib/utils/cn"
 import { useWatchlistStore } from "@/store/watchlist"
 import type { InsiderActivity } from "@/lib/api/dart-insider-types"
@@ -365,17 +366,10 @@ export default function InsiderPage() {
         </Card>
       ) : tickers.length === 0 ? (
         <Card className="animate-fade-up stagger-2">
-          <div className="py-12 text-center">
-            <p className="text-sm text-[var(--color-text-tertiary)]">
-              관심종목을 추가하면 내부자 거래를 확인할 수 있습니다
-            </p>
-            <Link
-              href="/screener"
-              className="mt-3 inline-block text-sm font-medium text-[var(--color-accent-500)] transition-colors hover:text-[var(--color-accent-400)]"
-            >
-              종목 검색하기 →
-            </Link>
-          </div>
+          <EmptyWatchlist
+            title="내부자 거래를 추적하려면 종목을 추가하세요"
+            description="관심종목을 등록하면 임원·대주주의 매매 내역을 확인할 수 있습니다."
+          />
         </Card>
       ) : (
         <>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { PriceChange } from "@/components/ui/PriceChange"
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton"
+import { DataFreshness } from "@/components/ui/DataFreshness"
 import { TrendingUp, BarChart3, DollarSign } from "lucide-react"
 import { formatNumber } from "@/lib/utils/format"
 
@@ -11,6 +12,7 @@ interface MarketIndex {
   readonly value: number
   readonly change: number
   readonly changePercent: number
+  readonly price?: number
 }
 
 const icons: Record<string, typeof TrendingUp> = {
@@ -34,6 +36,7 @@ const iconColors: Record<string, string> = {
 export function MarketOverview() {
   const [indices, setIndices] = useState<MarketIndex[]>([])
   const [loading, setLoading] = useState(true)
+  const [fetchedAt, setFetchedAt] = useState<Date | null>(null)
 
   useEffect(() => {
     async function fetchData() {
@@ -42,6 +45,7 @@ export function MarketOverview() {
         const json = await res.json()
         if (json.success) {
           setIndices(json.data)
+          setFetchedAt(new Date())
         }
       } catch {
         // silently fail
@@ -63,7 +67,11 @@ export function MarketOverview() {
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="space-y-1.5">
+      <div className="flex justify-end">
+        {fetchedAt && <DataFreshness type="delayed" timestamp={fetchedAt} />}
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {indices.map((index, i) => {
         const Icon = icons[index.name] ?? TrendingUp
         const gradient = gradients[index.name] ?? "from-slate-50 to-slate-100/50"
@@ -105,6 +113,7 @@ export function MarketOverview() {
           </div>
         )
       })}
+      </div>
     </div>
   )
 }

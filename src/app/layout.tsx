@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Script from "next/script"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Urbanist } from "next/font/google"
 import "./globals.css"
@@ -8,6 +9,8 @@ import { ToastContainer } from "@/components/ui/ToastContainer"
 import { InsiderPollingProvider } from "@/components/layout/InsiderPollingProvider"
 import { AuthProvider } from "@/components/providers/AuthProvider"
 import { SyncProvider } from "@/components/providers/SyncProvider"
+
+const GA_ID = "G-9WC7DWSWQY"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +40,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      <head>
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}');
+          `}
+        </Script>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${urbanist.variable} antialiased`}
       >

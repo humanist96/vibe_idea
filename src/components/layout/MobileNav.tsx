@@ -3,10 +3,11 @@
 import { useState, useEffect, useCallback } from "react"
 import { createPortal } from "react-dom"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
 import Image from "next/image"
 import { cn } from "@/lib/utils/cn"
+import { useMarketMode, type MarketMode } from "@/store/market-mode"
 import {
   Menu,
   X,
@@ -23,6 +24,12 @@ import {
   TrendingUp,
   Layers,
   MessageCircle,
+  Scale,
+  FileText,
+  Calendar,
+  BarChart3,
+  PieChart,
+  Newspaper,
   LogIn,
   LogOut,
   User,
@@ -39,19 +46,22 @@ interface NavSection {
   readonly items: readonly NavItem[]
 }
 
-const navSections: readonly NavSection[] = [
+const krNavSections: readonly NavSection[] = [
   {
     items: [
       { href: "/", label: "대시보드", icon: LayoutDashboard },
       { href: "/chat", label: "AI 어시스턴트", icon: MessageCircle },
       { href: "/screener", label: "스크리너", icon: Search },
+      { href: "/compare", label: "종목 비교", icon: Scale },
       { href: "/watchlist", label: "관심종목", icon: Star },
       { href: "/events", label: "기업 이벤트", icon: Bell },
+      { href: "/earnings", label: "실적 서프라이즈", icon: BarChart3 },
     ],
   },
   {
     title: "My 투자 데이터",
     items: [
+      { href: "/reports", label: "데일리 보고서", icon: FileText },
       { href: "/flow", label: "투자자 동향", icon: ArrowLeftRight },
       { href: "/insider", label: "내부자 거래", icon: UserCheck },
       { href: "/dividends", label: "배당", icon: Banknote },
@@ -63,16 +73,92 @@ const navSections: readonly NavSection[] = [
     items: [
       { href: "/ranking", label: "랭킹", icon: TrendingUp },
       { href: "/themes", label: "테마", icon: Layers },
+      { href: "/sectors", label: "섹터 로테이션", icon: PieChart },
+      { href: "/ipo", label: "공모주", icon: Calendar },
       { href: "/macro", label: "매크로", icon: Globe },
       { href: "/valuation", label: "밸류에이션", icon: Grid3X3 },
     ],
   },
 ]
 
+const usNavSections: readonly NavSection[] = [
+  {
+    items: [
+      { href: "/us-stocks", label: "대시보드", icon: LayoutDashboard },
+      { href: "/chat", label: "AI 어시스턴트", icon: MessageCircle },
+      { href: "/us-stocks/screener", label: "스크리너", icon: Search },
+      { href: "/us-stocks/compare", label: "종목 비교", icon: Scale },
+      { href: "/watchlist", label: "관심종목", icon: Star },
+      { href: "/us-stocks/earnings", label: "실적 서프라이즈", icon: BarChart3 },
+    ],
+  },
+  {
+    title: "투자",
+    items: [
+      { href: "/us-stocks/reports", label: "데일리 보고서", icon: FileText },
+      { href: "/us-stocks/insider", label: "내부자 거래", icon: UserCheck },
+      { href: "/us-stocks/dividends", label: "배당", icon: Banknote },
+    ],
+  },
+  {
+    title: "시장",
+    items: [
+      { href: "/us-stocks/ranking", label: "랭킹", icon: TrendingUp },
+      { href: "/us-stocks/themes", label: "테마", icon: Layers },
+      { href: "/us-stocks/sectors", label: "섹터 로테이션", icon: PieChart },
+      { href: "/us-stocks/ipo", label: "IPO", icon: Calendar },
+      { href: "/macro", label: "매크로", icon: Globe },
+      { href: "/us-stocks/valuation", label: "밸류에이션", icon: Grid3X3 },
+    ],
+  },
+]
+
+/** KR↔US 페이지 매핑: 토글 시 대응 페이지로 이동 */
+const KR_TO_US: Record<string, string> = {
+  "/": "/us-stocks",
+  "/chat": "/chat",
+  "/screener": "/us-stocks/screener",
+  "/compare": "/us-stocks/compare",
+  "/watchlist": "/watchlist",
+  "/earnings": "/us-stocks/earnings",
+  "/reports": "/us-stocks/reports",
+  "/insider": "/us-stocks/insider",
+  "/dividends": "/us-stocks/dividends",
+  "/ranking": "/us-stocks/ranking",
+  "/themes": "/us-stocks/themes",
+  "/sectors": "/us-stocks/sectors",
+  "/ipo": "/us-stocks/ipo",
+  "/macro": "/macro",
+  "/valuation": "/us-stocks/valuation",
+}
+
+const US_TO_KR: Record<string, string> = Object.fromEntries(
+  Object.entries(KR_TO_US).map(([kr, us]) => [us, kr])
+)
+
+function resolveCounterpart(pathname: string, target: MarketMode): string {
+  if (target === "us") {
+    return KR_TO_US[pathname] ?? "/us-stocks"
+  }
+  return US_TO_KR[pathname] ?? "/"
+}
+
 export function MobileNav() {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
   const { data: session } = useSession()
+  const { mode, setMode } = useMarketMode()
+
+  const handleSwitch = (target: MarketMode) => {
+    if (target === mode) return
+    setMode(target)
+    const dest = resolveCounterpart(pathname, target)
+    router.push(dest)
+    setOpen(false)
+  }
+
+  const navSections = mode === "kr" ? krNavSections : usNavSections
 
   const close = useCallback(() => setOpen(false), [])
 
@@ -180,6 +266,38 @@ export function MobileNav() {
                 >
                   <X className="h-5 w-5" />
                 </button>
+              </div>
+
+              {/* Market Toggle */}
+              <div style={{ padding: "12px 12px 0" }}>
+                <div className="flex rounded-xl bg-slate-100 p-1">
+                  <button
+                    type="button"
+                    onClick={() => handleSwitch("kr")}
+                    className={cn(
+                      "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200",
+                      mode === "kr"
+                        ? "bg-white text-slate-900 shadow-sm"
+                        : "text-slate-400 hover:text-slate-600"
+                    )}
+                  >
+                    <span className="text-sm">🇰🇷</span>
+                    국내
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSwitch("us")}
+                    className={cn(
+                      "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200",
+                      mode === "us"
+                        ? "bg-white text-slate-900 shadow-sm"
+                        : "text-slate-400 hover:text-slate-600"
+                    )}
+                  >
+                    <span className="text-sm">🇺🇸</span>
+                    해외
+                  </button>
+                </div>
               </div>
 
               {/* Nav */}

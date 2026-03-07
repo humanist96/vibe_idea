@@ -34,9 +34,9 @@ function formatPrice(value: number | null): string {
 
 function getOpinionColor(opinion: string | null): string {
   if (!opinion) return "text-[var(--color-text-secondary)]"
-  if (opinion.includes("매수")) return "text-emerald-400"
+  if (opinion.includes("매수")) return "text-red-400"
   if (opinion.includes("중립")) return "text-amber-400"
-  if (opinion.includes("매도")) return "text-red-400"
+  if (opinion.includes("매도")) return "text-blue-400"
   return "text-[var(--color-text-secondary)]"
 }
 
@@ -138,7 +138,7 @@ export function ConsensusPanel({ ticker, currentPrice }: ConsensusPanelProps) {
               <div
                 className={`absolute inset-y-0 left-0 rounded-full transition-all duration-700 ${
                   gaugePercent >= 100
-                    ? "bg-emerald-500"
+                    ? "bg-red-500"
                     : gaugePercent >= 70
                       ? "bg-amber-500"
                       : "bg-[var(--color-accent-400)]"

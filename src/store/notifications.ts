@@ -1,9 +1,11 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
+export type NotificationType = "price_surge" | "price_drop" | "market_alert" | "earnings_alert"
+
 export interface Notification {
   readonly id: string
-  readonly type: "insider_buy" | "insider_sell"
+  readonly type: NotificationType
   readonly ticker: string
   readonly stockName: string
   readonly message: string

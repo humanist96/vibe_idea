@@ -9,15 +9,15 @@ interface ScoreBadgeProps {
 }
 
 function getScoreColor(score: number): string {
-  if (score >= 7) return "from-emerald-500 to-emerald-400 shadow-emerald-500/20"
+  if (score >= 7) return "from-red-500 to-red-400 shadow-red-500/20"
   if (score >= 4) return "from-amber-500 to-yellow-400 shadow-amber-500/20"
-  return "from-red-500 to-red-400 shadow-red-500/20"
+  return "from-blue-500 to-blue-400 shadow-blue-500/20"
 }
 
 function getScoreRing(score: number): string {
-  if (score >= 7) return "ring-emerald-200"
+  if (score >= 7) return "ring-red-200"
   if (score >= 4) return "ring-amber-200"
-  return "ring-red-200"
+  return "ring-blue-200"
 }
 
 const sizeStyles = {

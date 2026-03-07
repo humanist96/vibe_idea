@@ -2,6 +2,7 @@
 
 import { useId } from "react"
 import { cn } from "@/lib/utils/cn"
+import { DataFreshness } from "@/components/ui/DataFreshness"
 import { TrendingUp, TrendingDown, Minus } from "lucide-react"
 import {
   AreaChart,
@@ -141,7 +142,10 @@ export function IndicatorCard({
         </div>
       )}
 
-      <p className="mt-2 text-[10px] text-[var(--color-text-muted)]">{date}</p>
+      <div className="mt-2 flex items-center justify-between">
+        <DataFreshness type="cached" />
+        <span className="text-[10px] text-[var(--color-text-muted)]">{date}</span>
+      </div>
     </div>
   )
 }

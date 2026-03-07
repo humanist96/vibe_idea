@@ -1,30 +1,19 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
+import { useCallback } from "react"
 import { Toast } from "./Toast"
-import { useNotificationStore } from "@/store/notifications"
-import type { Notification } from "@/store/notifications"
-
-const MAX_TOASTS = 5
+import { useToastStore } from "@/store/toast"
 
 export function ToastContainer() {
-  const [toasts, setToasts] = useState<Notification[]>([])
-  const notifications = useNotificationStore((s) => s.notifications)
+  const toasts = useToastStore((s) => s.toasts)
+  const removeToast = useToastStore((s) => s.removeToast)
 
-  useEffect(() => {
-    if (notifications.length === 0) return
-    const latest = notifications[0]
-    if (!latest || latest.read) return
-
-    setToasts((prev) => {
-      if (prev.some((t) => t.id === latest.id)) return prev
-      return [latest, ...prev].slice(0, MAX_TOASTS)
-    })
-  }, [notifications])
-
-  const handleDismiss = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id))
-  }, [])
+  const handleDismiss = useCallback(
+    (id: string) => {
+      removeToast(id)
+    },
+    [removeToast]
+  )
 
   if (toasts.length === 0) return null
 
