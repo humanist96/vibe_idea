@@ -6,6 +6,7 @@ import { RecentlyViewedStocks } from "@/components/dashboard/RecentlyViewedStock
 import { FearGreedGauge } from "@/components/dashboard/FearGreedGauge"
 import { WatchlistQuickView } from "@/components/dashboard/WatchlistQuickView"
 import { IpoWidget } from "@/components/dashboard/IpoWidget"
+import { NewsImpactCard } from "@/components/dashboard/NewsImpactCard"
 
 export default function DashboardPage() {
   return (
@@ -34,6 +35,7 @@ export default function DashboardPage() {
         <div className="space-y-6 animate-fade-up stagger-5">
           <FearGreedGauge />
           <WatchlistQuickView />
+          <NewsImpactCard />
           <MarketSummary />
           <IpoWidget />
           <InsiderActivityFeed />
