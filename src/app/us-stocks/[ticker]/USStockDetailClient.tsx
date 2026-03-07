@@ -11,6 +11,11 @@ import { useUSWatchlistStore } from "@/store/us-watchlist"
 import { Star, ExternalLink, TrendingUp, TrendingDown, Clock, Building2, Users, Calendar, MapPin } from "lucide-react"
 import { FairValueCard } from "@/components/stock/FairValueCard"
 import { EntryExitCoachCard } from "@/components/stock/EntryExitCoachCard"
+import { USAIScorePanel } from "@/components/us-stocks/USAIScorePanel"
+import { USEarningsPreviewCard } from "@/components/us-stocks/USEarningsPreviewCard"
+import { USSimilarStocksCard } from "@/components/us-stocks/USSimilarStocksCard"
+import { USDividendSustainabilityCard } from "@/components/us-stocks/USDividendSustainabilityCard"
+import { USInsiderSentimentCard } from "@/components/us-stocks/USInsiderSentimentCard"
 
 // ── Types ──────────────────────────────────────────────
 
@@ -267,6 +272,11 @@ export function USStockDetailClient({ ticker }: USStockDetailClientProps) {
         <PriceChartSimple data={historical} />
       </div>
 
+      {/* AI Score Panel */}
+      <div className="animate-fade-up stagger-3">
+        <USAIScorePanel ticker={symbol} />
+      </div>
+
       {/* Key Metrics Grid */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 animate-fade-up stagger-3">
         <MetricCard label="시가총액" value={formatMarketCapUSD(stock.metrics.marketCap)} />
@@ -302,6 +312,45 @@ export function USStockDetailClient({ ticker }: USStockDetailClientProps) {
           pbr={stock.metrics.pb}
           changePercent={q.changePercent}
         />
+      </div>
+
+      {/* AI 실적 프리뷰 + 유사 종목 DNA + 배당 지속가능성 */}
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2 animate-fade-up">
+        <USEarningsPreviewCard
+          ticker={symbol}
+          name={stock.nameKr ?? stock.name}
+          recentPrice={q.price}
+          changePercent={q.changePercent}
+          sector={stock.sectorKr || stock.sector}
+          earningsData={earnings.length > 0 ? {
+            actualEps: earnings[0].epsActual,
+            estimatedEps: earnings[0].epsEstimate,
+            surprisePercent: earnings[0].surprisePercent,
+            reportDate: earnings[0].date,
+          } : undefined}
+        />
+        <USSimilarStocksCard
+          ticker={symbol}
+          name={stock.nameKr ?? stock.name}
+          sector={stock.sectorKr || stock.sector}
+          per={stock.metrics.pe}
+          pbr={stock.metrics.pb}
+          marketCap={stock.metrics.marketCap}
+          dividendYield={stock.metrics.dividendYield}
+          changePercent={q.changePercent}
+        />
+      </div>
+
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2 animate-fade-up">
+        <USDividendSustainabilityCard
+          ticker={symbol}
+          name={stock.nameKr ?? stock.name}
+          currentPrice={q.price}
+          dividendYield={stock.metrics.dividendYield}
+          eps={stock.metrics.eps}
+          sector={stock.sectorKr || stock.sector}
+        />
+        <USInsiderSentimentCard ticker={symbol} />
       </div>
 
       {/* Day Stats */}
