@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useCallback, useRef } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Card } from "@/components/ui/Card"
 import { FilterPanel, type Filters, EMPTY_FILTERS } from "@/components/screener/FilterPanel"
+import { NlSearchBar } from "@/components/screener/NlSearchBar"
 import { QuickPresets } from "@/components/screener/QuickPresets"
 import { SavedPresets } from "@/components/screener/SavedPresets"
 import { StockTable } from "@/components/screener/StockTable"
@@ -161,6 +162,24 @@ function ScreenerContent() {
     [updateUrl, saveDefaults, currentSort, currentOrder]
   )
 
+  const handleNlFilters = useCallback(
+    (nlFilters: Filters, sort?: string, order?: "asc" | "desc") => {
+      const record = filtersToRecord(nlFilters)
+      const newSort = sort ?? currentSort
+      const newOrder = order ?? currentOrder
+      saveDefaults(record, newSort, newOrder)
+
+      const updates: Record<string, string> = { page: "1" }
+      for (const key of FILTER_KEYS) {
+        updates[key] = key === "market" && nlFilters[key] === "ALL" ? "" : nlFilters[key]
+      }
+      if (sort) updates.sort = sort
+      if (order) updates.order = order
+      updateUrl(updates)
+    },
+    [updateUrl, saveDefaults, currentSort, currentOrder]
+  )
+
   const handlePageChange = useCallback(
     (page: number) => {
       updateUrl({ page: String(page) })
@@ -238,6 +257,10 @@ function ScreenerContent() {
 
   return (
     <>
+      <Card className="animate-fade-up stagger-1">
+        <NlSearchBar onFiltersApplied={handleNlFilters} />
+      </Card>
+
       <Card className="animate-fade-up stagger-2">
         <div className="space-y-3">
           <FilterPanel

@@ -13,6 +13,7 @@ import { ProfileCard } from "@/components/my/ProfileCard"
 import { ActivitySummaryCard } from "@/components/my/ActivitySummaryCard"
 import { ScreenerPresetsCard } from "@/components/my/ScreenerPresetsCard"
 import { ReportArchiveCard } from "@/components/my/ReportArchiveCard"
+import { PortfolioDoctorCard } from "@/components/my/PortfolioDoctorCard"
 
 const REFRESH_INTERVAL = 5 * 60 * 1000
 
@@ -92,6 +93,9 @@ export function MyPageClient() {
           <RecentAlertsCard />
         </div>
       </div>
+
+      {/* AI Portfolio Doctor */}
+      <PortfolioDoctorCard items={items} quotes={quotes} />
 
       {/* Divider */}
       <div className="border-t border-[var(--color-border)]" />
