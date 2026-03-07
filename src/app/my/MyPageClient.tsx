@@ -67,16 +67,16 @@ export function MyPageClient() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="animate-fade-up">
-        <h1 className="font-display text-2xl font-bold text-[var(--color-text-primary)]">
+        <h1 className="font-display text-xl sm:text-2xl font-bold text-[var(--color-text-primary)]">
           마이페이지
         </h1>
       </div>
 
       {/* Portfolio Dashboard */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
+        <div className="space-y-4 sm:space-y-6 lg:col-span-2">
           <PortfolioSummaryCard items={items} quotes={quotes} isLoading={isLoading} />
           <HoldingsTable
             items={items}
@@ -86,7 +86,7 @@ export function MyPageClient() {
             onEdit={handleEdit}
           />
         </div>
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4 lg:grid-cols-1 lg:gap-6">
           <SectorDonutChart items={items} quotes={quotes} />
           <WatchlistTodayCard />
           <RecentAlertsCard />
@@ -97,7 +97,7 @@ export function MyPageClient() {
       <div className="border-t border-[var(--color-border)]" />
 
       {/* Profile & Settings */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <ProfileCard />
         <ActivitySummaryCard />
         <ScreenerPresetsCard />

@@ -40,10 +40,10 @@ export function ActivitySummaryCard() {
   ]
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-6">
+    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6">
       <h3 className="mb-4 text-sm font-bold text-[var(--color-text-primary)]">활동 요약</h3>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
         {stats.map((stat) => {
           const Icon = stat.icon
           return (
@@ -57,7 +57,7 @@ export function ActivitySummaryCard() {
               <div className="text-lg font-bold text-[var(--color-text-primary)]">
                 {stat.value}
               </div>
-              <div className="text-[10px] text-[var(--color-text-muted)]">{stat.label}</div>
+              <div className="text-xs text-[var(--color-text-muted)]">{stat.label}</div>
             </div>
           )
         })}

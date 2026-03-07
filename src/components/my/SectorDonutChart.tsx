@@ -51,7 +51,7 @@ export function SectorDonutChart({ items, quotes }: Props) {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-6">
+      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6">
         <h3 className="mb-2 text-sm font-bold text-[var(--color-text-primary)]">섹터 비중</h3>
         <p className="text-xs text-[var(--color-text-muted)]">종목 추가 후 확인</p>
       </div>
@@ -61,11 +61,11 @@ export function SectorDonutChart({ items, quotes }: Props) {
   let currentAngle = 0
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-6">
+    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6">
       <h3 className="mb-4 text-sm font-bold text-[var(--color-text-primary)]">섹터 비중</h3>
 
       <div className="flex items-center justify-center">
-        <svg viewBox="0 0 200 200" className="h-36 w-36">
+        <svg viewBox="0 0 200 200" className="h-28 w-28 sm:h-36 sm:w-36">
           {entries.map(([sector, value], idx) => {
             const angle = total > 0 ? (value / total) * 360 : 0
             const path = describeArc(100, 100, 80, currentAngle, currentAngle + angle)
@@ -87,34 +87,34 @@ export function SectorDonutChart({ items, quotes }: Props) {
             x="100"
             y="96"
             textAnchor="middle"
-            className="fill-[var(--color-text-primary)] text-xs font-bold"
-            fontSize="12"
+            className="fill-[var(--color-text-primary)] font-bold"
+            fontSize="14"
           >
             {entries.length}
           </text>
           <text
             x="100"
-            y="112"
+            y="114"
             textAnchor="middle"
             className="fill-[var(--color-text-muted)]"
-            fontSize="9"
+            fontSize="11"
           >
             섹터
           </text>
         </svg>
       </div>
 
-      <div className="mt-4 space-y-1.5">
+      <div className="mt-4 space-y-2">
         {entries.slice(0, 5).map(([sector, value], idx) => (
-          <div key={sector} className="flex items-center justify-between text-xs">
+          <div key={sector} className="flex items-center justify-between text-xs sm:text-sm">
             <div className="flex items-center gap-2">
               <span
-                className="inline-block h-2.5 w-2.5 rounded-full"
+                className="inline-block h-3 w-3 rounded-full shrink-0"
                 style={{ backgroundColor: COLORS[idx % COLORS.length] }}
               />
-              <span className="text-[var(--color-text-secondary)]">{sector}</span>
+              <span className="truncate text-[var(--color-text-secondary)]">{sector}</span>
             </div>
-            <span className="text-[var(--color-text-muted)]">
+            <span className="ml-2 shrink-0 text-[var(--color-text-muted)]">
               {total > 0 ? ((value / total) * 100).toFixed(1) : 0}%
             </span>
           </div>

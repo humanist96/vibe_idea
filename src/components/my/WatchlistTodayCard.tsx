@@ -57,7 +57,7 @@ export function WatchlistTodayCard() {
   }, [nonPortfolioTickers.join(",")])
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-6">
+    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6">
       <div className="mb-3 flex items-center gap-2">
         <Star className="h-4 w-4 text-amber-500" />
         <h3 className="text-sm font-bold text-[var(--color-text-primary)]">관심종목 오늘</h3>
@@ -70,23 +70,23 @@ export function WatchlistTodayCard() {
       ) : isLoading ? (
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-6 animate-pulse rounded bg-[var(--color-surface-100)]" />
+            <div key={i} className="h-8 animate-pulse rounded-lg bg-[var(--color-surface-100)]" />
           ))}
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-1">
           {prices.map((p) => (
             <Link
               key={p.ticker}
               href={`/stock/${p.ticker}`}
-              className="flex items-center justify-between rounded-lg px-2 py-1.5 hover:bg-[var(--color-surface-50)] transition-colors"
+              className="flex items-center justify-between rounded-xl px-3 py-2.5 hover:bg-[var(--color-surface-50)] transition-colors"
             >
-              <div>
+              <div className="min-w-0 flex-1">
                 <span className="text-sm text-[var(--color-text-primary)]">{p.name}</span>
                 <span className="ml-1.5 text-xs text-[var(--color-text-muted)]">{p.ticker}</span>
               </div>
               <span
-                className={`text-xs font-medium ${
+                className={`ml-2 shrink-0 text-sm font-medium ${
                   p.changePercent > 0
                     ? "text-red-500"
                     : p.changePercent < 0

@@ -57,7 +57,7 @@ export function TickerSearchInput({ market, onSelect }: Props) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={market === "KR" ? "종목명 또는 티커 검색" : "Search symbol or name"}
-          className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-50)] py-2.5 pl-10 pr-4 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
+          className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-50)] py-3 pl-10 pr-4 text-base text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
         />
       </div>
 
@@ -72,15 +72,15 @@ export function TickerSearchInput({ market, onSelect }: Props) {
                 setQuery("")
                 setIsOpen(false)
               }}
-              className="flex w-full items-center justify-between px-4 py-2.5 text-left hover:bg-[var(--color-surface-50)] transition-colors"
+              className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-[var(--color-surface-50)] transition-colors"
             >
-              <div>
+              <div className="min-w-0 flex-1">
                 <span className="text-sm font-medium text-[var(--color-text-primary)]">
                   {r.name}
                 </span>
                 <span className="ml-2 text-xs text-[var(--color-text-muted)]">{r.ticker}</span>
               </div>
-              <span className="text-xs text-[var(--color-text-muted)]">{r.sector}</span>
+              <span className="ml-2 shrink-0 text-xs text-[var(--color-text-muted)]">{r.sector}</span>
             </button>
           ))}
         </div>
