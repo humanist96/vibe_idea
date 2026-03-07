@@ -62,7 +62,7 @@ export function ReportArchiveCard() {
           {recentForTab.map((stock) => {
             const href =
               tab === "KR"
-                ? `/stocks/${stock.ticker}`
+                ? `/stock/${stock.ticker}`
                 : `/us-stocks/${stock.ticker}`
 
             return (

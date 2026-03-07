@@ -78,7 +78,7 @@ export function WatchlistTodayCard() {
           {prices.map((p) => (
             <Link
               key={p.ticker}
-              href={`/stocks/${p.ticker}`}
+              href={`/stock/${p.ticker}`}
               className="flex items-center justify-between rounded-lg px-2 py-1.5 hover:bg-[var(--color-surface-50)] transition-colors"
             >
               <div>
