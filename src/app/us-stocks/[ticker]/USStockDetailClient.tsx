@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/Badge"
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
 import { useUSWatchlistStore } from "@/store/us-watchlist"
 import { Star, ExternalLink, TrendingUp, TrendingDown, Clock, Building2, Users, Calendar, MapPin } from "lucide-react"
+import { FairValueCard } from "@/components/stock/FairValueCard"
+import { EntryExitCoachCard } from "@/components/stock/EntryExitCoachCard"
 
 // ── Types ──────────────────────────────────────────────
 
@@ -275,6 +277,31 @@ export function USStockDetailClient({ ticker }: USStockDetailClientProps) {
         <MetricCard label="베타" value={stock.metrics.beta ? stock.metrics.beta.toFixed(2) : "--"} />
         <MetricCard label="52주 최고" value={formatUSD(stock.metrics.fiftyTwoWeekHigh)} />
         <MetricCard label="52주 최저" value={formatUSD(stock.metrics.fiftyTwoWeekLow)} />
+      </div>
+
+      {/* AI 적정주가 + 매매 타이밍 코치 */}
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2 animate-fade-up">
+        <FairValueCard
+          ticker={symbol}
+          name={stock.nameKr ?? stock.name}
+          currentPrice={q.price}
+          per={stock.metrics.pe}
+          pbr={stock.metrics.pb}
+          eps={stock.metrics.eps}
+          dividendYield={stock.metrics.dividendYield}
+          marketCap={stock.metrics.marketCap ?? undefined}
+          sector={stock.sectorKr}
+        />
+        <EntryExitCoachCard
+          ticker={symbol}
+          name={stock.nameKr ?? stock.name}
+          currentPrice={q.price}
+          high52w={stock.metrics.fiftyTwoWeekHigh ?? undefined}
+          low52w={stock.metrics.fiftyTwoWeekLow ?? undefined}
+          per={stock.metrics.pe}
+          pbr={stock.metrics.pb}
+          changePercent={q.changePercent}
+        />
       </div>
 
       {/* Day Stats */}

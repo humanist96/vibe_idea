@@ -14,6 +14,8 @@ import { ConsensusPanel } from "@/components/stock/ConsensusPanel"
 
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
 import { RecentlyViewedBar } from "@/components/stock/RecentlyViewedBar"
+import { FairValueCard } from "@/components/stock/FairValueCard"
+import { EntryExitCoachCard } from "@/components/stock/EntryExitCoachCard"
 
 interface StockData {
   readonly ticker: string
@@ -115,6 +117,32 @@ export function StockDetailClient({ ticker, stockName }: StockDetailClientProps)
       />
 
       <ConsensusPanel ticker={ticker} currentPrice={stock.price} />
+
+      {/* AI 적정주가 + 매매 타이밍 코치 */}
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2 animate-fade-up">
+        <FairValueCard
+          ticker={stock.ticker}
+          name={stockName}
+          currentPrice={stock.price}
+          per={stock.per}
+          pbr={stock.pbr}
+          eps={stock.eps}
+          dividendYield={stock.dividendYield}
+          marketCap={stock.marketCap}
+          sector={stock.sector}
+        />
+        <EntryExitCoachCard
+          ticker={stock.ticker}
+          name={stockName}
+          currentPrice={stock.price}
+          high52w={stock.fiftyTwoWeekHigh}
+          low52w={stock.fiftyTwoWeekLow}
+          per={stock.per}
+          pbr={stock.pbr}
+          volume={stock.volume}
+          changePercent={stock.changePercent}
+        />
+      </div>
 
       <FundamentalsTable ticker={ticker} />
 

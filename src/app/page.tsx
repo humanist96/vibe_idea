@@ -8,6 +8,11 @@ import { WatchlistQuickView } from "@/components/dashboard/WatchlistQuickView"
 import { IpoWidget } from "@/components/dashboard/IpoWidget"
 import { NewsImpactCard } from "@/components/dashboard/NewsImpactCard"
 import { RiskRadarCard } from "@/components/dashboard/RiskRadarCard"
+import { MomentumBreakoutCard } from "@/components/dashboard/MomentumBreakoutCard"
+import { SectorRotationCard } from "@/components/dashboard/SectorRotationCard"
+import { EconomicCalendarCard } from "@/components/dashboard/EconomicCalendarCard"
+import { SmartCompareWidget } from "@/components/dashboard/SmartCompareWidget"
+import { FilingSummaryCard } from "@/components/dashboard/FilingSummaryCard"
 
 export default function DashboardPage() {
   return (
@@ -35,13 +40,23 @@ export default function DashboardPage() {
       {/* Recently viewed stocks */}
       <RecentlyViewedStocks />
 
+      {/* AI 분석 카드: 모멘텀 + 섹터 로테이션 + 경제 캘린더 */}
+      <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 animate-fade-up stagger-3">
+        <MomentumBreakoutCard />
+        <SectorRotationCard />
+        <EconomicCalendarCard />
+      </div>
+
       {/* Main content grid */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 animate-fade-up stagger-4">
+        <div className="lg:col-span-2 space-y-6 animate-fade-up stagger-4">
           <TopStocksTable />
+          {/* AI 종목 비교 */}
+          <SmartCompareWidget />
         </div>
         <div className="space-y-6 animate-fade-up stagger-5">
           <FearGreedGauge />
+          <FilingSummaryCard />
           <MarketSummary />
           <IpoWidget />
           <InsiderActivityFeed />
