@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { Urbanist } from "next/font/google"
 import "./globals.css"
 import { Sidebar } from "@/components/layout/Sidebar"
+import { BottomTabBar } from "@/components/layout/BottomTabBar"
 import { Header } from "@/components/layout/Header"
 import { ToastContainer } from "@/components/ui/ToastContainer"
 import { InsiderPollingProvider } from "@/components/layout/InsiderPollingProvider"
@@ -62,9 +63,10 @@ export default function RootLayout({
             <ToastContainer />
             <InsiderPollingProvider />
             <Sidebar />
+            <BottomTabBar />
             <div className="lg:pl-64">
               <Header />
-              <main className="p-4 lg:p-6">{children}</main>
+              <main className="p-4 pb-20 lg:p-6 lg:pb-6">{children}</main>
             </div>
           </SyncProvider>
         </AuthProvider>

@@ -8,142 +8,120 @@ import { useSession, signOut } from "next-auth/react"
 import Image from "next/image"
 import { cn } from "@/lib/utils/cn"
 import { useMarketMode, type MarketMode } from "@/store/market-mode"
+import { Menu, X, ChevronDown, LogIn, LogOut, User } from "lucide-react"
 import {
-  Menu,
-  X,
-  LayoutDashboard,
-  Search,
-  Star,
-  ArrowLeftRight,
-  UserCheck,
-  Banknote,
-  Building2,
-  Bell,
-  Globe,
-  Grid3X3,
-  TrendingUp,
-  Layers,
-  MessageCircle,
-  Scale,
-  FileText,
-  Calendar,
-  BarChart3,
-  PieChart,
-  Newspaper,
-  LogIn,
-  LogOut,
-  User,
-} from "lucide-react"
+  krCoreItems,
+  krCollapsibleSections,
+  usCoreItems,
+  usCollapsibleSections,
+  resolveCounterpart,
+  isNavItemActive,
+  type NavItem,
+  type NavCollapsibleSection,
+} from "@/lib/constants/nav-data"
 
-interface NavItem {
-  readonly href: string
-  readonly label: string
-  readonly icon: React.ComponentType<{ className?: string }>
-}
+const STORAGE_KEY = "nav-collapsed-sections"
 
-interface NavSection {
-  readonly title?: string
-  readonly items: readonly NavItem[]
-}
-
-const krNavSections: readonly NavSection[] = [
-  {
-    items: [
-      { href: "/", label: "대시보드", icon: LayoutDashboard },
-      { href: "/chat", label: "AI 어시스턴트", icon: MessageCircle },
-      { href: "/screener", label: "스크리너", icon: Search },
-      { href: "/compare", label: "종목 비교", icon: Scale },
-      { href: "/watchlist", label: "관심종목", icon: Star },
-      { href: "/events", label: "기업 이벤트", icon: Bell },
-      { href: "/earnings", label: "실적 서프라이즈", icon: BarChart3 },
-      { href: "/my", label: "마이페이지", icon: User },
-    ],
-  },
-  {
-    title: "My 투자 데이터",
-    items: [
-      { href: "/reports", label: "데일리 보고서", icon: FileText },
-      { href: "/flow", label: "투자자 동향", icon: ArrowLeftRight },
-      { href: "/insider", label: "내부자 거래", icon: UserCheck },
-      { href: "/dividends", label: "배당", icon: Banknote },
-      { href: "/block-holdings", label: "대량보유", icon: Building2 },
-    ],
-  },
-  {
-    title: "시장",
-    items: [
-      { href: "/ranking", label: "랭킹", icon: TrendingUp },
-      { href: "/themes", label: "테마", icon: Layers },
-      { href: "/sectors", label: "섹터 로테이션", icon: PieChart },
-      { href: "/ipo", label: "공모주", icon: Calendar },
-      { href: "/macro", label: "매크로", icon: Globe },
-      { href: "/valuation", label: "밸류에이션", icon: Grid3X3 },
-    ],
-  },
-]
-
-const usNavSections: readonly NavSection[] = [
-  {
-    items: [
-      { href: "/us-stocks", label: "대시보드", icon: LayoutDashboard },
-      { href: "/chat", label: "AI 어시스턴트", icon: MessageCircle },
-      { href: "/us-stocks/screener", label: "스크리너", icon: Search },
-      { href: "/us-stocks/compare", label: "종목 비교", icon: Scale },
-      { href: "/watchlist", label: "관심종목", icon: Star },
-      { href: "/us-stocks/earnings", label: "실적 서프라이즈", icon: BarChart3 },
-      { href: "/my", label: "마이페이지", icon: User },
-    ],
-  },
-  {
-    title: "투자",
-    items: [
-      { href: "/us-stocks/reports", label: "데일리 보고서", icon: FileText },
-      { href: "/us-stocks/insider", label: "내부자 거래", icon: UserCheck },
-      { href: "/us-stocks/dividends", label: "배당", icon: Banknote },
-    ],
-  },
-  {
-    title: "시장",
-    items: [
-      { href: "/us-stocks/ranking", label: "랭킹", icon: TrendingUp },
-      { href: "/us-stocks/themes", label: "테마", icon: Layers },
-      { href: "/us-stocks/sectors", label: "섹터 로테이션", icon: PieChart },
-      { href: "/us-stocks/ipo", label: "IPO", icon: Calendar },
-      { href: "/macro", label: "매크로", icon: Globe },
-      { href: "/us-stocks/valuation", label: "밸류에이션", icon: Grid3X3 },
-    ],
-  },
-]
-
-/** KR↔US 페이지 매핑: 토글 시 대응 페이지로 이동 */
-const KR_TO_US: Record<string, string> = {
-  "/": "/us-stocks",
-  "/chat": "/chat",
-  "/screener": "/us-stocks/screener",
-  "/compare": "/us-stocks/compare",
-  "/watchlist": "/watchlist",
-  "/earnings": "/us-stocks/earnings",
-  "/reports": "/us-stocks/reports",
-  "/insider": "/us-stocks/insider",
-  "/dividends": "/us-stocks/dividends",
-  "/ranking": "/us-stocks/ranking",
-  "/themes": "/us-stocks/themes",
-  "/sectors": "/us-stocks/sectors",
-  "/ipo": "/us-stocks/ipo",
-  "/macro": "/macro",
-  "/valuation": "/us-stocks/valuation",
-  "/my": "/my",
-}
-
-const US_TO_KR: Record<string, string> = Object.fromEntries(
-  Object.entries(KR_TO_US).map(([kr, us]) => [us, kr])
-)
-
-function resolveCounterpart(pathname: string, target: MarketMode): string {
-  if (target === "us") {
-    return KR_TO_US[pathname] ?? "/us-stocks"
+function getPersistedSections(): Record<string, boolean> {
+  if (typeof window === "undefined") return {}
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    return {}
   }
-  return US_TO_KR[pathname] ?? "/"
+}
+
+function persistSections(state: Record<string, boolean>) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+  } catch {
+    // storage full or unavailable
+  }
+}
+
+function MobileNavLink({
+  item,
+  pathname,
+  onClick,
+}: {
+  readonly item: NavItem
+  readonly pathname: string
+  readonly onClick: () => void
+}) {
+  const isActive = isNavItemActive(pathname, item.href)
+  const Icon = item.icon
+  return (
+    <Link
+      href={item.href}
+      onClick={onClick}
+      className={cn(
+        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+        isActive
+          ? "bg-amber-50 text-amber-700"
+          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+      )}
+    >
+      <Icon
+        className={cn(
+          "h-[18px] w-[18px] shrink-0",
+          isActive ? "text-amber-500" : "text-slate-400"
+        )}
+      />
+      {item.label}
+    </Link>
+  )
+}
+
+function MobileCollapsibleSection({
+  section,
+  pathname,
+  expanded,
+  onToggle,
+  onLinkClick,
+}: {
+  readonly section: NavCollapsibleSection
+  readonly pathname: string
+  readonly expanded: boolean
+  readonly onToggle: () => void
+  readonly onLinkClick: () => void
+}) {
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={onToggle}
+        className="mb-0.5 flex w-full items-center justify-between px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors"
+      >
+        {section.title}
+        <ChevronDown
+          className={cn(
+            "h-3.5 w-3.5 transition-transform duration-200",
+            expanded ? "rotate-0" : "-rotate-90"
+          )}
+        />
+      </button>
+      <div
+        className={cn(
+          "grid transition-[grid-template-rows] duration-200 ease-in-out",
+          expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        )}
+      >
+        <div className="overflow-hidden">
+          <div className="space-y-0.5">
+            {section.items.map((item) => (
+              <MobileNavLink
+                key={item.href + item.label}
+                item={item}
+                pathname={pathname}
+                onClick={onLinkClick}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export function MobileNav() {
@@ -153,6 +131,8 @@ export function MobileNav() {
   const { data: session } = useSession()
   const { mode, setMode } = useMarketMode()
 
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => getPersistedSections())
+
   const handleSwitch = (target: MarketMode) => {
     if (target === mode) return
     setMode(target)
@@ -161,9 +141,15 @@ export function MobileNav() {
     setOpen(false)
   }
 
-  const navSections = mode === "kr" ? krNavSections : usNavSections
-
   const close = useCallback(() => setOpen(false), [])
+
+  const toggleSection = useCallback((title: string) => {
+    setExpandedSections((prev) => {
+      const next = { ...prev, [title]: !prev[title] }
+      persistSections(next)
+      return next
+    })
+  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -184,6 +170,9 @@ export function MobileNav() {
       document.body.style.overflow = ""
     }
   }, [open])
+
+  const coreItems = mode === "kr" ? krCoreItems : usCoreItems
+  const collapsibleSections = mode === "kr" ? krCollapsibleSections : usCollapsibleSections
 
   return (
     <div className="lg:hidden">
@@ -311,42 +300,34 @@ export function MobileNav() {
                   padding: "16px 12px",
                 }}
               >
-                {navSections.map((section, sIdx) => (
-                  <div key={section.title ?? sIdx} style={{ marginBottom: 20 }}>
-                    {section.title && (
-                      <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
-                        {section.title}
-                      </p>
-                    )}
-                    <div className="space-y-0.5">
-                      {section.items.map((item) => {
-                        const isActive = pathname === item.href
-                        const Icon = item.icon
-                        return (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            onClick={close}
-                            className={cn(
-                              "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
-                              isActive
-                                ? "bg-amber-50 text-amber-700"
-                                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                            )}
-                          >
-                            <Icon
-                              className={cn(
-                                "h-[18px] w-[18px] shrink-0",
-                                isActive ? "text-amber-500" : "text-slate-400"
-                              )}
-                            />
-                            {item.label}
-                          </Link>
-                        )
-                      })}
-                    </div>
-                  </div>
-                ))}
+                {/* Core items - 항상 노출 */}
+                <div className="space-y-0.5">
+                  {coreItems.map((item) => (
+                    <MobileNavLink
+                      key={item.href + item.label}
+                      item={item}
+                      pathname={pathname}
+                      onClick={close}
+                    />
+                  ))}
+                </div>
+
+                {/* 구분선 */}
+                <div className="mx-3 my-3 border-t border-slate-200" />
+
+                {/* Collapsible sections */}
+                <div className="space-y-2">
+                  {collapsibleSections.map((section) => (
+                    <MobileCollapsibleSection
+                      key={section.title}
+                      section={section}
+                      pathname={pathname}
+                      expanded={expandedSections[section.title] !== false}
+                      onToggle={() => toggleSection(section.title)}
+                      onLinkClick={close}
+                    />
+                  ))}
+                </div>
               </nav>
 
               {/* User section */}
