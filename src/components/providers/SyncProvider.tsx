@@ -8,6 +8,8 @@ import { useScreenerDefaultsStore } from "@/store/screener-defaults"
 import { useRecentlyViewedStore } from "@/store/recently-viewed"
 import { useNotificationStore } from "@/store/notifications"
 import type { NotificationType } from "@/store/notifications"
+import { usePortfolioStore } from "@/store/portfolio"
+import type { PortfolioItem } from "@/store/portfolio"
 
 interface UserData {
   watchlist: string[]
@@ -35,6 +37,15 @@ interface UserData {
     message: string
     date: string
     read: boolean
+  }>
+  portfolio: Array<{
+    ticker: string
+    market: string
+    name: string
+    sectorKr: string
+    quantity: number
+    avgPrice: number
+    addedAt: number
   }>
 }
 
@@ -103,7 +114,8 @@ export function SyncProvider({ children }: SyncProviderProps) {
           data.presets.length > 0 ||
           data.defaults !== null ||
           data.recentlyViewed.length > 0 ||
-          data.notifications.length > 0
+          data.notifications.length > 0 ||
+          data.portfolio.length > 0
 
         if (!hasDbData) {
           // First login migration: push localStorage data to DB
@@ -112,13 +124,15 @@ export function SyncProvider({ children }: SyncProviderProps) {
           const defaults = useScreenerDefaultsStore.getState()
           const recentlyViewed = useRecentlyViewedStore.getState().stocks
           const notifications = useNotificationStore.getState().notifications
+          const portfolio = usePortfolioStore.getState().items
 
           const hasLocalData =
             watchlist.length > 0 ||
             presets.length > 0 ||
             Object.keys(defaults.lastFilters).length > 0 ||
             recentlyViewed.length > 0 ||
-            notifications.length > 0
+            notifications.length > 0 ||
+            portfolio.length > 0
 
           if (hasLocalData) {
             await Promise.all([
@@ -174,6 +188,23 @@ export function SyncProvider({ children }: SyncProviderProps) {
                     body: JSON.stringify({ notifications }),
                   })
                 : null,
+              portfolio.length > 0
+                ? fetch("/api/user/portfolio", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      items: portfolio.map((p) => ({
+                        ticker: p.ticker,
+                        market: p.market,
+                        name: p.name,
+                        sectorKr: p.sectorKr,
+                        quantity: p.quantity,
+                        avgPrice: p.avgPrice,
+                        addedAt: p.addedAt,
+                      })),
+                    }),
+                  })
+                : null,
             ])
           }
         } else {
@@ -214,6 +245,18 @@ export function SyncProvider({ children }: SyncProviderProps) {
               message: n.message,
               date: n.date,
               read: n.read,
+            })),
+          })
+
+          usePortfolioStore.setState({
+            items: data.portfolio.map((p) => ({
+              ticker: p.ticker,
+              market: p.market as PortfolioItem["market"],
+              name: p.name,
+              sectorKr: p.sectorKr,
+              quantity: p.quantity,
+              avgPrice: p.avgPrice,
+              addedAt: p.addedAt,
             })),
           })
         }
@@ -272,12 +315,28 @@ export function SyncProvider({ children }: SyncProviderProps) {
       syncToServer("notifications", { notifications })
     }, 1000)
 
+    const debouncedPortfolio = debounce(() => {
+      const { items } = usePortfolioStore.getState()
+      syncToServer("portfolio", {
+        items: items.map((p) => ({
+          ticker: p.ticker,
+          market: p.market,
+          name: p.name,
+          sectorKr: p.sectorKr,
+          quantity: p.quantity,
+          avgPrice: p.avgPrice,
+          addedAt: p.addedAt,
+        })),
+      })
+    }, 1000)
+
     const unsubs = [
       useWatchlistStore.subscribe(debouncedWatchlist),
       useScreenerPresetsStore.subscribe(debouncedPresets),
       useScreenerDefaultsStore.subscribe(debouncedDefaults),
       useRecentlyViewedStore.subscribe(debouncedRecentlyViewed),
       useNotificationStore.subscribe(debouncedNotifications),
+      usePortfolioStore.subscribe(debouncedPortfolio),
     ]
 
     return () => {
@@ -287,6 +346,7 @@ export function SyncProvider({ children }: SyncProviderProps) {
       debouncedDefaults.cancel()
       debouncedRecentlyViewed.cancel()
       debouncedNotifications.cancel()
+      debouncedPortfolio.cancel()
     }
   }, [status, session?.user?.id, syncToServer])
 

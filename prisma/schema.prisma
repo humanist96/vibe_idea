@@ -27,6 +27,7 @@ model User {
   recentlyViewed    RecentlyViewed[]
   notifications     UserNotification[]
   chatSessions      ChatSession[]
+  portfolioItems    PortfolioItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -129,6 +130,23 @@ model UserNotification {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+}
+
+model PortfolioItem {
+  id       String   @id @default(cuid())
+  userId   String
+  ticker   String
+  market   String   // "KR" | "US"
+  name     String
+  sectorKr String
+  quantity Int
+  avgPrice Float
+  addedAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, ticker])
   @@index([userId])
 }
 

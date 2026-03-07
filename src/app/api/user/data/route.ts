@@ -10,7 +10,7 @@ export async function GET() {
 
   const userId = session.user.id
 
-  const [watchlistItems, presets, defaults, recentlyViewed, notifications] =
+  const [watchlistItems, presets, defaults, recentlyViewed, notifications, portfolioItems] =
     await Promise.all([
       prisma.watchlistItem.findMany({
         where: { userId },
@@ -33,6 +33,10 @@ export async function GET() {
         where: { userId },
         orderBy: { date: "desc" },
         take: 50,
+      }),
+      prisma.portfolioItem.findMany({
+        where: { userId },
+        orderBy: { addedAt: "asc" },
       }),
     ])
 
@@ -66,6 +70,15 @@ export async function GET() {
         message: n.message,
         date: n.date,
         read: n.read,
+      })),
+      portfolio: portfolioItems.map((p) => ({
+        ticker: p.ticker,
+        market: p.market,
+        name: p.name,
+        sectorKr: p.sectorKr,
+        quantity: p.quantity,
+        avgPrice: p.avgPrice,
+        addedAt: p.addedAt.getTime(),
       })),
     },
   })
