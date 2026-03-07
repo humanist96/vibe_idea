@@ -1,6 +1,18 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { getUSNews } from "@/lib/api/finnhub"
 
+/** Finnhub Yahoo 뉴스는 실제 썸네일 대신 Yahoo Finance 로고(354x50)를 반환 — 필터링 */
+const PLACEHOLDER_PATTERNS = [
+  "yahoo_finance_en-US",
+  "s.yimg.com/rz/stage",
+  "g.foolcdn.com/misc-assets",
+]
+
+function isValidThumbnail(url: string | undefined): boolean {
+  if (!url || !url.startsWith("http")) return false
+  return !PLACEHOLDER_PATTERNS.some((p) => url.includes(p))
+}
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ ticker: string }> }
@@ -17,7 +29,7 @@ export async function GET(
       summary: item.summary,
       source: item.source,
       url: item.url,
-      image: item.image && item.image.startsWith("http") ? item.image : "",
+      image: isValidThumbnail(item.image) ? item.image : "",
       datetime: item.datetime,
       related: item.related,
     }))
