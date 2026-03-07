@@ -35,9 +35,15 @@ interface AlertsData {
   readonly earningsAlerts: EarningsAlert[]
 }
 
-function buildDedupKey(type: string, ticker: string): string {
-  const today = new Date().toISOString().slice(0, 10)
-  return `${ticker}:${type}:${today}`
+/**
+ * Build a dedup key that prevents the same alert from repeating.
+ * - Price alerts: same ticker + direction (surge/drop) won't repeat
+ *   until the notification is cleared
+ * - Market alerts: same sub-type (fear_greed/index) won't repeat
+ * - Earnings alerts: same ticker + quarter won't repeat
+ */
+function buildDedupKey(type: string, identifier: string, extra?: string): string {
+  return extra ? `${identifier}:${type}:${extra}` : `${identifier}:${type}`
 }
 
 export function useAlertPolling(intervalMs = FIFTEEN_MINUTES) {
@@ -59,7 +65,17 @@ export function useAlertPolling(intervalMs = FIFTEEN_MINUTES) {
 
       const data: AlertsData = json.data
       const existing = useNotificationStore.getState().notifications
-      const existingKeys = new Set(existing.map((n) => buildDedupKey(n.type, n.ticker)))
+
+      // Build dedup keys from ALL existing notifications (not just today)
+      const existingKeys = new Set(
+        existing.map((n) => {
+          // For earnings, extract quarter from message to make key more specific
+          const quarterMatch = n.message.match(/\(([^)]+)\)\s*$/)
+          const quarter = quarterMatch ? quarterMatch[1] : undefined
+          return buildDedupKey(n.type, n.ticker, quarter)
+        })
+      )
+
       const today = new Date().toISOString().slice(0, 10)
 
       // --- Price alerts ---
@@ -80,12 +96,13 @@ export function useAlertPolling(intervalMs = FIFTEEN_MINUTES) {
           date: today,
         })
         addToast({ type: type as ToastType, ticker: alert.ticker, message: msg })
+        existingKeys.add(key)
       }
 
       // --- Market alerts ---
       for (const alert of data.marketAlerts) {
         const type: NotificationType = "market_alert"
-        const key = buildDedupKey(`market_alert_${alert.type}`, alert.type)
+        const key = buildDedupKey(type, alert.type)
         if (existingKeys.has(key)) continue
 
         addNotification({
@@ -96,12 +113,13 @@ export function useAlertPolling(intervalMs = FIFTEEN_MINUTES) {
           date: today,
         })
         addToast({ type: "market_alert", message: alert.message })
+        existingKeys.add(key)
       }
 
       // --- Earnings alerts ---
       for (const alert of data.earningsAlerts) {
         const type: NotificationType = "earnings_alert"
-        const key = buildDedupKey(type, alert.ticker)
+        const key = buildDedupKey(type, alert.ticker, alert.quarter)
         if (existingKeys.has(key)) continue
 
         const dDayLabel = alert.dDay === 0 ? "오늘" : `D-${alert.dDay}`
@@ -115,6 +133,7 @@ export function useAlertPolling(intervalMs = FIFTEEN_MINUTES) {
           date: today,
         })
         addToast({ type: "earnings_alert", ticker: alert.ticker, message: msg })
+        existingKeys.add(key)
       }
     } catch {
       // silently fail
