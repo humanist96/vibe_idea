@@ -56,6 +56,7 @@ const krNavSections: readonly NavSection[] = [
       { href: "/watchlist", label: "관심종목", icon: Star },
       { href: "/events", label: "기업 이벤트", icon: Bell },
       { href: "/earnings", label: "실적 서프라이즈", icon: BarChart3 },
+      { href: "/my", label: "마이페이지", icon: User },
     ],
   },
   {
@@ -90,6 +91,7 @@ const usNavSections: readonly NavSection[] = [
       { href: "/us-stocks/compare", label: "종목 비교", icon: Scale },
       { href: "/watchlist", label: "관심종목", icon: Star },
       { href: "/us-stocks/earnings", label: "실적 서프라이즈", icon: BarChart3 },
+      { href: "/my", label: "마이페이지", icon: User },
     ],
   },
   {
@@ -130,6 +132,7 @@ const KR_TO_US: Record<string, string> = {
   "/ipo": "/us-stocks/ipo",
   "/macro": "/macro",
   "/valuation": "/us-stocks/valuation",
+  "/my": "/my",
 }
 
 const US_TO_KR: Record<string, string> = Object.fromEntries(
