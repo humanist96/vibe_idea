@@ -199,6 +199,9 @@ export function USStockDetailClient({ ticker }: USStockDetailClientProps) {
                 src={stock.logo}
                 alt={stock.name}
                 className="h-10 w-10 rounded-xl object-contain bg-white p-1 ring-1 ring-slate-200"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = "none"
+                }}
               />
             )}
             <div>
@@ -514,7 +517,10 @@ export function USStockDetailClient({ ticker }: USStockDetailClientProps) {
                     <img
                       src={item.image}
                       alt=""
-                      className="h-16 w-24 shrink-0 rounded-lg object-cover"
+                      className="h-16 w-24 shrink-0 rounded-lg object-cover bg-slate-100"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = "none"
+                      }}
                     />
                   )}
                   <div className="min-w-0 flex-1">

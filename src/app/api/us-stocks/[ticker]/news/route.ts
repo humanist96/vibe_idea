@@ -17,7 +17,7 @@ export async function GET(
       summary: item.summary,
       source: item.source,
       url: item.url,
-      image: item.image,
+      image: item.image && item.image.startsWith("http") ? item.image : "",
       datetime: item.datetime,
       related: item.related,
     }))
