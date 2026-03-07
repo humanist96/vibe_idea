@@ -7,6 +7,7 @@ import { FearGreedGauge } from "@/components/dashboard/FearGreedGauge"
 import { WatchlistQuickView } from "@/components/dashboard/WatchlistQuickView"
 import { IpoWidget } from "@/components/dashboard/IpoWidget"
 import { NewsImpactCard } from "@/components/dashboard/NewsImpactCard"
+import { RiskRadarCard } from "@/components/dashboard/RiskRadarCard"
 
 export default function DashboardPage() {
   return (
@@ -37,6 +38,7 @@ export default function DashboardPage() {
           <WatchlistQuickView />
           <NewsImpactCard />
           <MarketSummary />
+          <RiskRadarCard />
           <IpoWidget />
           <InsiderActivityFeed />
         </div>

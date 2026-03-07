@@ -14,6 +14,8 @@ import { ActivitySummaryCard } from "@/components/my/ActivitySummaryCard"
 import { ScreenerPresetsCard } from "@/components/my/ScreenerPresetsCard"
 import { ReportArchiveCard } from "@/components/my/ReportArchiveCard"
 import { PortfolioDoctorCard } from "@/components/my/PortfolioDoctorCard"
+import { InvestmentJournalCard } from "@/components/my/InvestmentJournalCard"
+import { ScenarioSimulatorCard } from "@/components/my/ScenarioSimulatorCard"
 
 const REFRESH_INTERVAL = 5 * 60 * 1000
 
@@ -94,8 +96,14 @@ export function MyPageClient() {
         </div>
       </div>
 
-      {/* AI Portfolio Doctor */}
-      <PortfolioDoctorCard items={items} quotes={quotes} />
+      {/* AI Portfolio Doctor + Journal */}
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+        <PortfolioDoctorCard items={items} quotes={quotes} />
+        <InvestmentJournalCard items={items} quotes={quotes} />
+      </div>
+
+      {/* Scenario Simulator */}
+      <ScenarioSimulatorCard items={items} quotes={quotes} />
 
       {/* Divider */}
       <div className="border-t border-[var(--color-border)]" />
