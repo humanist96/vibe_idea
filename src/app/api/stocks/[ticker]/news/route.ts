@@ -64,16 +64,19 @@ export async function GET(
     const naver = naverNews.status === "fulfilled" ? naverNews.value : []
     const google = googleNews.status === "fulfilled" ? googleNews.value : []
 
-    // 네이버 우선, 구글 보조 — 합치고 중복 제거
-    const merged = [...naver, ...google]
+    // 제목에 종목명이 포함된 뉴스만 필터링
+    const allNews = [...naver, ...google]
+    const filtered = allNews.filter((article) =>
+      article.title.includes(stockName)
+    )
 
     // 날짜순 정렬 (최신 우선)
-    merged.sort(
+    filtered.sort(
       (a, b) =>
         new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     )
 
-    const deduplicated = deduplicateNews(merged)
+    const deduplicated = deduplicateNews(filtered)
 
     return NextResponse.json({
       success: true,
