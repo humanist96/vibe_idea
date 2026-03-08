@@ -16,6 +16,7 @@ import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
 import { RecentlyViewedBar } from "@/components/stock/RecentlyViewedBar"
 import { FairValueCard } from "@/components/stock/FairValueCard"
 import { EntryExitCoachCard } from "@/components/stock/EntryExitCoachCard"
+import { StockNewsFeed } from "@/components/stock/StockNewsFeed"
 
 interface StockData {
   readonly ticker: string
@@ -149,6 +150,10 @@ export function StockDetailClient({ ticker, stockName }: StockDetailClientProps)
       <InvestorFlowPanel ticker={ticker} />
 
       <InsiderActivityTable ticker={ticker} />
+
+      <div className="animate-fade-up">
+        <StockNewsFeed ticker={ticker} />
+      </div>
 
       <CompanyInfo
         ticker={ticker}
