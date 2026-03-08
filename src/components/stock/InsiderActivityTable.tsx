@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react"
 import { Card, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Badge } from "@/components/ui/Badge"
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
-import { UserCheck, ChevronUp, ChevronDown } from "lucide-react"
+import { UserCheck, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils/cn"
 import type { InsiderActivity } from "@/lib/api/dart-insider-types"
 
@@ -84,6 +84,8 @@ export function InsiderActivityTable({ ticker }: InsiderActivityTableProps) {
   const [error, setError] = useState<string | null>(null)
   const [sortKey, setSortKey] = useState<SortKey>("date")
   const [sortDir, setSortDir] = useState<SortDir>("desc")
+  const [page, setPage] = useState(0)
+  const PAGE_SIZE = 10
 
   useEffect(() => {
     async function fetchInsider() {
@@ -121,6 +123,9 @@ export function InsiderActivityTable({ ticker }: InsiderActivityTableProps) {
     () => [...activities].sort((a, b) => compareActivities(a, b, sortKey, sortDir)),
     [activities, sortKey, sortDir]
   )
+
+  const totalPages = Math.ceil(sorted.length / PAGE_SIZE)
+  const paged = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
 
   if (loading) {
     return (
@@ -176,7 +181,7 @@ export function InsiderActivityTable({ ticker }: InsiderActivityTableProps) {
               </tr>
             </thead>
             <tbody>
-              {sorted.map((activity) => (
+              {paged.map((activity) => (
                 <tr
                   key={activity.id}
                   className="table-row-hover border-b border-[var(--color-border-subtle)] last:border-0"
@@ -227,6 +232,35 @@ export function InsiderActivityTable({ ticker }: InsiderActivityTableProps) {
               ))}
             </tbody>
           </table>
+
+          {totalPages > 1 && (
+            <div className="mt-3 flex items-center justify-between border-t border-[var(--color-border-subtle)] pt-3">
+              <span className="text-[10px] text-[var(--color-text-tertiary)]">
+                {page * PAGE_SIZE + 1}~{Math.min((page + 1) * PAGE_SIZE, sorted.length)}건 / 총 {sorted.length}건
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  disabled={page === 0}
+                  className="rounded p-1 transition-colors hover:bg-[var(--color-surface-elevated)] disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="h-4 w-4 text-[var(--color-text-secondary)]" />
+                </button>
+                <span className="px-2 text-xs text-[var(--color-text-secondary)]">
+                  {page + 1} / {totalPages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                  disabled={page >= totalPages - 1}
+                  className="rounded p-1 transition-colors hover:bg-[var(--color-surface-elevated)] disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight className="h-4 w-4 text-[var(--color-text-secondary)]" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </Card>

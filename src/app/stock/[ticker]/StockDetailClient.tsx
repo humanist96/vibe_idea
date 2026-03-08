@@ -149,11 +149,11 @@ export function StockDetailClient({ ticker, stockName }: StockDetailClientProps)
 
       <InvestorFlowPanel ticker={ticker} />
 
-      <InsiderActivityTable ticker={ticker} />
-
       <div className="animate-fade-up">
         <StockNewsFeed ticker={ticker} />
       </div>
+
+      <InsiderActivityTable ticker={ticker} />
 
       <CompanyInfo
         ticker={ticker}
