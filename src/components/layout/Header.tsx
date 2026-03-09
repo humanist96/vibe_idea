@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback, useRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { Search, Bell } from "lucide-react"
 import type { NotificationType } from "@/store/notifications"
 import { useDebouncedSearch } from "@/hooks/use-debounced-search"
@@ -11,6 +11,8 @@ import { UserMenu } from "@/components/auth/UserMenu"
 
 export function Header() {
   const router = useRouter()
+  const pathname = usePathname()
+  if (pathname.startsWith("/landing")) return null
   const { query, setQuery, results, clear } = useDebouncedSearch(300)
   const [showResults, setShowResults] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)

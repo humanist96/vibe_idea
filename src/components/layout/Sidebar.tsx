@@ -4,12 +4,16 @@ import { cn } from "@/lib/utils/cn"
 import { SidebarNav } from "./SidebarNav"
 import { SidebarUser } from "./SidebarUser"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 interface SidebarProps {
   readonly className?: string
 }
 
 export function Sidebar({ className }: SidebarProps) {
+  const pathname = usePathname()
+  if (pathname.startsWith("/landing")) return null
+
   return (
     <aside
       className={cn(

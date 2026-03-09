@@ -10,6 +10,8 @@ export function BottomTabBar() {
   const pathname = usePathname()
   const { mode } = useMarketMode()
 
+  if (pathname.startsWith("/landing")) return null
+
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur-sm lg:hidden"
