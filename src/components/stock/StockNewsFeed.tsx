@@ -54,7 +54,7 @@ export function StockNewsFeed({ ticker }: Props) {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4">
+      <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4">
         <div className="flex items-center gap-2">
           <Newspaper className="h-4 w-4 text-blue-400" />
           <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
@@ -71,7 +71,7 @@ export function StockNewsFeed({ ticker }: Props) {
   if (news.length === 0) return null
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4">
+    <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4">
       <div className="flex items-center gap-2">
         <Newspaper className="h-4 w-4 text-blue-400" />
         <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
@@ -82,7 +82,7 @@ export function StockNewsFeed({ ticker }: Props) {
         </span>
       </div>
 
-      <div className="mt-3 divide-y divide-[var(--color-border)]">
+      <div className="mt-3 divide-y divide-[var(--color-border-default)]">
         {news.map((item, i) => (
           <a
             key={i}

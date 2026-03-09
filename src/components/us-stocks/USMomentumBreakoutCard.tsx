@@ -109,7 +109,7 @@ export function USMomentumBreakoutCard() {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4">
+    <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Zap className="h-4 w-4 text-yellow-400" />
@@ -148,7 +148,7 @@ export function USMomentumBreakoutCard() {
                       <span className="text-[10px] text-[var(--color-text-tertiary)]">{typeLabel[b.type] ?? b.type}</span>
                       <div className="ml-auto flex items-center gap-1">
                         {Array.from({ length: 5 }).map((_, j) => (
-                          <div key={j} className={`h-1 w-1 rounded-full ${j < b.strength ? "bg-yellow-400" : "bg-[var(--color-border)]"}`} />
+                          <div key={j} className={`h-1 w-1 rounded-full ${j < b.strength ? "bg-yellow-400" : "bg-[var(--color-border-default)]"}`} />
                         ))}
                       </div>
                     </div>

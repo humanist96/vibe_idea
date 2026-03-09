@@ -60,7 +60,7 @@ export function PortfolioSummaryCard({ items, quotes, isLoading }: Props) {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6">
+      <div className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4 sm:p-6">
         <h2 className="mb-2 text-base sm:text-lg font-bold text-[var(--color-text-primary)]">
           포트폴리오 요약
         </h2>
@@ -72,7 +72,7 @@ export function PortfolioSummaryCard({ items, quotes, isLoading }: Props) {
   }
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6">
+    <div className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4 sm:p-6">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-base sm:text-lg font-bold text-[var(--color-text-primary)]">
           포트폴리오 요약

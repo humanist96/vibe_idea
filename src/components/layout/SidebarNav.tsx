@@ -181,7 +181,7 @@ export function SidebarNav() {
       </div>
 
       {/* 구분선 */}
-      <div className="mx-3 border-t border-[var(--color-border)]" />
+      <div className="mx-3 border-t border-[var(--color-border-default)]" />
 
       {/* Collapsible sections */}
       <div className="space-y-2">

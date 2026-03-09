@@ -8,7 +8,7 @@ export function ScreenerPresetsCard() {
   const presets = useScreenerPresetsStore((s) => s.presets)
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6">
+    <div className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4 sm:p-6">
       <div className="mb-4 flex items-center gap-2">
         <Filter className="h-4 w-4 text-purple-500" />
         <h3 className="text-sm font-bold text-[var(--color-text-primary)]">저장된 프리셋</h3>

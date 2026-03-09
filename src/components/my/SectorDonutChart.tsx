@@ -51,7 +51,7 @@ export function SectorDonutChart({ items, quotes }: Props) {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6">
+      <div className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4 sm:p-6">
         <h3 className="mb-2 text-sm font-bold text-[var(--color-text-primary)]">섹터 비중</h3>
         <p className="text-xs text-[var(--color-text-muted)]">종목 추가 후 확인</p>
       </div>
@@ -61,7 +61,7 @@ export function SectorDonutChart({ items, quotes }: Props) {
   let currentAngle = 0
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6">
+    <div className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4 sm:p-6">
       <h3 className="mb-4 text-sm font-bold text-[var(--color-text-primary)]">섹터 비중</h3>
 
       <div className="flex items-center justify-center">

@@ -69,7 +69,7 @@ export function USDividendSustainabilityCard({ ticker, name, currentPrice, divid
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4">
+    <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <BadgeDollarSign className="h-4 w-4 text-green-400" />
@@ -93,7 +93,7 @@ export function USDividendSustainabilityCard({ ticker, name, currentPrice, divid
           <div className="flex items-center gap-4">
             <div className="relative h-14 w-14">
               <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
-                <circle cx="18" cy="18" r="16" fill="none" stroke="var(--color-border)" strokeWidth="3" />
+                <circle cx="18" cy="18" r="16" fill="none" stroke="var(--color-border-default)" strokeWidth="3" />
                 <circle
                   cx="18" cy="18" r="16" fill="none"
                   stroke={data.sustainabilityScore >= 70 ? "#34d399" : data.sustainabilityScore >= 40 ? "#fbbf24" : "#f87171"}

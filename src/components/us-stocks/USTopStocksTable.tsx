@@ -58,7 +58,7 @@ export function USTopStocksTable() {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[var(--color-border)]">
+            <tr className="border-b border-[var(--color-border-default)]">
               <th className="pb-2 text-left text-[11px] font-medium text-[var(--color-text-muted)]">#</th>
               <th className="pb-2 text-left text-[11px] font-medium text-[var(--color-text-muted)]">종목</th>
               <th className="pb-2 text-right text-[11px] font-medium text-[var(--color-text-muted)]">현재가</th>
@@ -72,7 +72,7 @@ export function USTopStocksTable() {
               return (
                 <tr
                   key={stock.symbol}
-                  className="border-b border-[var(--color-border)] last:border-0 transition-colors hover:bg-[var(--color-surface-50)]"
+                  className="border-b border-[var(--color-border-default)] last:border-0 transition-colors hover:bg-[var(--color-surface-50)]"
                 >
                   <td className="py-2.5 text-xs text-[var(--color-text-muted)]">{i + 1}</td>
                   <td className="py-2.5">

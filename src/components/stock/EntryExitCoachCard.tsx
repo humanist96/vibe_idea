@@ -69,7 +69,7 @@ export function EntryExitCoachCard(props: Props) {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4">
+    <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Crosshair className="h-4 w-4 text-violet-400" />

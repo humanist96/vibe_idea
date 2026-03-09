@@ -9,7 +9,7 @@ export function ProfileCard() {
   const { mode, setMode } = useMarketMode()
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6">
+    <div className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4 sm:p-6">
       <div className="mb-4 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
           <User className="h-5 w-5 text-amber-600" />

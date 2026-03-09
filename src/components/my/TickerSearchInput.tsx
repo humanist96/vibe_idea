@@ -57,12 +57,12 @@ export function TickerSearchInput({ market, onSelect }: Props) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={market === "KR" ? "종목명 또는 티커 검색" : "Search symbol or name"}
-          className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-50)] py-3 pl-10 pr-4 text-base text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
+          className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-50)] py-3 pl-10 pr-4 text-base text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
         />
       </div>
 
       {isOpen && results.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] shadow-lg max-h-60 overflow-y-auto">
+        <div className="absolute z-50 mt-1 w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] shadow-lg max-h-60 overflow-y-auto">
           {results.map((r) => (
             <button
               key={r.ticker}

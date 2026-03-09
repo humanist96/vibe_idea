@@ -46,7 +46,7 @@ export function HoldingsTable({ items, quotes, isLoading, onAdd, onEdit }: Props
     return (
       <div
         key={item.ticker}
-        className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-50)] p-4"
+        className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-50)] p-4"
       >
         <div className="mb-3 flex items-center justify-between">
           <div className="min-w-0 flex-1">
@@ -114,7 +114,7 @@ export function HoldingsTable({ items, quotes, isLoading, onAdd, onEdit }: Props
     return (
       <tr
         key={item.ticker}
-        className="border-b border-[var(--color-border)] last:border-b-0 hover:bg-[var(--color-surface-50)] transition-colors"
+        className="border-b border-[var(--color-border-default)] last:border-b-0 hover:bg-[var(--color-surface-50)] transition-colors"
       >
         <td className="px-3 py-3">
           <div className="truncate font-medium text-sm text-[var(--color-text-primary)]">{item.name}</div>
@@ -163,7 +163,7 @@ export function HoldingsTable({ items, quotes, isLoading, onAdd, onEdit }: Props
   }
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6">
+    <div className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4 sm:p-6">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-base sm:text-lg font-bold text-[var(--color-text-primary)]">보유 종목</h2>
         <button
@@ -202,7 +202,7 @@ export function HoldingsTable({ items, quotes, isLoading, onAdd, onEdit }: Props
           <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-[var(--color-border)] text-xs text-[var(--color-text-muted)]">
+                <tr className="border-b border-[var(--color-border-default)] text-xs text-[var(--color-text-muted)]">
                   <th className="px-3 py-2 font-medium">종목</th>
                   <th className="px-3 py-2 text-right font-medium">수량</th>
                   <th className="px-3 py-2 text-right font-medium">매수가</th>

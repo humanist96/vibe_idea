@@ -57,7 +57,7 @@ export function WatchlistTodayCard() {
   }, [nonPortfolioTickers.join(",")])
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6">
+    <div className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4 sm:p-6">
       <div className="mb-3 flex items-center gap-2">
         <Star className="h-4 w-4 text-amber-500" />
         <h3 className="text-sm font-bold text-[var(--color-text-primary)]">관심종목 오늘</h3>

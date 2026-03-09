@@ -66,7 +66,7 @@ export function HoldingModal({ editingItem, onClose }: Props) {
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-md rounded-t-2xl sm:rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-5 sm:p-6 shadow-2xl sm:mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-md rounded-t-2xl sm:rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-5 sm:p-6 shadow-2xl sm:mx-4 max-h-[90vh] overflow-y-auto">
         <div className="mb-5 flex items-center justify-between">
           <h3 className="text-base sm:text-lg font-bold text-[var(--color-text-primary)]">
             {isEditing ? "종목 수정" : "종목 추가"}
@@ -139,7 +139,7 @@ export function HoldingModal({ editingItem, onClose }: Props) {
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
               placeholder="10"
-              className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-50)] px-4 py-3 text-base text-[var(--color-text-primary)] focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
+              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-50)] px-4 py-3 text-base text-[var(--color-text-primary)] focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
             />
           </div>
 
@@ -155,7 +155,7 @@ export function HoldingModal({ editingItem, onClose }: Props) {
               value={avgPrice}
               onChange={(e) => setAvgPrice(e.target.value)}
               placeholder={market === "KR" ? "73000" : "185.50"}
-              className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-50)] px-4 py-3 text-base text-[var(--color-text-primary)] focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
+              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-50)] px-4 py-3 text-base text-[var(--color-text-primary)] focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
             />
           </div>
         </div>
@@ -164,7 +164,7 @@ export function HoldingModal({ editingItem, onClose }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 rounded-xl border border-[var(--color-border)] px-4 py-3 text-sm font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-50)] transition-colors"
+            className="flex-1 rounded-xl border border-[var(--color-border-default)] px-4 py-3 text-sm font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-50)] transition-colors"
           >
             취소
           </button>

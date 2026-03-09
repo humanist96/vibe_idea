@@ -74,7 +74,7 @@ export function SmartCompareWidget() {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4">
+    <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4">
       <div className="flex items-center gap-2">
         <GitCompareArrows className="h-4 w-4 text-purple-400" />
         <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">AI 종목 비교</h3>
@@ -92,7 +92,7 @@ export function SmartCompareWidget() {
               setTickers(next)
             }}
             placeholder={`종목${i + 1}`}
-            className="w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-2.5 py-1.5 text-xs text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-purple-500 focus:outline-none"
+            className="w-0 flex-1 rounded-lg border border-[var(--color-border-default)] bg-[var(--color-surface-elevated)] px-2.5 py-1.5 text-xs text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-purple-500 focus:outline-none"
           />
         ))}
         <button

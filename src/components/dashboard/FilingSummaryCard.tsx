@@ -72,7 +72,7 @@ export function FilingSummaryCard() {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4">
+    <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4">
       <div className="flex items-center gap-2">
         <FileSearch className="h-4 w-4 text-teal-400" />
         <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">공시 AI 요약</h3>
@@ -106,7 +106,7 @@ export function FilingSummaryCard() {
                 <span className="text-[9px] text-[var(--color-text-tertiary)]">{s.type}</span>
                 <div className="ml-auto flex items-center gap-1">
                   {Array.from({ length: 5 }).map((_, j) => (
-                    <div key={j} className={`h-1 w-1 rounded-full ${j < s.impactScore ? "bg-teal-400" : "bg-[var(--color-border)]"}`} />
+                    <div key={j} className={`h-1 w-1 rounded-full ${j < s.impactScore ? "bg-teal-400" : "bg-[var(--color-border-default)]"}`} />
                   ))}
                 </div>
               </div>

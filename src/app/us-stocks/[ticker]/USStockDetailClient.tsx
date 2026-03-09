@@ -463,7 +463,7 @@ export function USStockDetailClient({ ticker }: USStockDetailClientProps) {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[var(--color-border)]">
+                <tr className="border-b border-[var(--color-border-default)]">
                   <th className="pb-2 text-left text-[11px] font-medium text-[var(--color-text-muted)]">날짜</th>
                   <th className="pb-2 text-right text-[11px] font-medium text-[var(--color-text-muted)]">EPS 추정</th>
                   <th className="pb-2 text-right text-[11px] font-medium text-[var(--color-text-muted)]">EPS 실제</th>
@@ -472,7 +472,7 @@ export function USStockDetailClient({ ticker }: USStockDetailClientProps) {
               </thead>
               <tbody>
                 {earnings.slice(0, 8).map((e) => (
-                  <tr key={e.date} className="border-b border-[var(--color-border)] last:border-0">
+                  <tr key={e.date} className="border-b border-[var(--color-border-default)] last:border-0">
                     <td className="py-2 font-mono text-xs">{e.date}</td>
                     <td className="py-2 text-right font-mono text-xs">
                       {e.epsEstimate != null ? `$${e.epsEstimate.toFixed(2)}` : "--"}

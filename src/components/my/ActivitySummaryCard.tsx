@@ -40,7 +40,7 @@ export function ActivitySummaryCard() {
   ]
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6">
+    <div className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4 sm:p-6">
       <h3 className="mb-4 text-sm font-bold text-[var(--color-text-primary)]">활동 요약</h3>
 
       <div className="grid grid-cols-2 gap-2.5 sm:gap-3">

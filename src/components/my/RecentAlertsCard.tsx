@@ -22,7 +22,7 @@ export function RecentAlertsCard() {
   const recent = notifications.slice(0, 5)
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 sm:p-6">
+    <div className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4 sm:p-6">
       <div className="mb-3 flex items-center gap-2">
         <Bell className="h-4 w-4 text-amber-500" />
         <h3 className="text-sm font-bold text-[var(--color-text-primary)]">최근 알림</h3>

@@ -62,7 +62,7 @@ export function InsiderSentimentCard({ transactions }: Props) {
   if (transactions.length === 0) return null
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4">
+    <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-surface-card)] p-4">
       <div className="flex items-center gap-2">
         <Users className="h-4 w-4 text-cyan-400" />
         <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">내부자 심리 분석</h3>
