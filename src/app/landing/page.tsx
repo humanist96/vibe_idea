@@ -131,7 +131,7 @@ function FloatingChart({ className, delay = 0 }: { readonly className: string; r
   const points = "0,80 30,65 60,70 90,45 120,55 150,30 180,35 210,15 240,25 270,10"
   return (
     <svg
-      className={`animate-[float_20s_ease-in-out_infinite] ${className}`}
+      className={`animate-[float-slow_28s_ease-in-out_infinite] ${className}`}
       style={{ animationDelay: `${delay}s` }}
       viewBox="0 0 270 100" fill="none"
     >
@@ -159,7 +159,7 @@ function NeuralMesh() {
   const edges = [[0,1],[1,2],[2,3],[0,4],[1,4],[1,5],[2,5],[2,6],[3,6],[4,7],[4,8],[5,8],[5,9],[6,9],[6,10],[7,8],[8,9],[9,10]]
 
   return (
-    <svg className="absolute right-[2%] top-[8%] h-[260px] w-[420px] opacity-[0.035] animate-[float_25s_ease-in-out_infinite]" viewBox="0 0 420 250" fill="none">
+    <svg className="absolute right-[2%] top-[8%] h-[260px] w-[420px] opacity-[0.08] animate-[float-slow_30s_ease-in-out_infinite]" viewBox="0 0 420 250" fill="none">
       {edges.map(([a, b]) => (
         <line key={`${a}-${b}`} x1={nodes[a][0]} y1={nodes[a][1]} x2={nodes[b][0]} y2={nodes[b][1]} stroke="#f59e0b" strokeWidth="0.8" />
       ))}
@@ -169,10 +169,73 @@ function NeuralMesh() {
           <circle cx={x} cy={y} r="1.5" fill="#f59e0b" opacity="0.5" />
         </g>
       ))}
-      <circle cx={210} cy={100} r="8" fill="#f59e0b" opacity="0.08">
-        <animate attributeName="r" values="6;12;6" dur="4s" repeatCount="indefinite" />
-        <animate attributeName="opacity" values="0.08;0.02;0.08" dur="4s" repeatCount="indefinite" />
+      <circle cx={210} cy={100} r="8" fill="#f59e0b" opacity="0.15">
+        <animate attributeName="r" values="6;10;6" dur="6s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.15;0.06;0.15" dur="6s" repeatCount="indefinite" />
       </circle>
+    </svg>
+  )
+}
+
+function DataFlowLines({ className }: { readonly className: string }) {
+  return (
+    <svg className={className} viewBox="0 0 400 200" fill="none">
+      {/* Horizontal data flow lines with dots */}
+      {[30, 70, 110, 150].map((y, i) => (
+        <g key={y}>
+          <line x1="0" y1={y} x2="400" y2={y} stroke="#f59e0b" strokeWidth="0.4" opacity={0.3 - i * 0.05} strokeDasharray="8 12" />
+          {[60 + i * 20, 180 + i * 15, 300 - i * 10].map((x) => (
+            <circle key={`${x}-${y}`} cx={x} cy={y} r="2" fill="#f59e0b" opacity={0.4}>
+              <animate attributeName="cx" values={`${x};${x + 40};${x}`} dur={`${8 + i * 2}s`} repeatCount="indefinite" />
+            </circle>
+          ))}
+        </g>
+      ))}
+    </svg>
+  )
+}
+
+function CircuitBoard({ className }: { readonly className: string }) {
+  return (
+    <svg className={className} viewBox="0 0 300 300" fill="none">
+      {/* Circuit-like paths */}
+      <path d="M50,150 L100,150 L100,80 L180,80 L180,120 L250,120" stroke="#60a5fa" strokeWidth="0.8" opacity="0.3" />
+      <path d="M30,200 L80,200 L80,230 L160,230 L160,180 L220,180 L220,220 L280,220" stroke="#60a5fa" strokeWidth="0.6" opacity="0.25" />
+      <path d="M60,60 L120,60 L120,40 L200,40 L200,100 L260,100" stroke="#f59e0b" strokeWidth="0.6" opacity="0.2" />
+      {/* Junction dots */}
+      {[[100, 150], [100, 80], [180, 80], [180, 120], [80, 200], [80, 230], [160, 230], [160, 180], [220, 180], [120, 60], [200, 40], [200, 100]].map(([x, y]) => (
+        <circle key={`${x}-${y}`} cx={x} cy={y} r="2.5" fill="#0a0f1e" stroke="#60a5fa" strokeWidth="0.8" opacity="0.4" />
+      ))}
+      {/* Pulse nodes */}
+      <circle cx={250} cy={120} r="4" fill="#f59e0b" opacity="0.15">
+        <animate attributeName="r" values="3;6;3" dur="5s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.15;0.05;0.15" dur="5s" repeatCount="indefinite" />
+      </circle>
+      <circle cx={280} cy={220} r="4" fill="#60a5fa" opacity="0.12">
+        <animate attributeName="r" values="3;5;3" dur="7s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.12;0.04;0.12" dur="7s" repeatCount="indefinite" />
+      </circle>
+    </svg>
+  )
+}
+
+function ScatterDots({ className }: { readonly className: string }) {
+  const dots = [
+    [40, 30], [120, 60], [80, 110], [200, 40], [160, 90], [240, 70],
+    [60, 160], [140, 140], [220, 130], [100, 180], [180, 170], [260, 160],
+  ]
+  return (
+    <svg className={className} viewBox="0 0 300 200" fill="none">
+      {dots.map(([x, y], i) => (
+        <g key={i}>
+          <circle cx={x} cy={y} r={1.5 + (i % 3)} fill="#f59e0b" opacity={0.15 + (i % 4) * 0.05}>
+            <animate attributeName="opacity" values={`${0.15 + (i % 4) * 0.05};${0.05};${0.15 + (i % 4) * 0.05}`} dur={`${6 + i * 0.5}s`} repeatCount="indefinite" />
+          </circle>
+          {i > 0 && i % 3 === 0 && (
+            <line x1={dots[i - 1][0]} y1={dots[i - 1][1]} x2={x} y2={y} stroke="#f59e0b" strokeWidth="0.4" opacity="0.1" />
+          )}
+        </g>
+      ))}
     </svg>
   )
 }
@@ -247,7 +310,15 @@ export default function LandingPage() {
       <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0) }
-          50% { transform: translateY(-12px) }
+          50% { transform: translateY(-6px) }
+        }
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0) rotate(0deg) }
+          50% { transform: translateY(-4px) rotate(0.5deg) }
+        }
+        @keyframes pulse-subtle {
+          0%, 100% { opacity: 0.07 }
+          50% { opacity: 0.12 }
         }
         @keyframes glow-line {
           0% { background-position: -200% 0 }
@@ -314,11 +385,11 @@ export default function LandingPage() {
         <NeuralMesh />
 
         {/* Floating charts */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.04]">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.09]">
           <FloatingChart className="absolute -right-8 top-[18%] h-[160px] w-[360px]" delay={0} />
           <FloatingChart className="absolute -left-4 bottom-[25%] h-[130px] w-[300px] scale-x-[-1]" delay={4} />
-          <CandlestickSilhouette className="absolute right-[12%] bottom-[30%] h-[120px] w-[200px] animate-[float_18s_ease-in-out_2s_infinite]" />
-          <CandlestickSilhouette className="absolute left-[8%] top-[25%] h-[100px] w-[170px] animate-[float_22s_ease-in-out_5s_infinite] scale-x-[-1]" />
+          <CandlestickSilhouette className="absolute right-[12%] bottom-[30%] h-[120px] w-[200px] animate-[float-slow_24s_ease-in-out_2s_infinite]" />
+          <CandlestickSilhouette className="absolute left-[8%] top-[25%] h-[100px] w-[170px] animate-[float-slow_28s_ease-in-out_5s_infinite] scale-x-[-1]" />
         </div>
 
         <div className={`relative z-10 mx-auto max-w-4xl text-center transition-all duration-1000 ease-out ${heroReady ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"}`}>
@@ -390,8 +461,10 @@ export default function LandingPage() {
 
       {/* ───── Core Features ───── */}
       <section id="features" className="relative px-6 py-32">
-        <div className="pointer-events-none absolute inset-0">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute right-0 top-0 h-[500px] w-[500px] rounded-full bg-amber-500/[0.02] blur-[180px]" />
+          <DataFlowLines className="absolute left-[3%] top-[10%] h-[200px] w-[400px] opacity-[0.06] animate-[float-slow_30s_ease-in-out_infinite]" />
+          <ScatterDots className="absolute right-[5%] bottom-[15%] h-[180px] w-[280px] opacity-[0.07]" />
         </div>
 
         <div className="relative mx-auto max-w-6xl">
@@ -435,8 +508,9 @@ export default function LandingPage() {
       <section id="markets" className="relative px-6 py-32">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute bottom-0 left-[10%] h-[400px] w-[400px] rounded-full bg-blue-500/[0.015] blur-[180px]" />
+          <CircuitBoard className="absolute left-[3%] bottom-[10%] h-[260px] w-[260px] opacity-[0.07] animate-[float-slow_35s_ease-in-out_3s_infinite]" />
           {/* Globe wireframe */}
-          <svg className="absolute right-[5%] top-[8%] h-[300px] w-[300px] opacity-[0.025]" viewBox="0 0 300 300" fill="none">
+          <svg className="absolute right-[5%] top-[8%] h-[300px] w-[300px] opacity-[0.06] animate-[float-slow_28s_ease-in-out_infinite]" viewBox="0 0 300 300" fill="none">
             <circle cx="150" cy="150" r="120" stroke="#60a5fa" strokeWidth="0.7" />
             <ellipse cx="150" cy="150" rx="75" ry="120" stroke="#60a5fa" strokeWidth="0.5" />
             <ellipse cx="150" cy="150" rx="35" ry="120" stroke="#60a5fa" strokeWidth="0.3" />
@@ -504,6 +578,10 @@ export default function LandingPage() {
 
       {/* ───── More Features ───── */}
       <section className="relative px-6 py-32">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <CandlestickSilhouette className="absolute left-[5%] top-[20%] h-[100px] w-[160px] opacity-[0.06] animate-[float-slow_26s_ease-in-out_infinite]" />
+          <FloatingChart className="absolute right-[3%] bottom-[20%] h-[120px] w-[280px] opacity-[0.05] animate-[float-slow_32s_ease-in-out_4s_infinite]" delay={8} />
+        </div>
         <div className="relative mx-auto max-w-6xl">
           <RevealSection className="mb-20 text-center">
             <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-amber-400/70">
@@ -536,6 +614,10 @@ export default function LandingPage() {
 
       {/* ───── How It Works ───── */}
       <section className="relative px-6 py-32">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <NeuralMesh />
+          <div className="absolute left-[10%] bottom-[20%] h-[400px] w-[400px] rounded-full bg-emerald-500/[0.015] blur-[180px]" />
+        </div>
         <div className="relative mx-auto max-w-4xl">
           <RevealSection className="mb-20 text-center">
             <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-amber-400/70">
@@ -571,8 +653,10 @@ export default function LandingPage() {
 
       {/* ───── CTA / Pricing ───── */}
       <section id="pricing" className="relative px-6 py-32">
-        <div className="pointer-events-none absolute inset-0">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-500/[0.02] blur-[200px]" />
+          <PerspectiveGrid />
+          <ScatterDots className="absolute left-[8%] top-[15%] h-[150px] w-[250px] opacity-[0.05]" />
         </div>
 
         <RevealSection className="relative mx-auto max-w-lg text-center">
