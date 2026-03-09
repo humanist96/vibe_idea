@@ -175,6 +175,200 @@ const MARKET_FEATURES = [
   },
 ]
 
+/* ───── 3D Perspective Grid (Hero) ───── */
+function PerspectiveGrid() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div
+        className="absolute bottom-0 left-1/2 -translate-x-1/2"
+        style={{
+          width: "200%",
+          height: "60%",
+          perspective: "800px",
+          perspectiveOrigin: "50% 0%",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            transform: "rotateX(65deg)",
+            backgroundImage:
+              "linear-gradient(rgba(245,158,11,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,0.06) 1px, transparent 1px)",
+            backgroundSize: "80px 80px",
+            maskImage: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 70%)",
+            WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 70%)",
+          }}
+        />
+      </div>
+    </div>
+  )
+}
+
+/* ───── Floating Candlestick Chart SVG ───── */
+function FloatingCandlesticks() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.07]">
+      <svg
+        className="absolute -right-20 top-[15%] h-[400px] w-[300px] animate-[float_12s_ease-in-out_infinite]"
+        viewBox="0 0 300 400"
+        fill="none"
+      >
+        {/* Candlesticks */}
+        {[
+          { x: 30, o: 280, c: 180, h: 150, l: 310, bull: true },
+          { x: 70, o: 220, c: 260, h: 200, l: 290, bull: false },
+          { x: 110, o: 260, c: 150, h: 120, l: 300, bull: true },
+          { x: 150, o: 180, c: 220, h: 160, l: 250, bull: false },
+          { x: 190, o: 240, c: 130, h: 100, l: 270, bull: true },
+          { x: 230, o: 160, c: 200, h: 130, l: 230, bull: false },
+          { x: 270, o: 210, c: 110, h: 80, l: 250, bull: true },
+        ].map((c) => (
+          <g key={c.x}>
+            <line x1={c.x} y1={c.h} x2={c.x} y2={c.l} stroke={c.bull ? "#f59e0b" : "#3b82f6"} strokeWidth="1.5" />
+            <rect
+              x={c.x - 12}
+              y={Math.min(c.o, c.c)}
+              width="24"
+              height={Math.abs(c.o - c.c)}
+              fill={c.bull ? "#f59e0b" : "#3b82f6"}
+              rx="2"
+            />
+          </g>
+        ))}
+      </svg>
+
+      <svg
+        className="absolute -left-16 bottom-[20%] h-[350px] w-[260px] animate-[float_15s_ease-in-out_2s_infinite]"
+        viewBox="0 0 260 350"
+        fill="none"
+      >
+        {[
+          { x: 20, o: 250, c: 170, h: 140, l: 280, bull: true },
+          { x: 55, o: 190, c: 230, h: 170, l: 260, bull: false },
+          { x: 90, o: 230, c: 140, h: 110, l: 260, bull: true },
+          { x: 125, o: 170, c: 210, h: 150, l: 240, bull: false },
+          { x: 160, o: 220, c: 120, h: 90, l: 250, bull: true },
+          { x: 195, o: 150, c: 190, h: 120, l: 220, bull: false },
+          { x: 230, o: 200, c: 100, h: 70, l: 230, bull: true },
+        ].map((c) => (
+          <g key={c.x}>
+            <line x1={c.x} y1={c.h} x2={c.x} y2={c.l} stroke={c.bull ? "#f59e0b" : "#3b82f6"} strokeWidth="1.5" />
+            <rect
+              x={c.x - 10}
+              y={Math.min(c.o, c.c)}
+              width="20"
+              height={Math.abs(c.o - c.c)}
+              fill={c.bull ? "#f59e0b" : "#3b82f6"}
+              rx="2"
+            />
+          </g>
+        ))}
+      </svg>
+    </div>
+  )
+}
+
+/* ───── Neural Network Nodes ───── */
+function NeuralNetwork() {
+  const nodes = [
+    { cx: 80, cy: 100 }, { cx: 200, cy: 60 }, { cx: 320, cy: 110 },
+    { cx: 140, cy: 200 }, { cx: 260, cy: 180 }, { cx: 380, cy: 200 },
+    { cx: 100, cy: 310 }, { cx: 220, cy: 290 }, { cx: 340, cy: 320 },
+    { cx: 460, cy: 140 }, { cx: 440, cy: 280 },
+  ]
+  const edges = [
+    [0, 1], [0, 3], [1, 2], [1, 4], [2, 4], [2, 5],
+    [3, 6], [3, 7], [4, 7], [4, 8], [5, 8], [5, 10],
+    [6, 7], [7, 8], [2, 9], [9, 10], [8, 10],
+  ]
+
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.05]">
+      <svg
+        className="absolute left-[5%] top-[10%] h-[400px] w-[500px] animate-[float_20s_ease-in-out_infinite]"
+        viewBox="0 0 500 400"
+        fill="none"
+      >
+        {edges.map(([a, b]) => (
+          <line
+            key={`${a}-${b}`}
+            x1={nodes[a].cx} y1={nodes[a].cy}
+            x2={nodes[b].cx} y2={nodes[b].cy}
+            stroke="#f59e0b"
+            strokeWidth="1"
+          />
+        ))}
+        {nodes.map((n, i) => (
+          <circle
+            key={i}
+            cx={n.cx} cy={n.cy} r="6"
+            fill="#0f172a"
+            stroke="#f59e0b"
+            strokeWidth="1.5"
+          />
+        ))}
+        {/* Pulsing center node */}
+        <circle cx={260} cy={180} r="10" fill="#f59e0b" opacity="0.3">
+          <animate attributeName="r" values="8;14;8" dur="3s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.3;0.1;0.3" dur="3s" repeatCount="indefinite" />
+        </circle>
+      </svg>
+    </div>
+  )
+}
+
+/* ───── Floating Price Ticker Line ───── */
+function FloatingPriceLine() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.06]">
+      <svg
+        className="absolute right-[5%] top-[30%] h-[200px] w-[600px] animate-[float_18s_ease-in-out_3s_infinite]"
+        viewBox="0 0 600 200"
+        fill="none"
+      >
+        <defs>
+          <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#f59e0b" stopOpacity="0" />
+            <stop offset="20%" stopColor="#f59e0b" stopOpacity="1" />
+            <stop offset="80%" stopColor="#3b82f6" stopOpacity="1" />
+            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M0 140 Q50 130 80 120 T160 90 T240 100 T320 60 T400 80 T480 40 T560 50 L600 45"
+          stroke="url(#lineGrad)"
+          strokeWidth="2"
+          fill="none"
+        />
+        <path
+          d="M0 140 Q50 130 80 120 T160 90 T240 100 T320 60 T400 80 T480 40 T560 50 L600 45 L600 200 L0 200 Z"
+          fill="url(#areaGrad)"
+        />
+        {/* Data points */}
+        {[
+          [80, 120], [160, 90], [240, 100], [320, 60], [400, 80], [480, 40], [560, 50],
+        ].map(([x, y]) => (
+          <circle key={`${x}-${y}`} cx={x} cy={y} r="3" fill="#f59e0b" opacity="0.5" />
+        ))}
+      </svg>
+    </div>
+  )
+}
+
+/* ───── Section Divider with subtle chart ───── */
+function SectionDivider() {
+  return (
+    <div className="pointer-events-none relative h-px w-full">
+      <div className="absolute inset-x-0 top-0 mx-auto h-px max-w-4xl bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
+    </div>
+  )
+}
+
 export default function LandingPage() {
   const [isVisible, setIsVisible] = useState(false)
 
@@ -184,6 +378,15 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-white">
+      {/* Global CSS for float animation */}
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          33% { transform: translateY(-15px) rotate(0.5deg); }
+          66% { transform: translateY(8px) rotate(-0.3deg); }
+        }
+      `}</style>
+
       {/* ───── Navigation ───── */}
       <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#0f172a]/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -232,16 +435,19 @@ export default function LandingPage() {
           <div className="absolute left-1/4 top-1/4 h-[500px] w-[500px] rounded-full bg-amber-500/5 blur-[120px]" />
           <div className="absolute bottom-1/4 right-1/4 h-[400px] w-[400px] rounded-full bg-blue-500/5 blur-[120px]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#0f172a_70%)]" />
-          {/* Grid pattern */}
-          <div
-            className="absolute inset-0 opacity-[0.02]"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)",
-              backgroundSize: "60px 60px",
-            }}
-          />
         </div>
+
+        {/* 3D Perspective Grid Floor */}
+        <PerspectiveGrid />
+
+        {/* Floating Candlestick Charts */}
+        <FloatingCandlesticks />
+
+        {/* Neural Network Background */}
+        <NeuralNetwork />
+
+        {/* Floating Price Line */}
+        <FloatingPriceLine />
 
         <div
           className={`relative mx-auto max-w-5xl text-center transition-all duration-1000 ${
@@ -311,10 +517,27 @@ export default function LandingPage() {
         </a>
       </section>
 
+      <SectionDivider />
+
       {/* ───── Core AI Features ───── */}
       <section id="features" className="relative px-6 py-24">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute right-0 top-0 h-[600px] w-[600px] rounded-full bg-amber-500/3 blur-[150px]" />
+        </div>
+
+        {/* Subtle neural dots background */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.03]">
+          <svg className="absolute left-0 top-0 h-full w-full" viewBox="0 0 1200 800" fill="none">
+            {Array.from({ length: 40 }).map((_, i) => (
+              <circle
+                key={i}
+                cx={((i * 137) % 1200)}
+                cy={((i * 97) % 800)}
+                r="2"
+                fill="#f59e0b"
+              />
+            ))}
+          </svg>
         </div>
 
         <div className="relative mx-auto max-w-7xl">
@@ -339,10 +562,28 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <SectionDivider />
+
       {/* ───── Market Coverage ───── */}
       <section id="markets" className="relative px-6 py-24">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-blue-500/3 blur-[150px]" />
+        </div>
+
+        {/* Globe wireframe hint */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.03]">
+          <svg
+            className="absolute right-[10%] top-[5%] h-[350px] w-[350px]"
+            viewBox="0 0 350 350"
+            fill="none"
+          >
+            <circle cx="175" cy="175" r="140" stroke="#3b82f6" strokeWidth="0.8" />
+            <ellipse cx="175" cy="175" rx="90" ry="140" stroke="#3b82f6" strokeWidth="0.6" />
+            <ellipse cx="175" cy="175" rx="45" ry="140" stroke="#3b82f6" strokeWidth="0.4" />
+            <line x1="35" y1="120" x2="315" y2="120" stroke="#3b82f6" strokeWidth="0.4" />
+            <line x1="35" y1="175" x2="315" y2="175" stroke="#3b82f6" strokeWidth="0.6" />
+            <line x1="35" y1="230" x2="315" y2="230" stroke="#3b82f6" strokeWidth="0.4" />
+          </svg>
         </div>
 
         <div className="relative mx-auto max-w-7xl">
@@ -418,6 +659,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <SectionDivider />
+
       {/* ───── Additional Features Grid ───── */}
       <section className="relative px-6 py-24">
         <div className="relative mx-auto max-w-7xl">
@@ -453,8 +696,23 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <SectionDivider />
+
       {/* ───── How It Works ───── */}
       <section className="relative px-6 py-24">
+        {/* Subtle bar chart background */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.025]">
+          <svg className="absolute left-[8%] bottom-[10%] h-[200px] w-[300px]" viewBox="0 0 300 200" fill="none">
+            {[30, 70, 110, 150, 190, 230, 270].map((x, i) => {
+              const h = [80, 120, 60, 140, 100, 160, 90][i]
+              return (
+                <rect key={x} x={x - 12} y={200 - h} width="24" height={h} fill="#f59e0b" rx="3" />
+              )
+            })}
+            <line x1="0" y1="199" x2="300" y2="199" stroke="#f59e0b" strokeWidth="1" />
+          </svg>
+        </div>
+
         <div className="relative mx-auto max-w-5xl">
           <div className="mb-16 text-center">
             <div className="mb-3 text-sm font-semibold uppercase tracking-widest text-amber-400">
