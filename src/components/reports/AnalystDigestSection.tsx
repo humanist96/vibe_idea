@@ -1,7 +1,6 @@
 "use client"
 
 import { BookOpen, TrendingUp, TrendingDown, Minus, ArrowUpRight, ArrowDownRight } from "lucide-react"
-import { TargetPriceBar } from "./charts/TargetPriceBar"
 import type { AnalystDigest } from "@/lib/report/types"
 import type { StockQuote } from "@/lib/api/naver-finance"
 

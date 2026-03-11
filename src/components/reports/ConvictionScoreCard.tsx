@@ -1,24 +1,12 @@
 "use client"
 
 import { Gauge } from "lucide-react"
+import { CONVICTION_SCORE_COLORS } from "./report-constants"
 import type { ConvictionScore } from "@/lib/report/types"
 
 interface ConvictionScoreCardProps {
   readonly conviction: ConvictionScore
   readonly stockName: string
-}
-
-const SCORE_COLORS: Record<string, string> = {
-  "강력 매수": "#16a34a",
-  "매수": "#22c55e",
-  "중립": "#eab308",
-  "매도": "#f97316",
-  "강력 매도": "#ef4444",
-  "매수 고려": "#22c55e",
-  "비중 확대": "#16a34a",
-  "관망": "#eab308",
-  "비중 축소": "#f97316",
-  "매도 고려": "#ef4444",
 }
 
 const SIGNAL_COLORS = {
@@ -34,7 +22,7 @@ const SIGNAL_LABELS = {
 }
 
 export function ConvictionScoreCard({ conviction, stockName }: ConvictionScoreCardProps) {
-  const color = SCORE_COLORS[conviction.label] ?? "#6b7280"
+  const color = CONVICTION_SCORE_COLORS[conviction.label] ?? "#6b7280"
   const pct = ((conviction.score - 1) / 9) * 100
 
   return (
@@ -45,23 +33,13 @@ export function ConvictionScoreCard({ conviction, stockName }: ConvictionScoreCa
       </div>
 
       {/* Score Bar */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 h-6 rounded-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 opacity-20" />
+      <div className="relative h-6 rounded-full overflow-visible">
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 opacity-20" />
         <div
-          className="absolute flex-1 h-6 flex items-center"
-          style={{ width: "calc(100% - 3.5rem)" }}
+          className="absolute top-1/2 -translate-y-1/2 h-7 w-7 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-[10px] font-bold text-white z-10"
+          style={{ backgroundColor: color, left: `clamp(0.5rem, ${pct}%, calc(100% - 1.25rem))` }}
         >
-          <div
-            className="relative h-6"
-            style={{ width: `${pct}%` }}
-          >
-            <div
-              className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-1/2 h-7 w-7 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-[10px] font-bold text-white"
-              style={{ backgroundColor: color }}
-            >
-              {conviction.score}
-            </div>
-          </div>
+          {conviction.score}
         </div>
       </div>
 

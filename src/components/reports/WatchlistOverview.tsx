@@ -5,6 +5,7 @@ import { PerformanceBar } from "./charts/PerformanceBar"
 import type { StockReportData, StockAnalysis } from "@/lib/report/types"
 import { formatCurrency, formatNumber } from "@/lib/utils/format"
 import { BarChart3 } from "lucide-react"
+import { ACTION_BADGE_COLORS } from "./report-constants"
 
 interface WatchlistOverviewProps {
   readonly stocks: readonly StockReportData[]
@@ -64,14 +65,6 @@ export function WatchlistOverview({ stocks, analyses }: WatchlistOverviewProps) 
                   : "text-red-600"
                 : ""
 
-              const actionColors: Record<string, string> = {
-                "매수 고려": "bg-green-100 text-green-700",
-                "비중 확대": "bg-emerald-100 text-emerald-700",
-                "관망": "bg-amber-100 text-amber-700",
-                "비중 축소": "bg-orange-100 text-orange-700",
-                "매도 고려": "bg-red-100 text-red-700",
-              }
-
               return (
                 <tr key={stock.ticker} className="table-row-hover border-b border-[var(--color-border-subtle)] last:border-0">
                   <td className="py-2 font-medium text-[var(--color-text-primary)]">
@@ -112,7 +105,7 @@ export function WatchlistOverview({ stocks, analyses }: WatchlistOverviewProps) 
                   </td>
                   <td className="hidden py-2 text-center lg:table-cell">
                     {actionItem ? (
-                      <span className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-medium ${actionColors[actionItem.action] ?? "bg-gray-100 text-gray-700"}`}>
+                      <span className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-medium ${ACTION_BADGE_COLORS[actionItem.action] ?? "bg-gray-100 text-gray-700"}`}>
                         {actionItem.action}
                       </span>
                     ) : (

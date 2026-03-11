@@ -1,6 +1,6 @@
 "use client"
 
-import { Crosshair, CheckCircle2, AlertCircle } from "lucide-react"
+import { Crosshair, CheckCircle2 } from "lucide-react"
 import type { ActionItem } from "@/lib/report/types"
 
 interface ActionItemCardProps {

@@ -30,12 +30,15 @@ export function RiskAlertBadges({ alerts }: RiskAlertBadgesProps) {
         return (
           <div
             key={i}
-            className={`group relative inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text} ${style.border}`}
+            tabIndex={0}
+            role="status"
+            aria-label={`${alert.label}: ${alert.detail}`}
+            className={`group relative inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium cursor-default ${style.bg} ${style.text} ${style.border}`}
           >
             <Icon className="h-2.5 w-2.5" />
             <span>{alert.label}</span>
             {/* Tooltip */}
-            <div className="invisible group-hover:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 w-max max-w-48 rounded-md bg-[var(--color-surface-800)] px-2 py-1 text-[10px] text-white shadow-lg z-50">
+            <div className="invisible group-hover:visible group-focus-within:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 w-max max-w-48 rounded-md bg-[var(--color-surface-800)] px-2 py-1 text-[10px] text-white shadow-lg z-50">
               {alert.detail}
               <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[var(--color-surface-800)]" />
             </div>
