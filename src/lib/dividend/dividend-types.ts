@@ -37,6 +37,11 @@ export interface DividendStock {
   readonly paymentDate: string | null
   readonly paymentMonths: readonly number[]
 
+  // 밸류에이션 지표
+  readonly marketCap: number | null
+  readonly per: number | null
+  readonly pbr: number | null
+
   // 안전성 지표
   readonly safetyScore: number
   readonly safetyGrade: DividendSafetyGrade

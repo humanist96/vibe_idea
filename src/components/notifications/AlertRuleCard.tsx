@@ -8,6 +8,10 @@ const ALERT_TYPE_LABELS: Record<string, string> = {
   PRICE_BELOW: "하한가 이하",
   VOLUME_SPIKE: "거래량 급증",
   EARNINGS_DATE: "실적 발표일",
+  EX_DATE_D7: "배당락일 D-7",
+  DIVIDEND_CHANGE: "배당 변동",
+  SAFETY_CHANGE: "안전도 변동",
+  GAP_MONTH: "배당 공백월",
 }
 
 interface AlertRule {

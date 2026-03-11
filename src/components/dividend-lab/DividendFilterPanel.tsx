@@ -12,6 +12,8 @@ type FilterState = {
   readonly growthRateMin: number | null
   readonly debtToEquityMax: number | null
   readonly fcfCoverageMin: number | null
+  readonly perMax: number | null
+  readonly pbrMax: number | null
   readonly frequency: readonly DividendFrequency[]
 }
 
@@ -23,6 +25,8 @@ const DEFAULT_FILTERS: FilterState = {
   growthRateMin: null,
   debtToEquityMax: null,
   fcfCoverageMin: null,
+  perMax: null,
+  pbrMax: null,
   frequency: [],
 }
 
@@ -58,6 +62,8 @@ export function DividendFilterPanel({ onFilterChange }: DividendFilterPanelProps
       ...(f.growthRateMin !== null ? { growthRateMin: f.growthRateMin } : {}),
       ...(f.debtToEquityMax !== null ? { debtToEquityMax: f.debtToEquityMax } : {}),
       ...(f.fcfCoverageMin !== null ? { fcfCoverageMin: f.fcfCoverageMin } : {}),
+      ...(f.perMax !== null ? { perMax: f.perMax } : {}),
+      ...(f.pbrMax !== null ? { pbrMax: f.pbrMax } : {}),
       ...(f.frequency.length > 0 ? { frequency: f.frequency } : {}),
     }
     onFilterChange(partial)
@@ -238,6 +244,46 @@ export function DividendFilterPanel({ onFilterChange }: DividendFilterPanelProps
                 onChange={(e) => {
                   const v = e.target.value ? Number(e.target.value) : null
                   updateFilter("fcfCoverageMin", v)
+                }}
+                className="w-full rounded-md bg-[var(--color-glass-2)] px-2 py-1.5 text-xs tabular-nums text-[var(--color-text-primary)] ring-1 ring-[var(--color-border-subtle)] placeholder:text-[var(--color-text-muted)]"
+              />
+            </div>
+
+            {/* PER max */}
+            <div>
+              <label className="mb-1.5 block text-[10px] uppercase tracking-wider text-[var(--color-text-tertiary)]">
+                PER 최대 (배)
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={200}
+                step={1}
+                value={filters.perMax ?? ""}
+                placeholder="제한 없음"
+                onChange={(e) => {
+                  const v = e.target.value ? Number(e.target.value) : null
+                  updateFilter("perMax", v)
+                }}
+                className="w-full rounded-md bg-[var(--color-glass-2)] px-2 py-1.5 text-xs tabular-nums text-[var(--color-text-primary)] ring-1 ring-[var(--color-border-subtle)] placeholder:text-[var(--color-text-muted)]"
+              />
+            </div>
+
+            {/* PBR max */}
+            <div>
+              <label className="mb-1.5 block text-[10px] uppercase tracking-wider text-[var(--color-text-tertiary)]">
+                PBR 최대 (배)
+              </label>
+              <input
+                type="number"
+                min={0.1}
+                max={50}
+                step={0.1}
+                value={filters.pbrMax ?? ""}
+                placeholder="제한 없음"
+                onChange={(e) => {
+                  const v = e.target.value ? Number(e.target.value) : null
+                  updateFilter("pbrMax", v)
                 }}
                 className="w-full rounded-md bg-[var(--color-glass-2)] px-2 py-1.5 text-xs tabular-nums text-[var(--color-text-primary)] ring-1 ring-[var(--color-border-subtle)] placeholder:text-[var(--color-text-muted)]"
               />

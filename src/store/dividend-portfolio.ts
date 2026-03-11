@@ -26,6 +26,7 @@ interface DividendPortfolioState {
 
   distributeEqual: () => void
   distributeByYield: (yields: ReadonlyMap<string, number>) => void
+  distributeByMarketCap: (marketCaps: ReadonlyMap<string, number>) => void
 
   loadFromSaved: (
     id: string,
@@ -146,6 +147,27 @@ export const useDividendPortfolioStore = create<DividendPortfolioState>()(
               ...i,
               weight:
                 ((yields.get(`${i.market}:${i.ticker}`) ?? 0) / totalYield) *
+                100,
+            })),
+          }
+        }),
+
+      distributeByMarketCap: (marketCaps) =>
+        set((state) => {
+          if (state.items.length === 0) return state
+          const totalCap = state.items.reduce(
+            (sum, i) => sum + (marketCaps.get(`${i.market}:${i.ticker}`) ?? 0),
+            0
+          )
+          if (totalCap === 0) {
+            const w = 100 / state.items.length
+            return { items: state.items.map((i) => ({ ...i, weight: w })) }
+          }
+          return {
+            items: state.items.map((i) => ({
+              ...i,
+              weight:
+                ((marketCaps.get(`${i.market}:${i.ticker}`) ?? 0) / totalCap) *
                 100,
             })),
           }

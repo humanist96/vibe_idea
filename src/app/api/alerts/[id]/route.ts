@@ -7,7 +7,16 @@ const patchSchema = z.object({
   active: z.boolean().optional(),
   threshold: z.number().positive().optional(),
   type: z
-    .enum(["PRICE_ABOVE", "PRICE_BELOW", "VOLUME_SPIKE", "EARNINGS_DATE"])
+    .enum([
+      "PRICE_ABOVE",
+      "PRICE_BELOW",
+      "VOLUME_SPIKE",
+      "EARNINGS_DATE",
+      "EX_DATE_D7",
+      "DIVIDEND_CHANGE",
+      "SAFETY_CHANGE",
+      "GAP_MONTH",
+    ])
     .optional(),
 })
 

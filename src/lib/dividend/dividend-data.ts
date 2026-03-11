@@ -7,9 +7,10 @@ import "server-only"
 
 import { cache, ONE_DAY, ONE_HOUR } from "@/lib/cache/memory-cache"
 import { getDividendInfo } from "@/lib/api/dart-dividend"
+import { getQuote as getNaverQuote } from "@/lib/api/naver-finance"
 import type { DividendInfo } from "@/lib/api/dart-dividend-types"
 import { getTwelveDividends, getTwelveStatistics } from "@/lib/api/twelve-data"
-import { getUSMetrics } from "@/lib/api/finnhub"
+import { getUSMetrics, getUSQuote } from "@/lib/api/finnhub"
 import { findUSStock, getAllUSStocks } from "@/lib/data/us-stock-registry"
 import { STOCK_LIST, findStock } from "@/lib/constants/stocks"
 import { scoreToGrade } from "./scoring"
@@ -151,6 +152,9 @@ export async function getKRDividendStock(
 
     if (!latestDividend) return null
 
+    // 현재가, 시총, PER/PBR 조회 (Naver Finance)
+    const naverQuote = await getNaverQuote(ticker).catch(() => null)
+
     const consecutiveYears = calcConsecutiveYears(dividendHistory)
     const growthRate = calcGrowthRate(dividendHistory)
     const safetyScore = calcSafetyScore(
@@ -167,7 +171,7 @@ export async function getKRDividendStock(
       market: "KR",
       sector: stockInfo.sector,
       sectorKr: stockInfo.sector,
-      currentPrice: 0,
+      currentPrice: naverQuote?.price ?? 0,
       currency: "KRW",
       dividendYield: latestDividend.dividendYield,
       dividendPerShare: latestDividend.dividendPerShare,
@@ -178,6 +182,9 @@ export async function getKRDividendStock(
       exDividendDate: null,
       paymentDate: null,
       paymentMonths: [12],
+      marketCap: naverQuote?.marketCap ?? null,
+      per: naverQuote?.per ?? null,
+      pbr: naverQuote?.pbr ?? null,
       safetyScore,
       safetyGrade: scoreToGrade(safetyScore),
       fcfCoverage: null,
@@ -253,11 +260,12 @@ export async function getUSDividendStock(
   if (!entry) return null
 
   try {
-    const [dividendsResult, statsResult, metricsResult] =
+    const [dividendsResult, statsResult, metricsResult, quoteResult] =
       await Promise.allSettled([
         getTwelveDividends(symbol),
         getTwelveStatistics(symbol),
         getUSMetrics(symbol),
+        getUSQuote(symbol),
       ])
 
     const dividends =
@@ -266,6 +274,8 @@ export async function getUSDividendStock(
       statsResult.status === "fulfilled" ? statsResult.value : null
     const metrics =
       metricsResult.status === "fulfilled" ? metricsResult.value : null
+    const usQuote =
+      quoteResult.status === "fulfilled" ? quoteResult.value : null
 
     const divsSplits = stats?.statistics?.dividends_and_splits
 
@@ -317,6 +327,14 @@ export async function getUSDividendStock(
       null
     )
 
+    // Finnhub metrics에서 밸류에이션 데이터 추출
+    const rawMarketCap = metrics?.metric?.marketCapitalization ?? null
+    const usMarketCap = typeof rawMarketCap === "number" ? rawMarketCap : null
+    const rawPe = metrics?.metric?.peAnnual ?? null
+    const usPer = typeof rawPe === "number" ? rawPe : null
+    const rawPb = metrics?.metric?.pbAnnual ?? null
+    const usPbr = typeof rawPb === "number" ? rawPb : null
+
     const stock: DividendStock = {
       ticker: symbol,
       name: entry.name,
@@ -324,7 +342,7 @@ export async function getUSDividendStock(
       market: "US",
       sector: entry.sector,
       sectorKr: entry.sectorKr,
-      currentPrice: 0,
+      currentPrice: usQuote?.c ?? 0,
       currency: "USD",
       dividendYield,
       dividendPerShare: Number(dividendPerShare.toFixed(4)),
@@ -335,6 +353,9 @@ export async function getUSDividendStock(
       exDividendDate: divsSplits?.ex_dividend_date ?? null,
       paymentDate: divsSplits?.dividend_date ?? null,
       paymentMonths,
+      marketCap: usMarketCap,
+      per: usPer,
+      pbr: usPbr,
       safetyScore,
       safetyGrade: scoreToGrade(safetyScore),
       fcfCoverage: null,

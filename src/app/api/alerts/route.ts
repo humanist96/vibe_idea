@@ -6,7 +6,16 @@ import { prisma } from "@/lib/db/prisma"
 const createSchema = z.object({
   ticker: z.string().min(1).max(20),
   market: z.enum(["KR", "US"]),
-  type: z.enum(["PRICE_ABOVE", "PRICE_BELOW", "VOLUME_SPIKE", "EARNINGS_DATE"]),
+  type: z.enum([
+    "PRICE_ABOVE",
+    "PRICE_BELOW",
+    "VOLUME_SPIKE",
+    "EARNINGS_DATE",
+    "EX_DATE_D7",
+    "DIVIDEND_CHANGE",
+    "SAFETY_CHANGE",
+    "GAP_MONTH",
+  ]),
   threshold: z.number().positive().optional(),
 })
 

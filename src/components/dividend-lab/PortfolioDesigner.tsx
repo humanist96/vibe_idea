@@ -8,6 +8,7 @@ import { SimulationDashboard } from "./SimulationDashboard"
 import { MonthlyDividendGrid } from "./MonthlyDividendGrid"
 import { DividendGrowthChart } from "./DividendGrowthChart"
 import { AIDiagnosisPanel } from "./AIDiagnosisPanel"
+import { WhatIfScenario } from "./WhatIfScenario"
 import { AIRecommendPanel } from "./AIRecommendPanel"
 import { PortfolioSaveLoad } from "./PortfolioSaveLoad"
 import { SectorDiversification } from "./SectorDiversification"
@@ -180,6 +181,14 @@ export function PortfolioDesigner() {
 
           {simulation && (
             <AIDiagnosisPanel simulation={simulation} />
+          )}
+
+          {simulation && items.length > 0 && (
+            <WhatIfScenario
+              simulation={simulation}
+              items={items}
+              settings={settings}
+            />
           )}
 
           <AIRecommendPanel

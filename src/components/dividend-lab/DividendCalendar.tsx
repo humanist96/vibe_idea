@@ -5,7 +5,9 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Card, CardHeader, CardTitle } from "@/components/ui/Card"
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
 import type { DividendCalendarEvent, DividendMarket } from "@/lib/dividend/dividend-types"
+import { useDividendPortfolioStore } from "@/store/dividend-portfolio"
 import { MARKET_BADGE_STYLES } from "./constants"
+import { DividendAlerts } from "./DividendAlerts"
 
 const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"]
 
@@ -20,6 +22,15 @@ export function DividendCalendar() {
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth() + 1)
   const [market, setMarket] = useState<DividendMarket | "ALL">("ALL")
+  const portfolioItems = useDividendPortfolioStore((s) => s.items)
+
+  const portfolioTickers = useMemo(() => {
+    const set = new Set<string>()
+    for (const item of portfolioItems) {
+      set.add(`${item.market}:${item.ticker}`)
+    }
+    return set
+  }, [portfolioItems])
   const [events, setEvents] = useState<readonly DividendCalendarEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -158,6 +169,10 @@ export function DividendCalendar() {
               <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" />
               지급일
             </span>
+            <span className="flex items-center gap-1">
+              <span className="inline-block h-2 w-2 rounded-full ring-2 ring-blue-400 bg-transparent" />
+              내 포트폴리오
+            </span>
           </div>
 
           {error && (
@@ -229,12 +244,15 @@ export function DividendCalendar() {
                         {day}
                       </span>
                       <div className="mt-0.5 space-y-0.5">
-                        {dayEvents.slice(0, 3).map((evt) => (
+                        {dayEvents.slice(0, 3).map((evt) => {
+                          const isInPortfolio = portfolioTickers.has(`${evt.market}:${evt.ticker}`)
+                          return (
                           <div
                             key={`${evt.ticker}-${evt.eventType}`}
                             className={
                               "truncate rounded px-1 py-0.5 text-[8px] font-medium ring-1 " +
-                              (EVENT_COLORS[evt.eventType] ?? "")
+                              (EVENT_COLORS[evt.eventType] ?? "") +
+                              (isInPortfolio ? " ring-2 ring-blue-400" : "")
                             }
                             title={`${evt.nameKr || evt.name} (${evt.market}) - ${evt.eventType}`}
                           >
@@ -243,7 +261,8 @@ export function DividendCalendar() {
                             </span>
                             {evt.nameKr || evt.name}
                           </div>
-                        ))}
+                          )
+                        })}
                         {dayEvents.length > 3 && (
                           <div className="text-[8px] text-[var(--color-text-muted)]">
                             +{dayEvents.length - 3}
@@ -258,6 +277,8 @@ export function DividendCalendar() {
           )}
         </div>
       </Card>
+
+      <DividendAlerts />
     </div>
   )
 }

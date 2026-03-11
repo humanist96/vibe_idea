@@ -3,6 +3,10 @@ export const ALERT_TYPES = [
   "PRICE_BELOW",
   "VOLUME_SPIKE",
   "EARNINGS_DATE",
+  "EX_DATE_D7",
+  "DIVIDEND_CHANGE",
+  "SAFETY_CHANGE",
+  "GAP_MONTH",
 ] as const
 
 export type AlertType = (typeof ALERT_TYPES)[number]

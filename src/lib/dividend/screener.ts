@@ -38,7 +38,8 @@ const PRESETS: Readonly<Record<DividendScreenerPreset, PresetFilters>> = {
   },
   value: {
     yieldMin: 3,
-    // perMax/pbrMax: DividendStock에 PER/PBR 데이터 추가 시 활성화
+    perMax: 20,
+    pbrMax: 3,
   },
 }
 
@@ -151,6 +152,24 @@ function matchesFilter(
     return false
   }
 
+  // PER 상한
+  if (
+    filters.perMax !== null &&
+    stock.per !== null &&
+    stock.per > filters.perMax
+  ) {
+    return false
+  }
+
+  // PBR 상한
+  if (
+    filters.pbrMax !== null &&
+    stock.pbr !== null &&
+    stock.pbr > filters.pbrMax
+  ) {
+    return false
+  }
+
   return true
 }
 
@@ -169,7 +188,7 @@ function getSortValue(stock: DividendStock, field: DividendSortField): number {
     case "dividendPerShare":
       return stock.dividendPerShare
     case "marketCap":
-      return 0 // 시총 데이터 별도 조회 필요
+      return stock.marketCap ?? 0
     default:
       return stock.dividendYield
   }
