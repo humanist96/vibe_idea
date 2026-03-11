@@ -1,0 +1,1177 @@
+{
+  "timestamp": "2026-03-11T10:31:25.551Z",
+  "reason": "compaction",
+  "status": {
+    "version": "2.0",
+    "lastUpdated": "2026-03-11T10:31:25.443Z",
+    "activeFeatures": [
+      "ai-score",
+      "us-stocks",
+      "[ticker]",
+      "news",
+      "stock",
+      "entry-exit",
+      "landing",
+      "layout",
+      "quotes",
+      "dashboard",
+      "store",
+      "dashboard-layout",
+      "vibe_idea",
+      "calendar-impact",
+      "analysis",
+      "rotation-signal",
+      "performance",
+      "momentum",
+      "risk-radar",
+      "impact",
+      "dividend",
+      "screener",
+      "portfolio",
+      "[id]",
+      "simulate",
+      "diagnosis",
+      "recommend",
+      "calendar",
+      "constants",
+      "dividend-lab"
+    ],
+    "primaryFeature": "ai-score",
+    "features": {
+      "ai-score": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-07T14:55:18.664Z",
+          "lastUpdated": "2026-03-07T15:00:16.487Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/us-stocks/[ticker]/ai-score/route.ts"
+      },
+      "us-stocks": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-07T14:55:46.880Z",
+          "lastUpdated": "2026-03-07T14:59:58.113Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/us-stocks/page.tsx"
+      },
+      "[ticker]": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-07T14:59:23.437Z",
+          "lastUpdated": "2026-03-08T03:00:57.572Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/stock/[ticker]/StockDetailClient.tsx"
+      },
+      "news": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-07T15:11:27.048Z",
+          "lastUpdated": "2026-03-08T02:59:02.128Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/stocks/[ticker]/news/route.ts"
+      },
+      "stock": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-08T00:27:17.937Z",
+          "lastUpdated": "2026-03-08T03:01:29.056Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/components/stock/InsiderActivityTable.tsx"
+      },
+      "entry-exit": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-09T05:52:11.885Z",
+          "lastUpdated": "2026-03-09T05:52:11.885Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/stocks/entry-exit/route.ts"
+      },
+      "landing": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-09T07:18:54.822Z",
+          "lastUpdated": "2026-03-09T08:06:11.927Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/landing/page.tsx"
+      },
+      "layout": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-09T07:20:44.827Z",
+          "lastUpdated": "2026-03-09T07:21:08.540Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/components/layout/Header.tsx"
+      },
+      "quotes": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T00:33:19.824Z",
+          "lastUpdated": "2026-03-11T00:33:21.933Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/user/portfolio/quotes/route.ts"
+      },
+      "dashboard": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T00:33:25.742Z",
+          "lastUpdated": "2026-03-11T07:01:10.754Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/components/dashboard/DashboardEditToolbar.tsx"
+      },
+      "store": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T00:40:48.603Z",
+          "lastUpdated": "2026-03-11T10:19:31.890Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/store/dividend-portfolio.ts"
+      },
+      "dashboard-layout": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T00:40:53.800Z",
+          "lastUpdated": "2026-03-11T00:43:12.576Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/user/dashboard-layout/route.ts"
+      },
+      "vibe_idea": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T00:42:07.406Z",
+          "lastUpdated": "2026-03-11T00:49:47.378Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/page.tsx"
+      },
+      "calendar-impact": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T00:54:41.434Z",
+          "lastUpdated": "2026-03-11T01:05:14.991Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/macro/calendar-impact/route.ts"
+      },
+      "analysis": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T00:55:01.237Z",
+          "lastUpdated": "2026-03-11T01:05:56.192Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/lib/analysis/sector-rotation.ts"
+      },
+      "rotation-signal": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T00:55:20.668Z",
+          "lastUpdated": "2026-03-11T01:05:12.779Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/sector/rotation-signal/route.ts"
+      },
+      "performance": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T00:55:27.355Z",
+          "lastUpdated": "2026-03-11T01:05:27.372Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/sectors/performance/route.ts"
+      },
+      "momentum": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T01:04:46.456Z",
+          "lastUpdated": "2026-03-11T01:04:50.216Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/market/momentum/route.ts"
+      },
+      "risk-radar": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T01:04:51.137Z",
+          "lastUpdated": "2026-03-11T01:04:55.431Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/risk-radar/route.ts"
+      },
+      "impact": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T01:04:56.881Z",
+          "lastUpdated": "2026-03-11T01:04:59.747Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/news/impact/route.ts"
+      },
+      "dividend": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T10:19:15.391Z",
+          "lastUpdated": "2026-03-11T10:27:44.448Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/lib/dividend/screener.ts"
+      },
+      "screener": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T10:23:43.552Z",
+          "lastUpdated": "2026-03-11T10:23:43.552Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/dividend-lab/screener/route.ts"
+      },
+      "portfolio": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T10:23:52.353Z",
+          "lastUpdated": "2026-03-11T10:23:52.353Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/dividend-lab/portfolio/route.ts"
+      },
+      "[id]": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T10:24:01.547Z",
+          "lastUpdated": "2026-03-11T10:24:01.547Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/dividend-lab/portfolio/[id]/route.ts"
+      },
+      "simulate": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T10:24:11.939Z",
+          "lastUpdated": "2026-03-11T10:24:11.939Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/dividend-lab/simulate/route.ts"
+      },
+      "diagnosis": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T10:24:30.725Z",
+          "lastUpdated": "2026-03-11T10:24:30.725Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/dividend-lab/diagnosis/route.ts"
+      },
+      "recommend": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T10:24:48.730Z",
+          "lastUpdated": "2026-03-11T10:24:48.730Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/dividend-lab/recommend/route.ts"
+      },
+      "calendar": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T10:24:59.250Z",
+          "lastUpdated": "2026-03-11T10:24:59.250Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/dividend-lab/calendar/route.ts"
+      },
+      "constants": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T10:28:50.414Z",
+          "lastUpdated": "2026-03-11T10:29:00.286Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/lib/constants/nav-data.ts"
+      },
+      "dividend-lab": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-11T10:29:21.436Z",
+          "lastUpdated": "2026-03-11T10:31:25.443Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/components/dividend-lab/SimulationDashboard.tsx"
+      }
+    },
+    "pipeline": {
+      "currentPhase": 1,
+      "level": "Dynamic",
+      "phaseHistory": []
+    },
+    "session": {
+      "startedAt": "2026-03-07T14:49:01.633Z",
+      "onboardingCompleted": false,
+      "lastActivity": "2026-03-11T10:31:25.443Z"
+    },
+    "history": [
+      {
+        "timestamp": "2026-03-07T14:55:18.664Z",
+        "feature": "ai-score",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:55:46.880Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:56:11.378Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:56:35.122Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:56:55.765Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:57:16.190Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:57:50.521Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:58:05.870Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:58:28.372Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:58:55.427Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:59:23.437Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:59:28.480Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:59:38.277Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:59:58.113Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:00:16.487Z",
+        "feature": "ai-score",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:11:06.965Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:11:27.048Z",
+        "feature": "news",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:11:39.366Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:32:20.479Z",
+        "feature": "news",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:32:26.983Z",
+        "feature": "news",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T00:27:01.947Z",
+        "feature": "news",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T00:27:17.937Z",
+        "feature": "stock",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T00:27:23.761Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T00:27:31.103Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T02:59:02.128Z",
+        "feature": "news",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T03:00:57.572Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T03:01:02.579Z",
+        "feature": "stock",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T03:01:05.746Z",
+        "feature": "stock",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T03:01:10.261Z",
+        "feature": "stock",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T03:01:29.056Z",
+        "feature": "stock",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T05:52:11.885Z",
+        "feature": "entry-exit",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:18:54.822Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:20:35.039Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:20:44.827Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:20:50.041Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:21:00.374Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:21:04.802Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:21:08.540Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:32:22.199Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:32:33.563Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:32:42.149Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:32:52.432Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:32:57.708Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:33:04.781Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:47:11.657Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:56:13.523Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:56:19.530Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:56:25.863Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:56:34.545Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:56:55.859Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:57:03.379Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:57:14.506Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:57:20.715Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:57:25.965Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:57:34.230Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:57:38.441Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T08:05:36.644Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T08:05:40.007Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T08:05:50.971Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T08:05:54.705Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T08:05:58.482Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T08:06:04.388Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T08:06:07.517Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T08:06:11.927Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:33:19.824Z",
+        "feature": "quotes",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:33:21.933Z",
+        "feature": "quotes",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:33:25.742Z",
+        "feature": "dashboard",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:40:40.131Z",
+        "feature": "dashboard",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:40:48.603Z",
+        "feature": "store",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:40:53.800Z",
+        "feature": "dashboard-layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:41:11.402Z",
+        "feature": "dashboard",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:41:29.954Z",
+        "feature": "dashboard",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:41:56.211Z",
+        "feature": "dashboard",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:42:07.406Z",
+        "feature": "vibe_idea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:43:12.576Z",
+        "feature": "dashboard-layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:49:47.378Z",
+        "feature": "vibe_idea",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:50:05.815Z",
+        "feature": "dashboard",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:50:12.232Z",
+        "feature": "dashboard",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:50:18.099Z",
+        "feature": "dashboard",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:50:25.018Z",
+        "feature": "dashboard",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:54:41.434Z",
+        "feature": "calendar-impact",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:55:01.237Z",
+        "feature": "analysis",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:55:20.668Z",
+        "feature": "rotation-signal",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T00:55:27.355Z",
+        "feature": "performance",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T01:04:46.456Z",
+        "feature": "momentum",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T01:04:50.216Z",
+        "feature": "momentum",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T01:04:51.137Z",
+        "feature": "risk-radar",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T01:04:55.431Z",
+        "feature": "risk-radar",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T01:04:56.881Z",
+        "feature": "impact",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T01:04:59.747Z",
+        "feature": "impact",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T01:05:12.779Z",
+        "feature": "rotation-signal",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T01:05:14.991Z",
+        "feature": "calendar-impact",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T01:05:27.372Z",
+        "feature": "performance",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T01:05:56.192Z",
+        "feature": "analysis",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T07:01:10.754Z",
+        "feature": "dashboard",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:19:15.391Z",
+        "feature": "dividend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:19:31.890Z",
+        "feature": "store",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:20:16.969Z",
+        "feature": "dividend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:21:03.515Z",
+        "feature": "dividend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:21:25.644Z",
+        "feature": "dividend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:23:43.552Z",
+        "feature": "screener",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:23:52.353Z",
+        "feature": "portfolio",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:24:01.547Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:24:11.939Z",
+        "feature": "simulate",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:24:30.725Z",
+        "feature": "diagnosis",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:24:48.730Z",
+        "feature": "recommend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:24:59.250Z",
+        "feature": "calendar",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:26:41.878Z",
+        "feature": "dividend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:26:49.053Z",
+        "feature": "dividend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:27:32.325Z",
+        "feature": "dividend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:27:44.448Z",
+        "feature": "dividend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:28:50.414Z",
+        "feature": "constants",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:28:55.961Z",
+        "feature": "constants",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:29:00.286Z",
+        "feature": "constants",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:29:21.436Z",
+        "feature": "dividend-lab",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:29:34.270Z",
+        "feature": "dividend-lab",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:30:02.944Z",
+        "feature": "dividend-lab",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:30:13.021Z",
+        "feature": "dividend-lab",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:30:30.400Z",
+        "feature": "dividend-lab",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:31:00.398Z",
+        "feature": "dividend-lab",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:31:14.647Z",
+        "feature": "dividend-lab",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-11T10:31:25.443Z",
+        "feature": "dividend-lab",
+        "phase": "do",
+        "action": "updated"
+      }
+    ]
+  }
+}

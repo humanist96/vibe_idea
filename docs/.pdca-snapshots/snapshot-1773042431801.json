@@ -1,0 +1,407 @@
+{
+  "timestamp": "2026-03-09T07:47:11.801Z",
+  "reason": "compaction",
+  "status": {
+    "version": "2.0",
+    "lastUpdated": "2026-03-09T07:47:11.657Z",
+    "activeFeatures": [
+      "ai-score",
+      "us-stocks",
+      "[ticker]",
+      "news",
+      "stock",
+      "entry-exit",
+      "landing",
+      "layout"
+    ],
+    "primaryFeature": "ai-score",
+    "features": {
+      "ai-score": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-07T14:55:18.664Z",
+          "lastUpdated": "2026-03-07T15:00:16.487Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/us-stocks/[ticker]/ai-score/route.ts"
+      },
+      "us-stocks": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-07T14:55:46.880Z",
+          "lastUpdated": "2026-03-07T14:59:58.113Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/us-stocks/page.tsx"
+      },
+      "[ticker]": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-07T14:59:23.437Z",
+          "lastUpdated": "2026-03-08T03:00:57.572Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/stock/[ticker]/StockDetailClient.tsx"
+      },
+      "news": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-07T15:11:27.048Z",
+          "lastUpdated": "2026-03-08T02:59:02.128Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/stocks/[ticker]/news/route.ts"
+      },
+      "stock": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-08T00:27:17.937Z",
+          "lastUpdated": "2026-03-08T03:01:29.056Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/components/stock/InsiderActivityTable.tsx"
+      },
+      "entry-exit": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-09T05:52:11.885Z",
+          "lastUpdated": "2026-03-09T05:52:11.885Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/stocks/entry-exit/route.ts"
+      },
+      "landing": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-09T07:18:54.822Z",
+          "lastUpdated": "2026-03-09T07:47:11.657Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/landing/page.tsx"
+      },
+      "layout": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-09T07:20:44.827Z",
+          "lastUpdated": "2026-03-09T07:21:08.540Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/components/layout/Header.tsx"
+      }
+    },
+    "pipeline": {
+      "currentPhase": 1,
+      "level": "Dynamic",
+      "phaseHistory": []
+    },
+    "session": {
+      "startedAt": "2026-03-07T14:49:01.633Z",
+      "onboardingCompleted": false,
+      "lastActivity": "2026-03-09T07:47:11.657Z"
+    },
+    "history": [
+      {
+        "timestamp": "2026-03-07T14:55:18.664Z",
+        "feature": "ai-score",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:55:46.880Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:56:11.378Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:56:35.122Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:56:55.765Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:57:16.190Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:57:50.521Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:58:05.870Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:58:28.372Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:58:55.427Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:59:23.437Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:59:28.480Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:59:38.277Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:59:58.113Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:00:16.487Z",
+        "feature": "ai-score",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:11:06.965Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:11:27.048Z",
+        "feature": "news",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:11:39.366Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:32:20.479Z",
+        "feature": "news",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:32:26.983Z",
+        "feature": "news",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T00:27:01.947Z",
+        "feature": "news",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T00:27:17.937Z",
+        "feature": "stock",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T00:27:23.761Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T00:27:31.103Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T02:59:02.128Z",
+        "feature": "news",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T03:00:57.572Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T03:01:02.579Z",
+        "feature": "stock",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T03:01:05.746Z",
+        "feature": "stock",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T03:01:10.261Z",
+        "feature": "stock",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-08T03:01:29.056Z",
+        "feature": "stock",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T05:52:11.885Z",
+        "feature": "entry-exit",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:18:54.822Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:20:35.039Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:20:44.827Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:20:50.041Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:21:00.374Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:21:04.802Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:21:08.540Z",
+        "feature": "layout",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:32:22.199Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:32:33.563Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:32:42.149Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:32:52.432Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:32:57.708Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:33:04.781Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-09T07:47:11.657Z",
+        "feature": "landing",
+        "phase": "do",
+        "action": "updated"
+      }
+    ]
+  }
+}

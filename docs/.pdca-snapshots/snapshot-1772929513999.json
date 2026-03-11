@@ -1,0 +1,201 @@
+{
+  "timestamp": "2026-03-08T00:25:13.997Z",
+  "reason": "compaction",
+  "status": {
+    "version": "2.0",
+    "lastUpdated": "2026-03-07T15:32:26.983Z",
+    "activeFeatures": [
+      "ai-score",
+      "us-stocks",
+      "[ticker]",
+      "news"
+    ],
+    "primaryFeature": "ai-score",
+    "features": {
+      "ai-score": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-07T14:55:18.664Z",
+          "lastUpdated": "2026-03-07T15:00:16.487Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/us-stocks/[ticker]/ai-score/route.ts"
+      },
+      "us-stocks": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-07T14:55:46.880Z",
+          "lastUpdated": "2026-03-07T14:59:58.113Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/us-stocks/page.tsx"
+      },
+      "[ticker]": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-07T14:59:23.437Z",
+          "lastUpdated": "2026-03-07T15:11:39.366Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/us-stocks/[ticker]/USStockDetailClient.tsx"
+      },
+      "news": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-07T15:11:27.048Z",
+          "lastUpdated": "2026-03-07T15:32:26.983Z"
+        },
+        "lastFile": "/Users/koscom/@work/vibe_idea/vibe_idea/src/app/api/us-stocks/[ticker]/news/route.ts"
+      }
+    },
+    "pipeline": {
+      "currentPhase": 1,
+      "level": "Dynamic",
+      "phaseHistory": []
+    },
+    "session": {
+      "startedAt": "2026-03-07T14:49:01.633Z",
+      "onboardingCompleted": false,
+      "lastActivity": "2026-03-07T15:32:26.983Z"
+    },
+    "history": [
+      {
+        "timestamp": "2026-03-07T14:55:18.664Z",
+        "feature": "ai-score",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:55:46.880Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:56:11.378Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:56:35.122Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:56:55.765Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:57:16.190Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:57:50.521Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:58:05.870Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:58:28.372Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:58:55.427Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:59:23.437Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:59:28.480Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:59:38.277Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T14:59:58.113Z",
+        "feature": "us-stocks",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:00:16.487Z",
+        "feature": "ai-score",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:11:06.965Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:11:27.048Z",
+        "feature": "news",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:11:39.366Z",
+        "feature": "[ticker]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:32:20.479Z",
+        "feature": "news",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-07T15:32:26.983Z",
+        "feature": "news",
+        "phase": "do",
+        "action": "updated"
+      }
+    ]
+  }
+}
