@@ -50,6 +50,8 @@ const SYSTEM_PROMPT = `당신은 경제 지표/이벤트 영향 분석 전문가
 - 포트폴리오 보유 종목과의 연관성 분석
 - 반드시 유효한 JSON만`
 
+export const maxDuration = 30
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()

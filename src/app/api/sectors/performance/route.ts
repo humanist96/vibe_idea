@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { getSectorPerformances } from "@/lib/analysis/sector-rotation"
 
-export const maxDuration = 30
+export const maxDuration = 60
 
 export async function GET() {
   try {

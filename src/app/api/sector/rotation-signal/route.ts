@@ -42,6 +42,8 @@ const SYSTEM_PROMPT = `당신은 섹터 로테이션 전략 전문가입니다. 
 - 역발상: 급락 후 반등 가능 섹터 1개 제안
 - 반드시 유효한 JSON만`
 
+export const maxDuration = 30
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()

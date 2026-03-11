@@ -46,6 +46,8 @@ const SYSTEM_PROMPT = `당신은 투자 리스크 분석 전문가입니다. 현
 2026년 3월 현재 글로벌 경제 상황을 반영하여 분석하세요.
 반드시 유효한 JSON만 응답.`
 
+export const maxDuration = 30
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -79,7 +81,7 @@ export async function POST(req: NextRequest) {
         { role: "user", content: `리스크 레이더를 작성해주세요.\n\n${parts.join("\n") || "포트폴리오 없음 - 시장 전반 리스크 분석"}` },
       ],
       temperature: 0.3,
-      max_tokens: 800,
+      max_tokens: 1500,
     })
 
     const content = completion.choices[0]?.message?.content?.trim()
@@ -91,9 +93,11 @@ export async function POST(req: NextRequest) {
     }
 
     const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
-    const result = JSON.parse(cleaned)
-
-    return NextResponse.json({ success: true, data: result })
+    try {
+      return NextResponse.json({ success: true, data: JSON.parse(cleaned) })
+    } catch {
+      return NextResponse.json({ success: false, error: "AI 응답 파싱 실패" }, { status: 500 })
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : "알 수 없는 오류"
     return NextResponse.json(

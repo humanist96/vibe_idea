@@ -39,6 +39,8 @@ const SYSTEM_PROMPT = `당신은 뉴스 임팩트 분석 전문가입니다. 주
 - 가장 최근 뉴스 위주로 분석
 - 반드시 유효한 JSON만 응답`
 
+export const maxDuration = 30
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -88,7 +90,7 @@ export async function POST(req: NextRequest) {
         { role: "user", content: `다음 관심종목들의 최신 뉴스를 분석해주세요:\n\n${newsText}` },
       ],
       temperature: 0.2,
-      max_tokens: 800,
+      max_tokens: 1200,
     })
 
     const content = completion.choices[0]?.message?.content?.trim()
@@ -100,9 +102,11 @@ export async function POST(req: NextRequest) {
     }
 
     const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
-    const result = JSON.parse(cleaned)
-
-    return NextResponse.json({ success: true, data: result })
+    try {
+      return NextResponse.json({ success: true, data: JSON.parse(cleaned) })
+    } catch {
+      return NextResponse.json({ success: false, error: "AI 응답 파싱 실패" }, { status: 500 })
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : "알 수 없는 오류"
     return NextResponse.json(
