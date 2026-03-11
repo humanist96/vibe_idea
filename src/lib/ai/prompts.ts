@@ -109,6 +109,80 @@ function buildNewsSentimentSection(sentiment: NewsSentiment): string {
   return lines.join("\n")
 }
 
+export interface USPromptData {
+  readonly name: string
+  readonly symbol: string
+  readonly price: number
+  readonly changePercent: number
+  readonly peAnnual: number | null
+  readonly pbAnnual: number | null
+  readonly epsAnnual: number | null
+  readonly dividendYield: number | null
+  readonly marketCap: number | null
+  readonly roeTTM: number | null
+  readonly beta: number | null
+  readonly high52w: number | null
+  readonly low52w: number | null
+  readonly sector: string | null
+  readonly technicalIndicators?: TechnicalIndicators
+  readonly newsSentiment?: NewsSentiment | null
+  readonly headlines: readonly string[]
+}
+
+const US_SCORING_INSTRUCTIONS = `You are an expert US stock analyst. Analyze the given stock data and provide a comprehensive AI score.
+
+Return format (JSON only):
+{
+  "aiScore": 1~10 (overall score, 10 is best),
+  "rating": "Strong Buy" | "Buy" | "Hold" | "Sell" | "Strong Sell",
+  "probability": 0~100 (outperformance probability),
+  "technicalScore": 1~10,
+  "fundamentalScore": 1~10,
+  "sentimentScore": 1~10,
+  "riskScore": 1~10 (10 = lowest risk),
+  "factors": [
+    { "name": "factor description in Korean", "impact": "positive" | "negative" | "neutral", "strength": 1~5 }
+  ] (minimum 3, maximum 10),
+  "summary": "Korean language summary 2~3 sentences",
+  "keyInsight": "Korean language key insight 1 sentence"
+}
+
+Rules:
+- Score based on technicals, fundamentals, sentiment, risk
+- factors must be in Korean
+- summary and keyInsight in Korean
+- Valid JSON only`
+
+export function buildUSScoringPrompt(data: USPromptData): string {
+  const ti = data.technicalIndicators
+  const parts = [
+    `Stock: ${data.name}(${data.symbol})`,
+    `Price: $${data.price}`,
+    `Change: ${data.changePercent > 0 ? "+" : ""}${data.changePercent.toFixed(2)}%`,
+    data.peAnnual != null ? `P/E: ${data.peAnnual}` : null,
+    data.pbAnnual != null ? `P/B: ${data.pbAnnual}` : null,
+    data.epsAnnual != null ? `EPS: $${data.epsAnnual}` : null,
+    data.dividendYield != null ? `Dividend Yield: ${data.dividendYield}%` : null,
+    data.marketCap ? `Market Cap: $${data.marketCap.toLocaleString()}` : null,
+    data.roeTTM != null ? `ROE: ${data.roeTTM}%` : null,
+    data.beta != null ? `Beta: ${data.beta}` : null,
+    data.high52w != null ? `52W High: $${data.high52w}` : null,
+    data.low52w != null ? `52W Low: $${data.low52w}` : null,
+    ti ? `RSI: ${ti.rsi.toFixed(1)}` : null,
+    ti ? `MACD: ${ti.macdHistogram > 0 ? "Bullish" : "Bearish"}` : null,
+    ti ? `Price vs SMA200: ${ti.priceVsSma200 > 0 ? "Above" : "Below"}` : null,
+    data.newsSentiment
+      ? `News Sentiment: ${data.newsSentiment.overallScore}/10 (${data.newsSentiment.positiveCount}P/${data.newsSentiment.negativeCount}N/${data.newsSentiment.neutralCount}U)`
+      : null,
+    data.headlines.length > 0
+      ? `Recent Headlines:\n${data.headlines.map((h) => `- ${h}`).join("\n")}`
+      : null,
+    data.sector ? `Sector: ${data.sector}` : null,
+  ].filter(Boolean).join("\n")
+
+  return `${US_SCORING_INSTRUCTIONS}\n\nAnalyze this US stock:\n\n${parts}`
+}
+
 export function buildScoringPrompt(data: PromptData): string {
   let prompt = `당신은 한국 주식 시장 전문 AI 분석가입니다. 아래 데이터를 기반으로 종합적인 주식 분석을 수행하고, 정해진 JSON 형식으로만 응답하세요.
 

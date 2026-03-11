@@ -31,11 +31,11 @@ export function RadarChart({
 
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <ReRadarChart data={data}>
-        <PolarGrid stroke="#e2e8f0" />
+      <ReRadarChart data={data} role="img" aria-label="AI 분석 레이더 차트: 기술, 재무, 심리, 리스크">
+        <PolarGrid stroke="var(--color-border-subtle, #e2e8f0)" />
         <PolarAngleAxis
           dataKey="subject"
-          tick={{ fontSize: 11, fill: "#94a3b8" }}
+          tick={{ fontSize: 11, fill: "var(--color-text-muted, #94a3b8)" }}
         />
         <PolarRadiusAxis
           angle={90}
@@ -46,8 +46,8 @@ export function RadarChart({
         <Radar
           name="Score"
           dataKey="value"
-          stroke="#d97706"
-          fill="#f59e0b"
+          stroke="var(--color-warning, #d97706)"
+          fill="var(--color-warning-light, #f59e0b)"
           fillOpacity={0.15}
           strokeWidth={2}
         />

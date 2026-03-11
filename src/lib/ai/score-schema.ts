@@ -45,15 +45,15 @@ export function getRatingFromScore(score: number): AIScore["rating"] {
 export function getRatingColor(rating: AIScore["rating"]): string {
   switch (rating) {
     case "Strong Buy":
-      return "text-red-600"
+      return "text-[var(--color-danger,#dc2626)]"
     case "Buy":
-      return "text-red-500"
+      return "text-[var(--color-danger,#ef4444)]"
     case "Hold":
-      return "text-amber-600"
+      return "text-[var(--color-warning,#d97706)]"
     case "Sell":
-      return "text-blue-500"
+      return "text-[var(--color-primary,#3b82f6)]"
     case "Strong Sell":
-      return "text-blue-600"
+      return "text-[var(--color-primary,#2563eb)]"
   }
 }
 

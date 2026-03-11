@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { Card, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
 import { ScoreGauge } from "@/components/charts/ScoreGauge"
@@ -13,6 +13,7 @@ import type { AIScore } from "@/lib/ai/score-schema"
 
 interface AIScorePanelProps {
   readonly ticker: string
+  readonly market?: "KR" | "US"
 }
 
 interface DataSourceDotProps {
@@ -33,12 +34,32 @@ function DataSourceDot({ label, active }: DataSourceDotProps) {
   )
 }
 
+const KR_DATA_SOURCES: readonly { readonly key: keyof NonNullable<AIScore["dataSources"]>; readonly label: string }[] = [
+  { key: "quote", label: "시세" },
+  { key: "technical", label: "기술적" },
+  { key: "dart", label: "DART" },
+  { key: "financials", label: "재무" },
+  { key: "naverNews", label: "네이버뉴스" },
+  { key: "googleNews", label: "구글뉴스" },
+]
+
+const US_DATA_SOURCES: readonly { readonly key: keyof NonNullable<AIScore["dataSources"]>; readonly label: string }[] = [
+  { key: "quote", label: "시세" },
+  { key: "technical", label: "기술적" },
+  { key: "financials", label: "재무" },
+  { key: "googleNews", label: "뉴스" },
+]
+
 function DataSourcesStatus({
   dataSources,
+  market,
 }: {
   readonly dataSources: AIScore["dataSources"]
+  readonly market: "KR" | "US"
 }) {
   if (!dataSources) return null
+
+  const sources = market === "KR" ? KR_DATA_SOURCES : US_DATA_SOURCES
 
   return (
     <div className="rounded-xl bg-[var(--color-surface-50)] p-3 ring-1 ring-[var(--color-border-subtle)]">
@@ -46,12 +67,9 @@ function DataSourcesStatus({
         데이터 소스
       </p>
       <div className="flex flex-wrap gap-3">
-        <DataSourceDot label="시세" active={dataSources.quote} />
-        <DataSourceDot label="기술적" active={dataSources.technical} />
-        <DataSourceDot label="DART" active={dataSources.dart} />
-        <DataSourceDot label="재무" active={dataSources.financials} />
-        <DataSourceDot label="네이버뉴스" active={dataSources.naverNews} />
-        <DataSourceDot label="구글뉴스" active={dataSources.googleNews} />
+        {sources.map((s) => (
+          <DataSourceDot key={s.key} label={s.label} active={dataSources[s.key]} />
+        ))}
       </div>
     </div>
   )
@@ -82,35 +100,29 @@ function NewsHeadlines({
   )
 }
 
-function AnalyzedTime({ analyzedAt }: { readonly analyzedAt?: string }) {
-  if (!analyzedAt) return null
-
-  const date = new Date(analyzedAt)
-  const timeStr = date.toLocaleString("ko-KR", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
-
-  return (
-    <p className="flex items-center gap-1 text-xs text-[var(--color-text-muted)]">
-      <Clock className="h-3 w-3" />
-      분석 시간: {timeStr}
-    </p>
-  )
+function getApiUrl(ticker: string, market: "KR" | "US"): string {
+  return market === "US"
+    ? `/api/us-stocks/${ticker}/ai-score`
+    : `/api/ai-score/${ticker}`
 }
 
-export function AIScorePanel({ ticker }: AIScorePanelProps) {
+export function AIScorePanel({ ticker, market = "KR" }: AIScorePanelProps) {
   const [score, setScore] = useState<AIScore | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchScore = async () => {
+  const fetchScore = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`/api/ai-score/${ticker}`)
+      const res = await fetch(getApiUrl(ticker, market))
+      if (!res.ok) {
+        if (res.status === 401) {
+          setError("로그인이 필요합니다.")
+          return
+        }
+        throw new Error(`Server error: ${res.status}`)
+      }
       const json = await res.json()
       if (json.success) {
         setScore(json.data)
@@ -122,7 +134,7 @@ export function AIScorePanel({ ticker }: AIScorePanelProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [ticker, market])
 
   return (
     <Card>
@@ -167,54 +179,57 @@ export function AIScorePanel({ ticker }: AIScorePanelProps) {
       )}
 
       {score && (
-        <>
-          {/* PC: 3컬럼 가로 레이아웃 / 모바일: 세로 */}
-          <div className="grid gap-6 lg:grid-cols-3">
-            {/* 좌측: 게이지 + 평가 요약 */}
-            <div className="space-y-4">
-              <div className="flex justify-center">
-                <ScoreGauge score={score.aiScore} />
-              </div>
-              <ScoreExplanation score={score} />
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Left: Gauge + Score explanation */}
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <ScoreGauge score={score.aiScore} />
             </div>
+            <ScoreExplanation score={score} />
+          </div>
 
-            {/* 중앙: 레이더 차트 + 주요 요인 */}
-            <div className="space-y-4">
-              <RadarChart
-                technical={score.technicalScore}
-                fundamental={score.fundamentalScore}
-                sentiment={score.sentimentScore}
-                risk={score.riskScore}
-              />
-              <div>
-                <h4 className="mb-2 text-sm font-semibold text-[var(--color-text-secondary)]">
-                  주요 요인
-                </h4>
-                <FactorsList factors={score.factors} />
-              </div>
-            </div>
-
-            {/* 우측: 뉴스 + 데이터 소스 + 메타 */}
-            <div className="space-y-4">
-              {score.newsHeadlines && score.newsHeadlines.length > 0 && (
-                <NewsHeadlines headlines={score.newsHeadlines} />
-              )}
-
-              <DataSourcesStatus dataSources={score.dataSources} />
-
-              <div className="flex items-center justify-between">
-                <AnalyzedTime analyzedAt={score.analyzedAt} />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={fetchScore}
-                >
-                  재분석
-                </Button>
-              </div>
+          {/* Center: Radar chart + Factors */}
+          <div className="space-y-4">
+            <RadarChart
+              technical={score.technicalScore}
+              fundamental={score.fundamentalScore}
+              sentiment={score.sentimentScore}
+              risk={score.riskScore}
+            />
+            <div>
+              <h4 className="mb-2 text-sm font-semibold text-[var(--color-text-secondary)]">
+                주요 요인
+              </h4>
+              <FactorsList factors={score.factors} />
             </div>
           </div>
-        </>
+
+          {/* Right: News + Data sources + Meta */}
+          <div className="space-y-4">
+            {score.newsHeadlines && score.newsHeadlines.length > 0 && (
+              <NewsHeadlines headlines={score.newsHeadlines} />
+            )}
+
+            <DataSourcesStatus dataSources={score.dataSources} market={market} />
+
+            <div className="flex items-center justify-between">
+              {score.analyzedAt && (
+                <p className="flex items-center gap-1 text-xs text-[var(--color-text-muted)]">
+                  <Clock className="h-3 w-3" />
+                  분석: {new Date(score.analyzedAt).toLocaleString("ko-KR", {
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              )}
+              <Button variant="ghost" size="sm" onClick={fetchScore}>
+                재분석
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </Card>
   )

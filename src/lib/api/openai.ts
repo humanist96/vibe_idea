@@ -17,8 +17,7 @@ export async function generateAIAnalysis(prompt: string): Promise<string> {
       temperature: 0.7,
     })
     return response.choices[0]?.message?.content ?? ""
-  } catch (error) {
-    console.error("OpenAI API error:", error)
+  } catch {
     throw new Error("AI analysis generation failed")
   }
 }

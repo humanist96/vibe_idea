@@ -9,17 +9,17 @@ interface FactorsListProps {
 const impactConfig = {
   positive: {
     icon: TrendingUp,
-    color: "text-red-600",
-    bg: "bg-red-50",
-    ring: "ring-red-100",
-    dotColor: "bg-red-500",
+    color: "text-[var(--color-danger,#dc2626)]",
+    bg: "bg-[var(--color-danger-bg,#fef2f2)]",
+    ring: "ring-[var(--color-danger-border,#fecaca)]",
+    dotColor: "bg-[var(--color-danger,#ef4444)]",
   },
   negative: {
     icon: TrendingDown,
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-    ring: "ring-blue-100",
-    dotColor: "bg-blue-500",
+    color: "text-[var(--color-primary,#2563eb)]",
+    bg: "bg-[var(--color-primary-bg,#eff6ff)]",
+    ring: "ring-[var(--color-primary-border,#bfdbfe)]",
+    dotColor: "bg-[var(--color-primary,#3b82f6)]",
   },
   neutral: {
     icon: Minus,
@@ -55,7 +55,7 @@ export function FactorsList({ factors }: FactorsListProps) {
             <span className="flex-1 text-sm text-[var(--color-text-secondary)]">
               {factor.name}
             </span>
-            <div className="flex gap-0.5">
+            <div className="flex gap-0.5" aria-label={`강도 ${factor.strength}/5`} role="meter" aria-valuenow={factor.strength} aria-valuemin={0} aria-valuemax={5}>
               {Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
