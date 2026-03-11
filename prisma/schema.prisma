@@ -27,8 +27,9 @@ model User {
   recentlyViewed    RecentlyViewed[]
   notifications     UserNotification[]
   chatSessions      ChatSession[]
-  portfolioItems    PortfolioItem[]
-  dashboardLayout   DashboardLayout?
+  portfolioItems         PortfolioItem[]
+  dashboardLayout        DashboardLayout?
+  dividendPortfolios     DividendPortfolio[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -149,6 +150,39 @@ model PortfolioItem {
 
   @@unique([userId, ticker])
   @@index([userId])
+}
+
+// ─── Dividend Portfolio ───────────────────────────────────────
+
+model DividendPortfolio {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  totalAmount Int                    // 총 투자금 (만원)
+  period      Int      @default(10)  // 투자 기간 (년)
+  drip        Boolean  @default(false)
+  monthlyAdd          Int      @default(0)   // 월 추가 적립 (만원)
+  dividendGrowthRate  Float    @default(3)   // 배당 성장률 가정 (%/년)
+  createdAt           DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user  User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items DividendPortfolioItem[]
+
+  @@index([userId])
+}
+
+model DividendPortfolioItem {
+  id          String @id @default(cuid())
+  portfolioId String
+  ticker      String
+  market      String // "KR" | "US"
+  weight      Float  // 비중 (0~100)
+
+  portfolio DividendPortfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@unique([portfolioId, ticker, market])
+  @@index([portfolioId])
 }
 
 // ─── Dashboard layout ─────────────────────────────────────────

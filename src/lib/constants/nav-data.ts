@@ -59,6 +59,7 @@ export const krCollapsibleSections: readonly NavCollapsibleSection[] = [
       { href: "/flow", label: "투자자 동향", icon: ArrowLeftRight },
       { href: "/insider", label: "내부자 거래", icon: UserCheck },
       { href: "/dividends", label: "배당", icon: Banknote },
+      { href: "/dividend-lab", label: "배당 연구소", icon: PieChart },
       { href: "/block-holdings", label: "대량보유", icon: Building2 },
     ],
   },
@@ -99,6 +100,7 @@ export const usCollapsibleSections: readonly NavCollapsibleSection[] = [
     items: [
       { href: "/us-stocks/insider", label: "내부자 거래", icon: UserCheck },
       { href: "/us-stocks/dividends", label: "배당", icon: Banknote },
+      { href: "/dividend-lab", label: "배당 연구소", icon: PieChart },
     ],
   },
   {
@@ -127,6 +129,7 @@ export const KR_TO_US: Record<string, string> = {
   "/flow": "/us-stocks",
   "/insider": "/us-stocks/insider",
   "/dividends": "/us-stocks/dividends",
+  "/dividend-lab": "/dividend-lab",
   "/block-holdings": "/us-stocks",
   "/ranking": "/us-stocks/ranking",
   "/themes": "/us-stocks/themes",
