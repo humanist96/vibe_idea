@@ -19,15 +19,20 @@ interface RotationData {
 
 export function SectorRotationCard() {
   const [data, setData] = useState<RotationData | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
   useEffect(() => {
     const fetchSectors = async () => {
       setLoading(true)
+      setError("")
       try {
         const res = await fetch("/api/sectors/performance")
         const json = await res.json()
-        if (!json.success || !json.data) return
+        if (!json.success || !json.data) {
+          setError("섹터 데이터를 불러올 수 없습니다")
+          return
+        }
 
         const sectors = json.data.map((s: { sector: string; return1w?: number; return1m?: number; return3m?: number }) => ({
           name: s.sector,
@@ -36,7 +41,10 @@ export function SectorRotationCard() {
           changePercent3m: s.return3m,
         })).filter((s: { name: string }) => s.name)
 
-        if (sectors.length < 3) return
+        if (sectors.length < 3) {
+          setError("섹터 데이터가 부족합니다")
+          return
+        }
 
         const aiRes = await fetch("/api/sector/rotation-signal", {
           method: "POST",
@@ -44,9 +52,13 @@ export function SectorRotationCard() {
           body: JSON.stringify({ sectors }),
         })
         const aiJson = await aiRes.json()
-        if (aiJson.success) setData(aiJson.data)
+        if (aiJson.success) {
+          setData(aiJson.data)
+        } else {
+          setError(aiJson.error || "AI 분석 실패")
+        }
       } catch {
-        // silent
+        setError("네트워크 오류")
       } finally {
         setLoading(false)
       }
@@ -77,7 +89,12 @@ export function SectorRotationCard() {
       {loading && (
         <div className="mt-4 flex items-center justify-center py-6">
           <Loader2 className="h-5 w-5 animate-spin text-[var(--color-text-tertiary)]" />
+          <span className="ml-2 text-xs text-[var(--color-text-tertiary)]">섹터 분석 중...</span>
         </div>
+      )}
+
+      {!loading && error && (
+        <p className="mt-3 text-xs text-[var(--color-text-tertiary)]">{error}</p>
       )}
 
       {data && (

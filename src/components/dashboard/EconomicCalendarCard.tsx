@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Calendar, Loader2, AlertTriangle, Shield } from "lucide-react"
 
 interface CalendarImpactData {
@@ -49,6 +49,10 @@ export function EconomicCalendarCard() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    analyze()
+  }, [])
 
   const riskColor = (r: string) => {
     if (r === "높음") return "text-red-400 bg-red-500/10"
