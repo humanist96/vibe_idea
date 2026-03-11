@@ -39,7 +39,7 @@ function parseJSON<T>(text: string): T | null {
 }
 
 /** 리스크 알림 생성 (데이터 기반, AI 불필요) */
-function buildRiskAlerts(stock: StockReportData): RiskAlert[] {
+export function buildRiskAlerts(stock: StockReportData): RiskAlert[] {
   const alerts: RiskAlert[] = []
   const q = stock.quote
   const t = stock.technical
@@ -80,7 +80,7 @@ function buildRiskAlerts(stock: StockReportData): RiskAlert[] {
 }
 
 /** 애널리스트 다이제스트 빌드 (AI 응답 보완) */
-function buildAnalystDigest(stock: StockReportData, aiDigest: string): AnalystDigest | null {
+export function buildAnalystDigest(stock: StockReportData, aiDigest: string): AnalystDigest | null {
   const consensus = stock.consensus
   if (!consensus) return null
 
