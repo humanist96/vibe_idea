@@ -55,7 +55,7 @@ export function DashboardEditToolbar({ isLoggedIn }: DashboardEditToolbarProps) 
     return (
       <button
         onClick={() => setEditing(true)}
-        className="flex items-center gap-1.5 rounded-lg border border-[var(--color-border-default)] bg-[var(--color-surface-card)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text-primary)]"
+        className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white shadow-md transition-colors hover:bg-blue-700"
       >
         <Settings2 className="h-3.5 w-3.5" />
         대시보드 편집
