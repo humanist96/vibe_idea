@@ -381,6 +381,43 @@ export async function getUSIPOCalendar(
   }
 }
 
+// ── Institutional Ownership Types ─────────────────────
+
+export interface FinnhubOwnershipHolder {
+  readonly name: string
+  readonly share: number
+  readonly change: number
+  readonly filingDate: string
+  readonly value: number
+}
+
+export interface FinnhubOwnershipResponse {
+  readonly symbol: string
+  readonly ownership: readonly FinnhubOwnershipHolder[]
+}
+
+/** 기관 투자자 보유 현황 (13F) */
+export async function getUSInstitutionalOwnership(
+  symbol: string
+): Promise<readonly FinnhubOwnershipHolder[]> {
+  const FOUR_HOURS = ONE_HOUR * 4
+  const cacheKey = `finnhub:ownership:${symbol}`
+  const cached = cache.get<readonly FinnhubOwnershipHolder[]>(cacheKey)
+  if (cached) return cached
+
+  try {
+    const data = await fetchFinnhub<FinnhubOwnershipResponse>(
+      "/stock/institutional-ownership",
+      { symbol }
+    )
+    const result = data.ownership ?? []
+    cache.set(cacheKey, result, FOUR_HOURS)
+    return result
+  } catch {
+    return []
+  }
+}
+
 /** 미국 시장 상태 (장중/장전/장후) */
 export async function getUSMarketStatus(): Promise<FinnhubMarketStatus> {
   const cacheKey = "finnhub:market-status"

@@ -26,10 +26,22 @@ model User {
   screenerDefaults  ScreenerDefaults?
   recentlyViewed    RecentlyViewed[]
   notifications     UserNotification[]
+  alertRules        AlertRule[]
+  alertNotifications AlertNotification[]
   chatSessions      ChatSession[]
   portfolioItems         PortfolioItem[]
   dashboardLayout        DashboardLayout?
   dividendPortfolios     DividendPortfolio[]
+  strategies             Strategy[]
+  backtests              Backtest[]
+  transactions           Transaction[]
+  dividendRecords        DividendRecord[]
+
+  ideas              Idea[]
+  ideaComments       IdeaComment[]
+  ideaLikes          IdeaLike[]
+  followers          Follow[] @relation("Following")
+  following          Follow[] @relation("Follower")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -225,4 +237,160 @@ model ChatMessage {
   session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId, createdAt])
+}
+
+// ─── Backtest models ─────────────────────────────────────────
+
+model Strategy {
+  id         String     @id @default(cuid())
+  userId     String
+  name       String
+  definition Json
+  isTemplate Boolean    @default(false)
+  createdAt  DateTime   @default(now())
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  backtests  Backtest[]
+
+  @@index([userId])
+}
+
+model Backtest {
+  id         String    @id @default(cuid())
+  userId     String
+  strategyId String?
+  ticker     String
+  market     String
+  period     String
+  result     Json
+  createdAt  DateTime  @default(now())
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  strategy   Strategy? @relation(fields: [strategyId], references: [id])
+
+  @@index([userId])
+}
+
+// ─── Portfolio Tracker models ────────────────────────────────
+
+model Transaction {
+  id        String   @id @default(cuid())
+  userId    String
+  ticker    String
+  market    String
+  type      String
+  quantity  Float
+  price     Float
+  fee       Float    @default(0)
+  date      DateTime
+  note      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, ticker])
+  @@index([userId, date])
+}
+
+model DividendRecord {
+  id         String   @id @default(cuid())
+  userId     String
+  ticker     String
+  market     String
+  amount     Float
+  currency   String   @default("KRW")
+  receivedAt DateTime
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── Alert & Notification models ─────────────────────────────
+
+model AlertRule {
+  id        String   @id @default(cuid())
+  userId    String
+  ticker    String
+  market    String   // "KR" | "US"
+  type      String   // "PRICE_ABOVE" | "PRICE_BELOW" | "VOLUME_SPIKE" | "EARNINGS_DATE"
+  threshold Float?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([ticker, market])
+}
+
+model AlertNotification {
+  id        String   @id @default(cuid())
+  userId    String
+  ruleId    String?
+  ticker    String?
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+}
+
+// ─── Social Trading models ──────────────────────────────────
+
+model Idea {
+  id          String        @id @default(cuid())
+  userId      String
+  ticker      String
+  market      String
+  direction   String        // "LONG" | "SHORT"
+  title       String
+  content     String        @db.Text
+  targetPrice Float?
+  horizon     String?       // "단기" | "중기" | "장기"
+  isPublic    Boolean       @default(true)
+  viewCount   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments    IdeaComment[]
+  likes       IdeaLike[]
+  @@index([userId])
+  @@index([ticker, market])
+  @@index([createdAt])
+}
+
+model IdeaComment {
+  id        String   @id @default(cuid())
+  ideaId    String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([ideaId])
+}
+
+model IdeaLike {
+  ideaId    String
+  userId    String
+  createdAt DateTime @default(now())
+  idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([ideaId, userId])
+}
+
+model Follow {
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+  @@id([followerId, followingId])
+  @@index([followingId])
 }
