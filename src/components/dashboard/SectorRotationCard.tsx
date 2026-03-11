@@ -25,16 +25,15 @@ export function SectorRotationCard() {
     const fetchSectors = async () => {
       setLoading(true)
       try {
-        const res = await fetch("/api/sectors")
+        const res = await fetch("/api/sectors/performance")
         const json = await res.json()
         if (!json.success || !json.data) return
 
-        const sectors = json.data.map((s: { sector: string; returnRate1w?: number; returnRate1m?: number; returnRate3m?: number; avgPer?: number }) => ({
+        const sectors = json.data.map((s: { sector: string; return1w?: number; return1m?: number; return3m?: number }) => ({
           name: s.sector,
-          changePercent1w: s.returnRate1w ?? 0,
-          changePercent1m: s.returnRate1m ?? 0,
-          changePercent3m: s.returnRate3m,
-          avgPer: s.avgPer,
+          changePercent1w: s.return1w ?? 0,
+          changePercent1m: s.return1m ?? 0,
+          changePercent3m: s.return3m,
         })).filter((s: { name: string }) => s.name)
 
         if (sectors.length < 3) return

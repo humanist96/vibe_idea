@@ -17,6 +17,11 @@ export interface QuoteResult {
   readonly price: number
   readonly change: number
   readonly changePercent: number
+  readonly name?: string
+  readonly volume?: number
+  readonly avgVolume?: number
+  readonly high52w?: number
+  readonly low52w?: number
 }
 
 export async function POST(req: NextRequest) {
@@ -50,6 +55,10 @@ export async function POST(req: NextRequest) {
                 price: q.price,
                 change: q.change,
                 changePercent: q.changePercent,
+                name: q.name,
+                volume: q.volume,
+                high52w: q.fiftyTwoWeekHigh,
+                low52w: q.fiftyTwoWeekLow,
               }
             }
           })
