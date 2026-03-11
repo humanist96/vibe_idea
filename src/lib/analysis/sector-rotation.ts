@@ -40,7 +40,9 @@ export async function getSectorPerformances(): Promise<readonly SectorPerformanc
   if (cached) return cached
 
   await ensureLoaded()
-  const sectors = getSectors()
+  const allSectors = getSectors()
+  // Limit to top 10 sectors to avoid API timeout on serverless
+  const sectors = allSectors.slice(0, 10)
 
   const sectorResults = await Promise.allSettled(
     sectors.map(async (sector) => {
@@ -49,17 +51,17 @@ export async function getSectorPerformances(): Promise<readonly SectorPerformanc
         sort: "marketCap",
         order: "desc",
         page: 1,
-        limit: 5,
+        limit: 3,
         market: "ALL",
         search: "",
       })
 
-      const topStocks: KrxStockEntry[] = screenerResult.data.slice(0, 5)
+      const topStocks: KrxStockEntry[] = screenerResult.data.slice(0, 3)
       if (topStocks.length === 0) return null
 
       const historicals = await Promise.allSettled(
         topStocks.map(async (stock: KrxStockEntry) => {
-          const hist = await getHistorical(stock.ticker, "6mo")
+          const hist = await getHistorical(stock.ticker, "3mo")
           return { ticker: stock.ticker, name: stock.name, data: hist }
         })
       )

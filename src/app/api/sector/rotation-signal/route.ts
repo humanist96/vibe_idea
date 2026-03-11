@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
         { role: "user", content: `섹터 로테이션을 분석해주세요:\n\n${sectorText}` },
       ],
       temperature: 0.2,
-      max_tokens: 800,
+      max_tokens: 1500,
     })
 
     const content = completion.choices[0]?.message?.content?.trim()
@@ -69,7 +69,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "AI 응답 없음" }, { status: 500 })
     }
     const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
-    return NextResponse.json({ success: true, data: JSON.parse(cleaned) })
+    try {
+      return NextResponse.json({ success: true, data: JSON.parse(cleaned) })
+    } catch {
+      return NextResponse.json({ success: false, error: "AI 응답 파싱 실패" }, { status: 500 })
+    }
   } catch (error) {
     const msg = error instanceof Error ? error.message : "알 수 없는 오류"
     return NextResponse.json({ success: false, error: msg }, { status: 500 })
