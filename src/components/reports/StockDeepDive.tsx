@@ -10,6 +10,10 @@ import { TechnicalSection } from "./TechnicalSection"
 import { NewsSentimentSection } from "./NewsSentimentSection"
 import { ConsensusSection } from "./ConsensusSection"
 import { InsiderSection } from "./InsiderSection"
+import { ConvictionScoreCard } from "./ConvictionScoreCard"
+import { ActionItemCard } from "./ActionItemCard"
+import { RiskAlertBadges } from "./RiskAlertBadges"
+import { AnalystDigestSection } from "./AnalystDigestSection"
 import { PriceChange } from "@/components/ui/PriceChange"
 import { formatCurrency } from "@/lib/utils/format"
 import type { StockReportData, StockAnalysis } from "@/lib/report/types"
@@ -44,13 +48,21 @@ export function StockDeepDive({ stock, analysis, color }: StockDeepDiveProps) {
           </div>
         </div>
 
-        {stock.aiScore && (
-          <div className="mt-2 flex items-center gap-2">
-            <span className="text-[10px] text-[var(--color-text-muted)]">AI 점수</span>
-            <span className="text-sm font-bold text-[var(--color-accent-400)]">{stock.aiScore.aiScore.toFixed(1)}</span>
-            <span className="text-[10px] text-[var(--color-text-muted)]">{stock.aiScore.rating}</span>
-          </div>
-        )}
+        <div className="mt-2 flex items-center gap-2 flex-wrap">
+          {stock.aiScore && (
+            <>
+              <span className="text-[10px] text-[var(--color-text-muted)]">AI 점수</span>
+              <span className="text-sm font-bold text-[var(--color-accent-400)]">{stock.aiScore.aiScore.toFixed(1)}</span>
+              <span className="text-[10px] text-[var(--color-text-muted)]">{stock.aiScore.rating}</span>
+            </>
+          )}
+          {/* Risk Alert Badges */}
+          {analysis && analysis.riskAlerts.length > 0 && (
+            <div className="ml-auto">
+              <RiskAlertBadges alerts={analysis.riskAlerts} />
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="space-y-6 p-4">
@@ -101,8 +113,30 @@ export function StockDeepDive({ stock, analysis, color }: StockDeepDiveProps) {
 
         <hr className="border-[var(--color-border-subtle)]" />
 
-        {/* Consensus */}
-        <ConsensusSection consensus={stock.consensus} quote={q} />
+        {/* Analyst Digest (replaces old ConsensusSection) */}
+        {analysis?.analystDigest ? (
+          <AnalystDigestSection digest={analysis.analystDigest} quote={q} />
+        ) : (
+          <ConsensusSection consensus={stock.consensus} quote={q} />
+        )}
+
+        {/* Conviction Score */}
+        {analysis?.conviction && (
+          <>
+            <hr className="border-[var(--color-border-subtle)]" />
+            <ConvictionScoreCard conviction={analysis.conviction} stockName={stock.name} />
+          </>
+        )}
+
+        {/* Action Item */}
+        {analysis?.actionItem && (
+          <>
+            <hr className="border-[var(--color-border-subtle)]" />
+            <ActionItemCard actionItem={analysis.actionItem} stockName={stock.name} />
+          </>
+        )}
+
+        <hr className="border-[var(--color-border-subtle)]" />
 
         {/* Insider (conditional) */}
         <InsiderSection insider={stock.insider} blockHoldings={stock.blockHoldings} />

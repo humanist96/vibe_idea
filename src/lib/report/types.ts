@@ -66,6 +66,7 @@ export type MoveReasonCategory =
   | "sector"
   | "macro"
   | "event"
+  | "analyst"
 
 export interface MoveReason {
   readonly rank: number
@@ -75,10 +76,52 @@ export interface MoveReason {
   readonly evidence: string
 }
 
+export interface ConvictionScore {
+  readonly score: number // 1-10
+  readonly label: string // "강력 매수" | "매수" | "중립" | "매도" | "강력 매도"
+  readonly factors: readonly ConvictionFactor[]
+}
+
+export interface ConvictionFactor {
+  readonly name: string
+  readonly signal: "bullish" | "bearish" | "neutral"
+  readonly weight: number // 기여도 (0-100)
+}
+
+export interface ActionItem {
+  readonly action: "매수 고려" | "비중 확대" | "관망" | "비중 축소" | "매도 고려"
+  readonly reason: string
+  readonly conditions: readonly string[] // 조건부 제안
+}
+
+export type RiskAlertLevel = "critical" | "warning" | "info"
+
+export interface RiskAlert {
+  readonly level: RiskAlertLevel
+  readonly label: string
+  readonly detail: string
+}
+
+export interface AnalystDigest {
+  readonly summary: string // AI가 요약한 애널리스트 동향
+  readonly recentReports: readonly {
+    readonly title: string
+    readonly provider: string
+    readonly date: string
+    readonly targetPrice: number | null
+  }[]
+  readonly targetPriceUpside: number | null // 목표가 괴리율 (%)
+  readonly opinionTrend: string | null // "상향" | "유지" | "하향"
+}
+
 export interface StockAnalysis {
   readonly ticker: string
   readonly moveReasons: readonly MoveReason[]
   readonly outlook: string
+  readonly conviction: ConvictionScore | null
+  readonly actionItem: ActionItem | null
+  readonly riskAlerts: readonly RiskAlert[]
+  readonly analystDigest: AnalystDigest | null
 }
 
 // ── Report Metadata ─────────────────────────────────────────────

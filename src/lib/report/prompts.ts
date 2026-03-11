@@ -36,6 +36,18 @@ export function buildMoveAnalysisPrompt(
     ? stock.events.slice(0, 3).map((e) => `- [${e.category}] ${e.reportName}`).join("\n")
     : "없음"
 
+  // 애널리스트 컨센서스 데이터
+  const consensusInfo = stock.consensus?.consensus
+  const targetPrice = consensusInfo?.targetPrice
+  const targetUpside = targetPrice ? (((targetPrice - q.price) / q.price) * 100).toFixed(1) : "N/A"
+  const opinion = consensusInfo?.investmentOpinion ?? "N/A"
+  const analystCount = consensusInfo?.analystCount ?? 0
+
+  const recentReports = (stock.consensus?.reports ?? [])
+    .slice(0, 5)
+    .map((r) => `- [${r.provider}] ${r.title} (목표가: ${r.targetPrice ? r.targetPrice.toLocaleString("ko-KR") + "원" : "-"})`)
+    .join("\n")
+
   const avgVolume = stock.historical.length >= 5
     ? Math.round(stock.historical.slice(0, -1).reduce((s, h) => s + h.volume, 0) / Math.max(stock.historical.length - 1, 1))
     : q.volume
@@ -59,21 +71,46 @@ ${headlines || "없음"}
 ## 공시
 ${eventList}
 
+## 애널리스트 컨센서스
+- 투자의견: ${opinion} (애널리스트 ${analystCount}명)
+- 목표가: ${targetPrice ? targetPrice.toLocaleString("ko-KR") + "원" : "N/A"} (현재가 대비 ${targetUpside}%)
+
+## 최근 애널리스트 리포트
+${recentReports || "없음"}
+
 ## 출력 형식 (반드시 JSON만 출력)
 {
   "reasons": [
     {
       "rank": 1,
-      "category": "supply_demand | news | technical | sector | macro | event",
+      "category": "supply_demand | news | technical | sector | macro | event | analyst",
       "description": "원인 설명 (1문장)",
       "impact": "positive | negative",
       "evidence": "근거 데이터 (구체적 수치 포함)"
     }
   ],
-  "outlook": "오늘 전망 (1-2문장)"
+  "outlook": "오늘 전망 (1-2문장)",
+  "conviction": {
+    "score": 7,
+    "label": "매수 | 강력 매수 | 중립 | 매도 | 강력 매도",
+    "factors": [
+      {"name": "기술적 분석", "signal": "bullish | bearish | neutral", "weight": 25},
+      {"name": "수급", "signal": "bullish | bearish | neutral", "weight": 25},
+      {"name": "뉴스 센티먼트", "signal": "bullish | bearish | neutral", "weight": 20},
+      {"name": "애널리스트 컨센서스", "signal": "bullish | bearish | neutral", "weight": 30}
+    ]
+  },
+  "actionItem": {
+    "action": "매수 고려 | 비중 확대 | 관망 | 비중 축소 | 매도 고려",
+    "reason": "핵심 근거 (1문장)",
+    "conditions": ["조건1: ...", "조건2: ..."]
+  },
+  "analystDigest": "최근 애널리스트 리포트 동향 요약 (2-3문장). 없으면 빈 문자열."
 }
 
 반드시 3개의 원인을 중요도 순으로 나열하세요.
+conviction.score는 1(강력매도)~10(강력매수), 5가 중립입니다.
+factors의 weight 합은 100이어야 합니다.
 반드시 제공된 데이터에 근거하여 분석하세요. 추측 금지.`
 }
 

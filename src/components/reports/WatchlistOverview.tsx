@@ -38,6 +38,8 @@ export function WatchlistOverview({ stocks, analyses }: WatchlistOverviewProps) 
               <th className="hidden pb-2 text-right font-semibold text-[var(--color-text-tertiary)] sm:table-cell">거래량</th>
               <th className="hidden pb-2 text-right font-semibold text-[var(--color-text-tertiary)] md:table-cell">수급</th>
               <th className="pb-2 text-right font-semibold text-[var(--color-text-tertiary)]">AI점수</th>
+              <th className="hidden pb-2 text-center font-semibold text-[var(--color-text-tertiary)] lg:table-cell">확신도</th>
+              <th className="hidden pb-2 text-center font-semibold text-[var(--color-text-tertiary)] lg:table-cell">액션</th>
             </tr>
           </thead>
           <tbody>
@@ -52,6 +54,23 @@ export function WatchlistOverview({ stocks, analyses }: WatchlistOverviewProps) 
                     : "외→"
                 : "-"
               const aiScore = stock.aiScore?.aiScore
+              const analysis = analyses.find((a) => a.ticker === stock.ticker)
+              const conviction = analysis?.conviction
+              const actionItem = analysis?.actionItem
+
+              const convictionColor = conviction
+                ? conviction.score >= 7 ? "text-green-600"
+                  : conviction.score >= 4 ? "text-amber-600"
+                  : "text-red-600"
+                : ""
+
+              const actionColors: Record<string, string> = {
+                "매수 고려": "bg-green-100 text-green-700",
+                "비중 확대": "bg-emerald-100 text-emerald-700",
+                "관망": "bg-amber-100 text-amber-700",
+                "비중 축소": "bg-orange-100 text-orange-700",
+                "매도 고려": "bg-red-100 text-red-700",
+              }
 
               return (
                 <tr key={stock.ticker} className="table-row-hover border-b border-[var(--color-border-subtle)] last:border-0">
@@ -77,6 +96,24 @@ export function WatchlistOverview({ stocks, analyses }: WatchlistOverviewProps) 
                     {aiScore != null ? (
                       <span className="font-bold tabular-nums text-[var(--color-accent-400)]">
                         {aiScore.toFixed(1)}
+                      </span>
+                    ) : (
+                      <span className="text-[var(--color-text-muted)]">-</span>
+                    )}
+                  </td>
+                  <td className="hidden py-2 text-center lg:table-cell">
+                    {conviction ? (
+                      <span className={`font-bold tabular-nums text-xs ${convictionColor}`}>
+                        {conviction.score}/10
+                      </span>
+                    ) : (
+                      <span className="text-[var(--color-text-muted)]">-</span>
+                    )}
+                  </td>
+                  <td className="hidden py-2 text-center lg:table-cell">
+                    {actionItem ? (
+                      <span className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-medium ${actionColors[actionItem.action] ?? "bg-gray-100 text-gray-700"}`}>
+                        {actionItem.action}
                       </span>
                     ) : (
                       <span className="text-[var(--color-text-muted)]">-</span>
