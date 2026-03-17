@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 import { Card } from "@/components/ui/Card"
 import { PriceChange } from "@/components/ui/PriceChange"
 import { Badge } from "@/components/ui/Badge"
@@ -12,6 +13,7 @@ import { useUSWatchlistStore } from "@/store/us-watchlist"
 import { useMarketMode } from "@/store/market-mode"
 import { formatCurrency } from "@/lib/utils/format"
 import { EmptyWatchlist } from "@/components/ui/EmptyWatchlist"
+import { Lock, Search } from "lucide-react"
 
 interface StockData {
   readonly ticker: string
@@ -35,6 +37,7 @@ interface USStockData {
 }
 
 export default function WatchlistPage() {
+  const { status } = useSession()
   const { mode } = useMarketMode()
   const krTickers = useWatchlistStore((s) => s.tickers)
   const usTickers = useUSWatchlistStore((s) => s.tickers)
@@ -45,6 +48,44 @@ export default function WatchlistPage() {
   const [krStocks, setKrStocks] = useState<StockData[]>([])
   const [usStocks, setUsStocks] = useState<USStockData[]>([])
   const [loading, setLoading] = useState(true)
+
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <span className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--color-accent-500)]/30 border-t-[var(--color-accent-500)]" />
+      </div>
+    )
+  }
+
+  if (status === "unauthenticated") {
+    return (
+      <div className="flex flex-col items-center py-20">
+        <Lock className="mb-4 h-10 w-10 text-[var(--color-text-muted)]" />
+        <p className="text-sm font-medium text-[var(--color-text-secondary)]">
+          로그인이 필요한 서비스입니다
+        </p>
+        <p className="mt-2 text-xs text-[var(--color-text-tertiary)] text-center max-w-xs">
+          로그인 후 스크리너에서 관심종목을 추가하고<br />
+          맞춤 분석 보고서를 받아보세요
+        </p>
+        <div className="mt-6 flex gap-3">
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent-500)] px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-[var(--color-accent-600)]"
+          >
+            로그인하기
+          </Link>
+          <Link
+            href="/screener"
+            className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border-default)] px-5 py-2.5 text-sm font-medium text-[var(--color-text-secondary)] transition-all hover:bg-[var(--color-surface-50)]"
+          >
+            <Search className="h-4 w-4" />
+            스크리너 둘러보기
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   useEffect(() => {
     async function fetchData() {
