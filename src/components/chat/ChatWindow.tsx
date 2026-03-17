@@ -6,9 +6,12 @@ import { ChatMessage } from "./ChatMessage"
 import { ChatInput } from "./ChatInput"
 import { QuickActions } from "./QuickActions"
 import { useWatchlistStore } from "@/store/watchlist"
+import { usePortfolioStore } from "@/store/portfolio"
+import { useReportHistoryStore } from "@/store/report-history"
 import { useChatHistoryStore } from "@/store/chat-history"
 import { useMarketMode } from "@/store/market-mode"
 import type { ChatMessage as ChatMsg } from "@/store/chat-history"
+import type { ReportSummaryPayload } from "@/lib/chat/intents/report-summary"
 import { cn } from "@/lib/utils/cn"
 
 interface Message {
@@ -20,10 +23,36 @@ interface Message {
 export function ChatWindow() {
   const scrollRef = useRef<HTMLDivElement>(null)
   const tickers = useWatchlistStore((s) => s.tickers)
+  const portfolioItems = usePortfolioStore((s) => s.items)
+  const { reports, getReport, fetchReports } = useReportHistoryStore()
   const marketMode = useMarketMode((s) => s.mode)
+
+  useEffect(() => {
+    if (reports.length === 0) fetchReports()
+  }, [reports.length, fetchReports])
   const [messages, setMessages] = useState<Message[]>([])
   const [isStreaming, setIsStreaming] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
+
+  // 보고서 요약 직렬화 헬퍼
+  const getLatestReportSummary = useCallback((): ReportSummaryPayload | null => {
+    if (reports.length === 0) return null
+    const latest = reports[0]
+    const data = getReport(latest.id)
+    if (!data) return null
+    return {
+      meta: latest,
+      executiveSummary: data.executiveSummary,
+      portfolioInsight: data.portfolioInsight,
+      watchPoints: data.watchPoints,
+      stockSummaries: data.stockAnalyses.map((a) => ({
+        ticker: a.ticker,
+        name: data.stocks.find((s) => s.ticker === a.ticker)?.name ?? a.ticker,
+        outlook: a.outlook,
+        riskLevel: a.riskAlerts[0]?.level ?? "none",
+      })),
+    }
+  }, [reports, getReport])
 
   const {
     sessions,
@@ -81,7 +110,9 @@ export function ChatWindow() {
               content: m.content,
             })),
             watchlistTickers: tickers,
+            portfolioItems: [...portfolioItems],
             marketMode,
+            latestReportSummary: getLatestReportSummary(),
           }),
         })
 
@@ -149,7 +180,7 @@ export function ChatWindow() {
         setIsStreaming(false)
       }
     },
-    [isStreaming, messages, tickers, marketMode, activeSessionId, createSession, addToHistory, updateInHistory]
+    [isStreaming, messages, tickers, portfolioItems, marketMode, activeSessionId, createSession, addToHistory, updateInHistory, getLatestReportSummary]
   )
 
   const handleQuickAction = useCallback(

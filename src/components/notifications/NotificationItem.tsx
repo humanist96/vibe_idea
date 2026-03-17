@@ -27,6 +27,11 @@ const dotColorMap: Record<string, string> = {
   price_drop: "bg-[var(--color-loss)]",
   market_alert: "bg-orange-500",
   earnings_alert: "bg-blue-500",
+  breakout_resistance: "bg-emerald-600",
+  breakdown_support: "bg-red-600",
+  earnings_surprise: "bg-purple-500",
+  foreign_bulk_buy: "bg-sky-500",
+  institution_bulk_buy: "bg-indigo-500",
 }
 
 function formatRelativeTime(dateStr: string): string {

@@ -10,6 +10,7 @@ import {
   getUSNews,
   getUSQuoteBatch,
 } from "@/lib/api/finnhub"
+import { getUSConsensus } from "@/lib/api/finnhub-consensus"
 import { getFearGreedIndex } from "@/lib/api/fear-greed"
 import { getGlobalMacroOverview } from "@/lib/api/fred"
 import { findUSStock } from "@/lib/data/us-stock-registry"
@@ -53,17 +54,19 @@ function settled<T>(result: PromiseSettledResult<T>, fallback: T): T {
 async function collectStockData(symbol: string): Promise<USStockReportData> {
   const entry = findUSStock(symbol)
 
-  const [quoteRes, metricsRes, candleRes, newsRes] = await Promise.allSettled([
+  const [quoteRes, metricsRes, candleRes, newsRes, consensusRes] = await Promise.allSettled([
     getUSQuote(symbol),
     getUSMetrics(symbol),
     getUSCandle(symbol, "D"),
     getUSNews(symbol, 7),
+    getUSConsensus(symbol),
   ])
 
   const quote = settled(quoteRes, null)
   const metrics = settled(metricsRes, null)
   const candle = settled(candleRes, null)
   const news = settled(newsRes, [] as readonly { headline: string; source: string; datetime: number; url: string }[])
+  const consensus = settled(consensusRes, null)
 
   // Build historical from candle data (last 60 days)
   const historical =
@@ -130,6 +133,7 @@ async function collectStockData(symbol: string): Promise<USStockReportData> {
         url: n.url,
       })),
     technical,
+    consensus,
   }
 }
 

@@ -12,6 +12,11 @@ const ALERT_TYPE_LABELS: Record<string, string> = {
   DIVIDEND_CHANGE: "배당 변동",
   SAFETY_CHANGE: "안전도 변동",
   GAP_MONTH: "배당 공백월",
+  BREAKOUT_RESISTANCE: "저항선 돌파",
+  BREAKDOWN_SUPPORT: "지지선 이탈",
+  EARNINGS_SURPRISE: "실적 서프라이즈",
+  FOREIGN_BULK_BUY: "외국인 대량 매수",
+  INSTITUTION_BULK_BUY: "기관 대량 매수",
 }
 
 interface AlertRule {
@@ -20,6 +25,9 @@ interface AlertRule {
   readonly market: string
   readonly type: string
   readonly threshold: number | null
+  readonly thresholdUnit: string | null
+  readonly notes: string | null
+  readonly triggeredCount: number
   readonly active: boolean
   readonly createdAt: string
 }
@@ -33,6 +41,8 @@ interface AlertRuleCardProps {
 function formatThreshold(threshold: number | null, market: string, type: string): string {
   if (threshold === null) return ""
   if (type === "VOLUME_SPIKE") return `${threshold}x`
+  if (type === "EARNINGS_SURPRISE") return `${threshold}%`
+  if (type === "FOREIGN_BULK_BUY" || type === "INSTITUTION_BULK_BUY") return `${threshold}억원`
   if (market === "US") {
     return `$${threshold.toLocaleString("en-US", { minimumFractionDigits: 2 })}`
   }
@@ -77,7 +87,13 @@ export function AlertRuleCard({ rule, onToggle, onDelete }: AlertRuleCardProps) 
         <p className="mt-0.5 text-xs text-[var(--color-text-secondary)]">
           {typeLabel}
           {thresholdText && ` · ${thresholdText}`}
+          {rule.triggeredCount > 0 && ` · ${rule.triggeredCount}회 발동`}
         </p>
+        {rule.notes && (
+          <p className="mt-0.5 text-[10px] text-[var(--color-text-muted)] truncate">
+            {rule.notes}
+          </p>
+        )}
       </div>
 
       <label className="relative inline-flex cursor-pointer items-center">

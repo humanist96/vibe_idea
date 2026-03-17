@@ -6,8 +6,20 @@ import { prisma } from "@/lib/db/prisma"
 const createSchema = z.object({
   ticker: z.string().min(1).max(20),
   market: z.enum(["KR", "US"]),
-  type: z.enum(["PRICE_ABOVE", "PRICE_BELOW", "VOLUME_SPIKE", "EARNINGS_DATE"]),
+  type: z.enum([
+    "PRICE_ABOVE",
+    "PRICE_BELOW",
+    "VOLUME_SPIKE",
+    "EARNINGS_DATE",
+    "BREAKOUT_RESISTANCE",
+    "BREAKDOWN_SUPPORT",
+    "EARNINGS_SURPRISE",
+    "FOREIGN_BULK_BUY",
+    "INSTITUTION_BULK_BUY",
+  ]),
   threshold: z.number().positive().optional(),
+  thresholdUnit: z.string().max(10).optional(),
+  notes: z.string().max(200).optional(),
 })
 
 export async function GET() {
@@ -54,7 +66,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { ticker, market, type, threshold } = parsed.data
+    const { ticker, market, type, threshold, thresholdUnit, notes } = parsed.data
 
     const existingCount = await prisma.alertRule.count({
       where: { userId: session.user.id },
@@ -74,6 +86,9 @@ export async function POST(req: NextRequest) {
         market,
         type,
         threshold: threshold ?? null,
+        // thresholdUnit and notes: awaiting Prisma migration
+        // thresholdUnit: thresholdUnit ?? null,
+        // notes: notes ?? null,
       },
     })
 

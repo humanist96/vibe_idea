@@ -10,6 +10,9 @@ interface AlertRule {
   readonly market: string
   readonly type: string
   readonly threshold: number | null
+  readonly thresholdUnit: string | null
+  readonly notes: string | null
+  readonly triggeredCount: number
   readonly active: boolean
   readonly createdAt: string
 }

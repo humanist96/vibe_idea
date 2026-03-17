@@ -22,6 +22,11 @@ const TYPE_STYLES: Record<ToastType, { border: string; icon: typeof CheckCircle 
   price_drop: { border: "border-l-[var(--color-loss)]", icon: TrendingDown },
   market_alert: { border: "border-l-orange-500", icon: AlertTriangle },
   earnings_alert: { border: "border-l-blue-500", icon: Calendar },
+  breakout_resistance: { border: "border-l-emerald-500", icon: TrendingUp },
+  breakdown_support: { border: "border-l-[var(--color-loss)]", icon: TrendingDown },
+  earnings_surprise: { border: "border-l-blue-500", icon: Calendar },
+  foreign_bulk_buy: { border: "border-l-purple-500", icon: TrendingUp },
+  institution_bulk_buy: { border: "border-l-purple-500", icon: TrendingUp },
 }
 
 export function Toast({ id, type, ticker, message, onDismiss }: ToastProps) {

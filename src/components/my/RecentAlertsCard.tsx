@@ -3,19 +3,29 @@
 import { useNotificationStore } from "@/store/notifications"
 import { Bell, TrendingUp, TrendingDown, BarChart3, Radio } from "lucide-react"
 
-const ICON_MAP = {
+const ICON_MAP: Record<string, typeof Bell> = {
   price_surge: TrendingUp,
   price_drop: TrendingDown,
   earnings_alert: BarChart3,
   market_alert: Radio,
-} as const
+  breakout_resistance: TrendingUp,
+  breakdown_support: TrendingDown,
+  earnings_surprise: BarChart3,
+  foreign_bulk_buy: TrendingUp,
+  institution_bulk_buy: TrendingUp,
+}
 
-const COLOR_MAP = {
+const COLOR_MAP: Record<string, string> = {
   price_surge: "text-red-500 bg-red-50",
   price_drop: "text-blue-500 bg-blue-50",
   earnings_alert: "text-amber-500 bg-amber-50",
   market_alert: "text-purple-500 bg-purple-50",
-} as const
+  breakout_resistance: "text-emerald-500 bg-emerald-50",
+  breakdown_support: "text-red-500 bg-red-50",
+  earnings_surprise: "text-blue-500 bg-blue-50",
+  foreign_bulk_buy: "text-purple-500 bg-purple-50",
+  institution_bulk_buy: "text-purple-500 bg-purple-50",
+}
 
 export function RecentAlertsCard() {
   const notifications = useNotificationStore((s) => s.notifications)

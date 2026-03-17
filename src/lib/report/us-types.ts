@@ -4,7 +4,9 @@
 
 import type { TechnicalIndicators } from "@/lib/analysis/technical"
 import type { FearGreedData } from "@/lib/api/fear-greed"
+import type { USConsensusData } from "@/lib/api/finnhub-consensus"
 import type { GlobalMacroIndicator } from "@/lib/api/fred-types"
+import type { ConvictionScore, ActionItem, RiskAlert, AnalystDigest } from "@/lib/report/types"
 
 // ── Market Context ──────────────────────────────────────
 
@@ -77,6 +79,7 @@ export interface USStockReportData {
   readonly historical: readonly USHistoricalPoint[]
   readonly news: readonly USNewsItem[]
   readonly technical: TechnicalIndicators | null
+  readonly consensus: USConsensusData | null
 }
 
 // ── Raw Report (Phase 1 Output) ─────────────────────────
@@ -110,6 +113,10 @@ export interface USStockAnalysis {
   readonly symbol: string
   readonly moveReasons: readonly USMoveReason[]
   readonly outlook: string
+  readonly conviction: ConvictionScore | null
+  readonly actionItem: ActionItem | null
+  readonly riskAlerts: readonly RiskAlert[]
+  readonly analystDigest: AnalystDigest | null
 }
 
 export interface USAnalyzedReportData extends USRawReportData {

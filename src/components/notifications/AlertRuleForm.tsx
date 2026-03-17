@@ -9,13 +9,57 @@ const ALERT_TYPE_LABELS: Record<string, string> = {
   PRICE_BELOW: "하한가 이하",
   VOLUME_SPIKE: "거래량 급증",
   EARNINGS_DATE: "실적 발표일",
+  BREAKOUT_RESISTANCE: "저항선 돌파",
+  BREAKDOWN_SUPPORT: "지지선 이탈",
+  EARNINGS_SURPRISE: "실적 서프라이즈",
+  FOREIGN_BULK_BUY: "외국인 대량 매수",
+  INSTITUTION_BULK_BUY: "기관 대량 매수",
 }
+
+const THRESHOLD_CONFIG: Record<string, {
+  readonly label: string
+  readonly placeholder: string
+  readonly unit: string
+  readonly defaultValue: string
+}> = {
+  PRICE_ABOVE: { label: "기준가", placeholder: "70000", unit: "KRW", defaultValue: "" },
+  PRICE_BELOW: { label: "기준가", placeholder: "70000", unit: "KRW", defaultValue: "" },
+  VOLUME_SPIKE: { label: "배수 (기본 2배)", placeholder: "2", unit: "", defaultValue: "" },
+  BREAKOUT_RESISTANCE: { label: "저항선 가격", placeholder: "80000", unit: "KRW", defaultValue: "" },
+  BREAKDOWN_SUPPORT: { label: "지지선 가격", placeholder: "60000", unit: "KRW", defaultValue: "" },
+  EARNINGS_SURPRISE: { label: "서프라이즈 임계값 (%)", placeholder: "10", unit: "%", defaultValue: "10" },
+  FOREIGN_BULK_BUY: { label: "순매수 임계값 (억원)", placeholder: "50", unit: "B_KRW", defaultValue: "50" },
+  INSTITUTION_BULK_BUY: { label: "순매수 임계값 (억원)", placeholder: "50", unit: "B_KRW", defaultValue: "50" },
+}
+
+const TYPES_NEEDING_THRESHOLD = new Set([
+  "PRICE_ABOVE",
+  "PRICE_BELOW",
+  "VOLUME_SPIKE",
+  "BREAKOUT_RESISTANCE",
+  "BREAKDOWN_SUPPORT",
+  "EARNINGS_SURPRISE",
+  "FOREIGN_BULK_BUY",
+  "INSTITUTION_BULK_BUY",
+])
 
 const formSchema = z.object({
   ticker: z.string().min(1, "종목코드를 입력하세요").max(20),
   market: z.enum(["KR", "US"]),
-  type: z.enum(["PRICE_ABOVE", "PRICE_BELOW", "VOLUME_SPIKE", "EARNINGS_DATE"]),
+  type: z.enum([
+    "PRICE_ABOVE",
+    "PRICE_BELOW",
+    "VOLUME_SPIKE",
+    "EARNINGS_DATE",
+    "BREAKOUT_RESISTANCE",
+    "BREAKDOWN_SUPPORT",
+    "EARNINGS_SURPRISE",
+    "FOREIGN_BULK_BUY",
+    "INSTITUTION_BULK_BUY",
+  ]),
   threshold: z.number().positive("0보다 큰 값을 입력하세요").optional(),
+  thresholdUnit: z.string().optional(),
+  notes: z.string().max(200).optional(),
 })
 
 interface WatchlistItem {
@@ -32,6 +76,7 @@ export function AlertRuleForm({ onCreated }: AlertRuleFormProps) {
   const [market, setMarket] = useState<"KR" | "US">("KR")
   const [type, setType] = useState<string>("PRICE_ABOVE")
   const [threshold, setThreshold] = useState("")
+  const [notes, setNotes] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [watchlist, setWatchlist] = useState<readonly WatchlistItem[]>([])
@@ -58,7 +103,7 @@ export function AlertRuleForm({ onCreated }: AlertRuleFormProps) {
     fetchWatchlist()
   }, [])
 
-  const needsThreshold = type === "PRICE_ABOVE" || type === "PRICE_BELOW" || type === "VOLUME_SPIKE"
+  const needsThreshold = TYPES_NEEDING_THRESHOLD.has(type)
 
   const handleWatchlistSelect = useCallback(
     (item: WatchlistItem) => {
@@ -71,16 +116,32 @@ export function AlertRuleForm({ onCreated }: AlertRuleFormProps) {
     []
   )
 
+  const handleTypeChange = useCallback((newType: string) => {
+    setType(newType)
+    const config = THRESHOLD_CONFIG[newType]
+    if (config?.defaultValue) {
+      setThreshold(config.defaultValue)
+    } else {
+      setThreshold("")
+    }
+    setError(null)
+  }, [])
+
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault()
       setError(null)
+
+      const thresholdConfig = THRESHOLD_CONFIG[type]
+      const thresholdUnit = thresholdConfig?.unit || undefined
 
       const formData = {
         ticker: ticker.trim().toUpperCase(),
         market,
         type,
         threshold: threshold ? parseFloat(threshold) : undefined,
+        thresholdUnit: thresholdUnit || undefined,
+        notes: notes.trim() || undefined,
       }
 
       const parsed = formSchema.safeParse(formData)
@@ -110,6 +171,7 @@ export function AlertRuleForm({ onCreated }: AlertRuleFormProps) {
 
         setTicker("")
         setThreshold("")
+        setNotes("")
         setType("PRICE_ABOVE")
         onCreated()
       } catch (err) {
@@ -118,8 +180,10 @@ export function AlertRuleForm({ onCreated }: AlertRuleFormProps) {
         setSubmitting(false)
       }
     },
-    [ticker, market, type, threshold, needsThreshold, onCreated]
+    [ticker, market, type, threshold, notes, needsThreshold, onCreated]
   )
+
+  const thresholdConfig = THRESHOLD_CONFIG[type]
 
   return (
     <div
@@ -207,7 +271,7 @@ export function AlertRuleForm({ onCreated }: AlertRuleFormProps) {
           </label>
           <select
             value={type}
-            onChange={(e) => setType(e.target.value)}
+            onChange={(e) => handleTypeChange(e.target.value)}
             className={
               "w-full rounded-lg px-3 py-2 text-sm outline-none " +
               "bg-[var(--color-surface-100)] text-[var(--color-text-primary)] " +
@@ -223,10 +287,10 @@ export function AlertRuleForm({ onCreated }: AlertRuleFormProps) {
           </select>
         </div>
 
-        {needsThreshold && (
+        {needsThreshold && thresholdConfig && (
           <div>
             <label className="mb-1 block text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-tertiary)]">
-              {type === "VOLUME_SPIKE" ? "배수 (기본 2배)" : "기준가"}
+              {thresholdConfig.label}
             </label>
             <input
               type="number"
@@ -235,7 +299,7 @@ export function AlertRuleForm({ onCreated }: AlertRuleFormProps) {
                 setThreshold(e.target.value)
                 setError(null)
               }}
-              placeholder={type === "VOLUME_SPIKE" ? "2" : "70000"}
+              placeholder={thresholdConfig.placeholder}
               step="any"
               min="0"
               className={
@@ -248,6 +312,26 @@ export function AlertRuleForm({ onCreated }: AlertRuleFormProps) {
             />
           </div>
         )}
+
+        <div>
+          <label className="mb-1 block text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-tertiary)]">
+            메모 (선택)
+          </label>
+          <input
+            type="text"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="예: 52주 신고가 저항선"
+            maxLength={200}
+            className={
+              "w-full rounded-lg px-3 py-2 text-sm outline-none " +
+              "bg-[var(--color-surface-100)] text-[var(--color-text-primary)] " +
+              "ring-1 ring-[var(--color-border-default)] " +
+              "placeholder:text-[var(--color-text-muted)] " +
+              "focus:ring-[var(--color-accent-400)]"
+            }
+          />
+        </div>
 
         {error && (
           <p className="text-xs text-red-500">{error}</p>

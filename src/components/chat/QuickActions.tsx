@@ -13,6 +13,8 @@ import {
   TrendingDown,
   DollarSign,
   Zap,
+  PieChart,
+  ClipboardList,
   type LucideIcon,
 } from "lucide-react"
 
@@ -68,6 +70,21 @@ const KR_QUICK_ACTIONS: readonly QuickAction[] = [
     message: "PER과 PBR의 차이를 알려줘",
     icon: BookOpen,
   },
+  {
+    label: "내 포트폴리오 분석",
+    message: "내 포트폴리오 분석해줘",
+    icon: PieChart,
+  },
+  {
+    label: "보고서 요약",
+    message: "오늘 데일리 보고서 요약해줘",
+    icon: ClipboardList,
+  },
+  {
+    label: "금리 인상 시나리오",
+    message: "금리가 오르면 내 포트폴리오 어떻게 돼?",
+    icon: TrendingUp,
+  },
 ]
 
 const US_QUICK_ACTIONS: readonly QuickAction[] = [
@@ -120,6 +137,16 @@ const US_QUICK_ACTIONS: readonly QuickAction[] = [
     label: "투자 용어",
     message: "미국 주식 투자 시 알아야 할 기본 용어 설명해줘",
     icon: BookOpen,
+  },
+  {
+    label: "내 포트폴리오 분석",
+    message: "내 포트폴리오 분석해줘",
+    icon: PieChart,
+  },
+  {
+    label: "달러 강세 시나리오",
+    message: "달러가 강세면 내 포트폴리오 어떻게 돼?",
+    icon: DollarSign,
   },
 ]
 

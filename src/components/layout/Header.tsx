@@ -72,6 +72,11 @@ export function Header() {
     price_drop: "bg-[var(--color-loss)]",
     market_alert: "bg-orange-500",
     earnings_alert: "bg-blue-500",
+    breakout_resistance: "bg-emerald-500",
+    breakdown_support: "bg-[var(--color-loss)]",
+    earnings_surprise: "bg-blue-500",
+    foreign_bulk_buy: "bg-purple-500",
+    institution_bulk_buy: "bg-purple-500",
   }
 
   return (

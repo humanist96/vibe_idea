@@ -8,6 +8,7 @@ import { useScreenerDefaultsStore } from "@/store/screener-defaults"
 import { useRecentlyViewedStore } from "@/store/recently-viewed"
 import { useNotificationStore } from "@/store/notifications"
 import type { NotificationType } from "@/store/notifications"
+import type { Severity } from "@/lib/notifications/types"
 import { usePortfolioStore } from "@/store/portfolio"
 import type { PortfolioItem } from "@/store/portfolio"
 
@@ -245,6 +246,9 @@ export function SyncProvider({ children }: SyncProviderProps) {
               message: n.message,
               date: n.date,
               read: n.read,
+              severity: (n as Record<string, unknown>).severity as Severity ?? "info",
+              alertRuleId: (n as Record<string, unknown>).alertRuleId as string | null ?? null,
+              metadata: (n as Record<string, unknown>).metadata as Record<string, unknown> | null ?? null,
             })),
           })
 

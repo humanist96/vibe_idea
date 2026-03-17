@@ -3,6 +3,10 @@
 import Link from "next/link"
 import { Card } from "@/components/ui/Card"
 import { PriceChange } from "@/components/ui/PriceChange"
+import { RiskAlertBadges } from "@/components/reports/RiskAlertBadges"
+import { ConvictionScoreCard } from "@/components/reports/ConvictionScoreCard"
+import { ActionItemCard } from "@/components/reports/ActionItemCard"
+import { USAnalystDigestSection } from "./USAnalystDigestSection"
 import { Activity, Newspaper, Target } from "lucide-react"
 import { cn } from "@/lib/utils/cn"
 import type {
@@ -63,6 +67,11 @@ export function USStockDeepDive({
       </div>
 
       <div className="space-y-5 p-4">
+        {/* Risk Alert Badges */}
+        {analysis?.riskAlerts && analysis.riskAlerts.length > 0 && (
+          <RiskAlertBadges alerts={analysis.riskAlerts} />
+        )}
+
         {/* Mini Chart */}
         {stock.historical.length > 5 && (
           <MiniLineChart data={stock.historical} />
@@ -124,6 +133,27 @@ export function USStockDeepDive({
           />
         </div>
 
+        {/* Conviction Score + Action Item */}
+        {(analysis?.conviction || analysis?.actionItem) && (
+          <>
+            <hr className="border-[var(--color-border-subtle)]" />
+            <div className="grid gap-4 md:grid-cols-2">
+              {analysis.conviction && (
+                <ConvictionScoreCard
+                  conviction={analysis.conviction}
+                  stockName={stock.nameKr}
+                />
+              )}
+              {analysis.actionItem && (
+                <ActionItemCard
+                  actionItem={analysis.actionItem}
+                  stockName={stock.nameKr}
+                />
+              )}
+            </div>
+          </>
+        )}
+
         <hr className="border-[var(--color-border-subtle)]" />
 
         {/* Move Reasons */}
@@ -134,6 +164,14 @@ export function USStockDeepDive({
           <>
             <hr className="border-[var(--color-border-subtle)]" />
             <TechnicalSection technical={stock.technical} />
+          </>
+        )}
+
+        {/* Analyst Digest */}
+        {analysis?.analystDigest && q && (
+          <>
+            <hr className="border-[var(--color-border-subtle)]" />
+            <USAnalystDigestSection digest={analysis.analystDigest} quote={q} />
           </>
         )}
 

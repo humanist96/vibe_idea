@@ -1,68 +1,104 @@
 "use client"
 
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
 import type { AnalyzedReportData, ReportMeta } from "@/lib/report/types"
-
-const MAX_REPORTS = 30
-const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
 
 interface ReportHistoryState {
   readonly reports: readonly ReportMeta[]
   readonly reportData: Record<string, AnalyzedReportData>
+  readonly loading: boolean
+  setReports: (reports: readonly ReportMeta[]) => void
   addReport: (meta: ReportMeta, data: AnalyzedReportData) => void
+  setReportData: (id: string, data: AnalyzedReportData) => void
   getReport: (id: string) => AnalyzedReportData | undefined
   deleteReport: (id: string) => void
-  cleanupOld: () => void
+  setLoading: (loading: boolean) => void
+  fetchReports: () => Promise<void>
+  fetchReportDetail: (reportId: string) => Promise<AnalyzedReportData | null>
+  deleteReportFromServer: (reportId: string) => Promise<void>
 }
 
-export const useReportHistoryStore = create<ReportHistoryState>()(
-  persist(
-    (set, get) => ({
-      reports: [],
-      reportData: {},
+export const useReportHistoryStore = create<ReportHistoryState>()((set, get) => ({
+  reports: [],
+  reportData: {},
+  loading: false,
 
-      addReport: (meta, data) => {
-        set((state) => {
-          const existing = state.reports.filter((r) => r.id !== meta.id)
-          const reports = [meta, ...existing].slice(0, MAX_REPORTS)
-          const reportData = { ...state.reportData, [meta.id]: data }
-          return { reports, reportData }
-        })
-      },
+  setReports: (reports) => set({ reports }),
 
-      getReport: (id) => {
-        return get().reportData[id]
-      },
+  setLoading: (loading) => set({ loading }),
 
-      deleteReport: (id) => {
-        set((state) => {
-          const reports = state.reports.filter((r) => r.id !== id)
-          const { [id]: _, ...reportData } = state.reportData
-          return { reports, reportData }
-        })
-      },
+  addReport: (meta, data) => {
+    set((state) => {
+      const existing = state.reports.filter((r) => r.id !== meta.id)
+      const reports = [meta, ...existing]
+      const reportData = { ...state.reportData, [meta.id]: data }
+      return { reports, reportData }
+    })
+  },
 
-      cleanupOld: () => {
-        const cutoff = Date.now() - THIRTY_DAYS_MS
-        set((state) => {
-          const reports = state.reports.filter(
-            (r) => new Date(r.generatedAt).getTime() > cutoff
-          )
-          const validIds = new Set(reports.map((r) => r.id))
-          const reportData: Record<string, AnalyzedReportData> = {}
-          for (const [id, data] of Object.entries(state.reportData)) {
-            if (validIds.has(id)) {
-              reportData[id] = data
-            }
-          }
-          return { reports, reportData }
-        })
-      },
-    }),
-    {
-      name: "korea-stock-ai-reports",
-      version: 1,
+  setReportData: (id, data) => {
+    set((state) => ({
+      reportData: { ...state.reportData, [id]: data },
+    }))
+  },
+
+  getReport: (id) => {
+    return get().reportData[id]
+  },
+
+  deleteReport: (id) => {
+    set((state) => {
+      const reports = state.reports.filter((r) => r.id !== id)
+      const { [id]: _, ...reportData } = state.reportData
+      return { reports, reportData }
+    })
+  },
+
+  fetchReports: async () => {
+    set({ loading: true })
+    try {
+      const res = await fetch("/api/reports/daily")
+      const json = await res.json()
+      if (json.success && json.data) {
+        set({ reports: json.data })
+      }
+    } catch {
+      // 네트워크 오류 시 빈 목록 유지
+    } finally {
+      set({ loading: false })
     }
-  )
-)
+  },
+
+  fetchReportDetail: async (reportId: string) => {
+    // 이미 로드된 데이터 확인
+    const existing = get().reportData[reportId]
+    if (existing) return existing
+
+    try {
+      const res = await fetch(`/api/reports/${reportId}`)
+      const json = await res.json()
+      if (json.success && json.data) {
+        const data = json.data as AnalyzedReportData
+        set((state) => ({
+          reportData: { ...state.reportData, [reportId]: data },
+        }))
+        return data
+      }
+    } catch {
+      // 조회 실패
+    }
+    return null
+  },
+
+  deleteReportFromServer: async (reportId: string) => {
+    try {
+      const res = await fetch(`/api/reports/${reportId}`, { method: "DELETE" })
+      const json = await res.json()
+      if (json.success) {
+        get().deleteReport(reportId)
+      }
+    } catch {
+      // 삭제 실패
+    }
+  },
+}))

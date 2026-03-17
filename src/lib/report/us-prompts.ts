@@ -2,6 +2,7 @@
  * US 보고서 AI 프롬프트 빌더
  */
 
+import { calcRecommendationSummary } from "@/lib/api/finnhub-consensus"
 import type { USStockReportData, USMarketContextData, USRawReportData } from "./us-types"
 
 function formatTechnical(stock: USStockReportData): string {
@@ -20,6 +21,55 @@ function formatTechnical(stock: USStockReportData): string {
 function formatHeadlines(stock: USStockReportData): string {
   if (stock.news.length === 0) return "최근 뉴스 없음"
   return stock.news.slice(0, 3).map((n) => n.headline).join("; ")
+}
+
+function formatConsensus(stock: USStockReportData): string {
+  const c = stock.consensus
+  if (!c || (!c.recommendation && !c.priceTarget)) {
+    return "컨센서스 데이터 없음"
+  }
+
+  const lines: string[] = []
+
+  if (c.recommendation) {
+    const { totalAnalysts, bullishPct, consensusLabel } = calcRecommendationSummary(
+      c.recommendation
+    )
+    lines.push(
+      `- 추천: 강력매수 ${c.recommendation.strongBuy} / 매수 ${c.recommendation.buy} / 중립 ${c.recommendation.hold} / 매도 ${c.recommendation.sell} / 강력매도 ${c.recommendation.strongSell}`,
+      `- 총 애널리스트: ${totalAnalysts}명, 매수비율: ${bullishPct.toFixed(0)}% (${consensusLabel})`
+    )
+  }
+
+  if (c.priceTarget) {
+    const q = stock.quote
+    const upside =
+      q && c.priceTarget.targetMean
+        ? (((c.priceTarget.targetMean - q.price) / q.price) * 100).toFixed(1)
+        : "N/A"
+    lines.push(
+      `- 평균 목표가: $${c.priceTarget.targetMean.toFixed(2)} (현재가 대비 ${upside}%)`,
+      `- 목표가 범위: $${c.priceTarget.targetLow.toFixed(2)} ~ $${c.priceTarget.targetHigh.toFixed(2)}`
+    )
+  }
+
+  return lines.join("\n")
+}
+
+function buildConvictionPromptSection(stock: USStockReportData): string {
+  const hasConsensus = stock.consensus?.recommendation != null
+  if (hasConsensus) {
+    return `컨빅션 스코어 4팩터 (가중치):
+- 기술적 지표 (30%): RSI, MACD, SMA 기반
+- 밸류에이션 (25%): PER, PBR, 52주 범위 기반
+- 모멘텀 (25%): 가격 변화율, 거래량비율 기반
+- 애널리스트 컨센서스 (20%): 위 컨센서스 데이터 기반`
+  }
+
+  return `컨빅션 스코어 3팩터 (가중치, 컨센서스 데이터 없음):
+- 기술적 지표 (40%): RSI, MACD, SMA 기반
+- 밸류에이션 (30%): PER, PBR, 52주 범위 기반
+- 모멘텀 (30%): 가격 변화율, 거래량비율 기반`
 }
 
 export function buildUSMoveAnalysisPrompt(
@@ -50,6 +100,9 @@ export function buildUSMoveAnalysisPrompt(
 ## 기술지표
 ${formatTechnical(stock)}
 
+## 애널리스트 컨센서스
+${formatConsensus(stock)}
+
 ## 시장 맥락
 - S&P 500: ${spy?.changePercent != null ? `${spy.changePercent > 0 ? "+" : ""}${spy.changePercent.toFixed(2)}%` : "N/A"}
 - 공포-탐욕 지수: ${market.fearGreed?.score ?? "N/A"} (${market.fearGreed?.label ?? ""})
@@ -57,9 +110,17 @@ ${formatTechnical(stock)}
 ## 최근 뉴스
 ${formatHeadlines(stock)}
 
+## ${buildConvictionPromptSection(stock)}
+
 ## 출력 형식 (JSON만 출력)
-{"reasons":[{"rank":1,"category":"valuation|momentum|news|technical|earnings|macro","description":"한글 설명 1문장","impact":"positive|negative","evidence":"근거 데이터"},{"rank":2,...}],"outlook":"향후 1-2주 전망 1-2문장"}
-최대 3개 요인을 중요도 순으로, 반드시 JSON만 출력하세요.`
+{
+  "reasons":[{"rank":1,"category":"valuation|momentum|news|technical|earnings|macro","description":"한글 설명 1문장","impact":"positive|negative","evidence":"근거 데이터"},{"rank":2,...}],
+  "outlook":"향후 1-2주 전망 1-2문장",
+  "conviction":{"score":7,"label":"매수","factors":[{"name":"기술적 지표","signal":"bullish|bearish|neutral","weight":30},{"name":"밸류에이션","signal":"neutral","weight":25},{"name":"모멘텀","signal":"bullish","weight":25},{"name":"애널리스트 컨센서스","signal":"bullish","weight":20}]},
+  "actionItem":{"action":"매수 고려|비중 확대|관망|비중 축소|매도 고려","reason":"근거 1-2문장","conditions":["조건1","조건2"]},
+  "analystDigest":"애널리스트 동향 요약 1-2문장"
+}
+최대 3개 요인을 중요도 순으로, conviction score는 1-10 범위, 반드시 JSON만 출력하세요.`
 }
 
 export function buildUSExecutiveSummaryPrompt(raw: USRawReportData): string {

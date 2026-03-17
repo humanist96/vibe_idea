@@ -10,20 +10,23 @@ function makeStock(overrides: Partial<StockReportData> = {}): StockReportData {
     ticker: "005930",
     name: "삼성전자",
     quote: {
+      ticker: "005930",
+      name: "삼성전자",
       price: 60000,
       change: 1000,
       changePercent: 1.69,
       volume: 1000000,
       marketCap: 360000000000000,
-      per: 12,
-      pbr: 1.2,
-      high: 61000,
-      low: 59000,
-      open: 59500,
-      prevClose: 59000,
+      previousClose: 59000,
+      dayHigh: 61000,
+      dayLow: 59000,
       fiftyTwoWeekHigh: 70000,
       fiftyTwoWeekLow: 50000,
-      foreignRatio: 50,
+      per: 12,
+      pbr: 1.2,
+      eps: 5000,
+      dividendYield: 2.5,
+      foreignRate: 50,
     },
     historical: [
       { date: "2026-03-07", open: 58000, high: 59000, low: 57000, close: 58000, volume: 800000 },
@@ -114,12 +117,13 @@ describe("buildRiskAlerts", () => {
   it("detects consecutive foreign selling (4+ of 5 days)", () => {
     const stock = makeStock({
       investorFlow: {
+        ticker: "005930",
         entries: [
-          { date: "2026-03-11", foreignNet: -500, institutionNet: 100, individualNet: 400, foreignRatio: 50 },
-          { date: "2026-03-10", foreignNet: -300, institutionNet: 200, individualNet: 100, foreignRatio: 50 },
-          { date: "2026-03-09", foreignNet: -200, institutionNet: 50, individualNet: 150, foreignRatio: 50 },
-          { date: "2026-03-08", foreignNet: 100, institutionNet: -50, individualNet: -50, foreignRatio: 50 },
-          { date: "2026-03-07", foreignNet: -400, institutionNet: 300, individualNet: 100, foreignRatio: 50 },
+          { date: "2026-03-11", close: 60000, change: 1000, changePercent: 1.69, volume: 1000000, foreignNet: -500, institutionNet: 100, foreignHolding: 5000000, foreignRatio: 50 },
+          { date: "2026-03-10", close: 59000, change: -500, changePercent: -0.84, volume: 950000, foreignNet: -300, institutionNet: 200, foreignHolding: 5000500, foreignRatio: 50 },
+          { date: "2026-03-09", close: 59500, change: 500, changePercent: 0.85, volume: 850000, foreignNet: -200, institutionNet: 50, foreignHolding: 5000800, foreignRatio: 50 },
+          { date: "2026-03-08", close: 59000, change: 1000, changePercent: 1.72, volume: 900000, foreignNet: 100, institutionNet: -50, foreignHolding: 5001000, foreignRatio: 50 },
+          { date: "2026-03-07", close: 58000, change: -1000, changePercent: -1.69, volume: 800000, foreignNet: -400, institutionNet: 300, foreignHolding: 5000900, foreignRatio: 50 },
         ],
       },
     })
@@ -133,12 +137,13 @@ describe("buildRiskAlerts", () => {
   it("does not trigger foreign selling when only 2 of 5 days negative", () => {
     const stock = makeStock({
       investorFlow: {
+        ticker: "005930",
         entries: [
-          { date: "2026-03-11", foreignNet: -100, institutionNet: 0, individualNet: 100, foreignRatio: 50 },
-          { date: "2026-03-10", foreignNet: 200, institutionNet: 0, individualNet: -200, foreignRatio: 50 },
-          { date: "2026-03-09", foreignNet: 300, institutionNet: 0, individualNet: -300, foreignRatio: 50 },
-          { date: "2026-03-08", foreignNet: -50, institutionNet: 0, individualNet: 50, foreignRatio: 50 },
-          { date: "2026-03-07", foreignNet: 150, institutionNet: 0, individualNet: -150, foreignRatio: 50 },
+          { date: "2026-03-11", close: 60000, change: 0, changePercent: 0, volume: 1000000, foreignNet: -100, institutionNet: 0, foreignHolding: 5000000, foreignRatio: 50 },
+          { date: "2026-03-10", close: 60000, change: 0, changePercent: 0, volume: 1000000, foreignNet: 200, institutionNet: 0, foreignHolding: 5000100, foreignRatio: 50 },
+          { date: "2026-03-09", close: 60000, change: 0, changePercent: 0, volume: 1000000, foreignNet: 300, institutionNet: 0, foreignHolding: 4999900, foreignRatio: 50 },
+          { date: "2026-03-08", close: 60000, change: 0, changePercent: 0, volume: 1000000, foreignNet: -50, institutionNet: 0, foreignHolding: 4999600, foreignRatio: 50 },
+          { date: "2026-03-07", close: 60000, change: 0, changePercent: 0, volume: 1000000, foreignNet: 150, institutionNet: 0, foreignHolding: 4999650, foreignRatio: 50 },
         ],
       },
     })
@@ -149,11 +154,13 @@ describe("buildRiskAlerts", () => {
   it("detects volume spike (>3x average)", () => {
     const stock = makeStock({
       quote: {
+        ticker: "005930", name: "삼성전자",
         price: 60000, change: 1000, changePercent: 1.69,
         volume: 5000000, // 5M vs ~875K avg → ~5.7x
-        marketCap: 360000000000000, per: 12, pbr: 1.2,
-        high: 61000, low: 59000, open: 59500, prevClose: 59000,
-        fiftyTwoWeekHigh: 70000, fiftyTwoWeekLow: 50000, foreignRatio: 50,
+        marketCap: 360000000000000, previousClose: 59000,
+        dayHigh: 61000, dayLow: 59000,
+        fiftyTwoWeekHigh: 70000, fiftyTwoWeekLow: 50000,
+        per: 12, pbr: 1.2, eps: 5000, dividendYield: 2.5, foreignRate: 50,
       },
     })
     const alerts = buildRiskAlerts(stock)

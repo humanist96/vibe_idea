@@ -1,6 +1,18 @@
 import { create } from "zustand"
 
-export type ToastType = "success" | "error" | "info" | "price_surge" | "price_drop" | "market_alert" | "earnings_alert"
+export type ToastType =
+  | "success"
+  | "error"
+  | "info"
+  | "price_surge"
+  | "price_drop"
+  | "market_alert"
+  | "earnings_alert"
+  | "breakout_resistance"
+  | "breakdown_support"
+  | "earnings_surprise"
+  | "foreign_bulk_buy"
+  | "institution_bulk_buy"
 
 export interface ToastItem {
   readonly id: string

@@ -2,6 +2,8 @@
 
 import { Card, CardHeader, CardTitle } from "@/components/ui/Card"
 import { BarChart3 } from "lucide-react"
+import { cn } from "@/lib/utils/cn"
+import { ACTION_BADGE_COLORS } from "@/components/reports/report-constants"
 import type { USStockReportData, USStockAnalysis } from "@/lib/report/us-types"
 
 interface USWatchlistOverviewProps {
@@ -9,7 +11,13 @@ interface USWatchlistOverviewProps {
   readonly analyses: readonly USStockAnalysis[]
 }
 
-export function USWatchlistOverview({ stocks }: USWatchlistOverviewProps) {
+function getConvictionColor(score: number): string {
+  if (score >= 8) return "bg-green-100 text-green-700"
+  if (score >= 5) return "bg-yellow-100 text-yellow-700"
+  return "bg-red-100 text-red-700"
+}
+
+export function USWatchlistOverview({ stocks, analyses }: USWatchlistOverviewProps) {
   const validStocks = stocks.filter((s) => s.quote)
 
   if (validStocks.length === 0) return null
@@ -52,12 +60,21 @@ export function USWatchlistOverview({ stocks }: USWatchlistOverviewProps) {
               <th className="hidden pb-2 text-right font-semibold text-[var(--color-text-tertiary)] md:table-cell">
                 배당률
               </th>
+              <th className="hidden pb-2 text-right font-semibold text-[var(--color-text-tertiary)] md:table-cell">
+                확신도
+              </th>
+              <th className="hidden pb-2 text-right font-semibold text-[var(--color-text-tertiary)] lg:table-cell">
+                액션
+              </th>
             </tr>
           </thead>
           <tbody>
             {validStocks.map((stock) => {
               const q = stock.quote!
               const m = stock.metrics
+              const analysis = analyses.find((a) => a.symbol === stock.symbol)
+              const conviction = analysis?.conviction
+              const actionItem = analysis?.actionItem
               return (
                 <tr
                   key={stock.symbol}
@@ -100,6 +117,34 @@ export function USWatchlistOverview({ stocks }: USWatchlistOverviewProps) {
                     {m.dividendYield
                       ? `${m.dividendYield.toFixed(2)}%`
                       : "-"}
+                  </td>
+                  <td className="hidden py-2 text-right md:table-cell">
+                    {conviction ? (
+                      <span
+                        className={cn(
+                          "inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-bold",
+                          getConvictionColor(conviction.score)
+                        )}
+                      >
+                        {conviction.score}/10
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-[var(--color-text-muted)]">-</span>
+                    )}
+                  </td>
+                  <td className="hidden py-2 text-right lg:table-cell">
+                    {actionItem ? (
+                      <span
+                        className={cn(
+                          "inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-bold",
+                          ACTION_BADGE_COLORS[actionItem.action] ?? "bg-gray-100 text-gray-700"
+                        )}
+                      >
+                        {actionItem.action}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-[var(--color-text-muted)]">-</span>
+                    )}
                   </td>
                 </tr>
               )

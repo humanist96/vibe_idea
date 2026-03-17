@@ -188,7 +188,7 @@ export function NotificationCenter({
 
       <div className="border-t border-[var(--color-border-subtle)] px-4 py-2">
         <Link
-          href="/notifications"
+          href="/my/notifications"
           onClick={onClose}
           className={
             "block text-center text-xs font-medium transition-colors " +

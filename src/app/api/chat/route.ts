@@ -2,13 +2,18 @@ import OpenAI from "openai"
 import { NextRequest } from "next/server"
 import { orchestrate, type Intent } from "@/lib/chat/orchestrator"
 import { getDisclaimer } from "@/lib/chat/compliance"
+import type { PortfolioItem } from "@/store/portfolio"
+import type { ReportSummaryPayload } from "@/lib/chat/intents/report-summary"
 
 /** 분석적 intent에는 GPT-4o, 단순 intent에는 GPT-4o-mini 사용 */
 const ANALYTICAL_INTENTS = new Set<Intent>([
   "stock_analysis",
   "us_stock_analysis",
-  "comparison",
+  "stock_comparison",
   "watchlist_review",
+  "portfolio_analysis",
+  "scenario_analysis",
+  "report_summary",
 ])
 
 function selectModel(intent: Intent): string {
@@ -23,7 +28,9 @@ interface ChatRequestBody {
     readonly content: string
   }[]
   readonly watchlistTickers?: readonly string[]
+  readonly portfolioItems?: readonly PortfolioItem[]
   readonly marketMode?: "kr" | "us"
+  readonly latestReportSummary?: ReportSummaryPayload | null
 }
 
 /** OpenAI 스트리밍 호출 — 429 시 최대 2회 재시도 */
@@ -90,7 +97,13 @@ function getUserFriendlyError(error: unknown): string {
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as ChatRequestBody
-    const { messages, watchlistTickers = [], marketMode = "kr" } = body
+    const {
+      messages,
+      watchlistTickers = [],
+      portfolioItems = [],
+      marketMode = "kr",
+      latestReportSummary = null,
+    } = body
 
     if (!messages || messages.length === 0) {
       return new Response(
@@ -108,7 +121,13 @@ export async function POST(request: NextRequest) {
     }
 
     // 오케스트레이터로 의도 분류 + 데이터 수집
-    const result = await orchestrate(lastMessage.content, watchlistTickers, marketMode)
+    const result = await orchestrate(
+      lastMessage.content,
+      watchlistTickers,
+      marketMode,
+      portfolioItems,
+      latestReportSummary ?? null
+    )
 
     // 컴플라이언스 차단 시 — 스트리밍 없이 즉시 응답
     if (result.blocked && result.redirectMessage) {

@@ -33,14 +33,21 @@ const markdownComponents: Components = {
       {children}
     </th>
   ),
-  td: ({ children, ...props }) => (
-    <td
-      className="border-t border-[var(--color-border-subtle)] px-3 py-2"
-      {...props}
-    >
-      {children}
-    </td>
-  ),
+  td: ({ children, ...props }) => {
+    const text = typeof children === "string" ? children : ""
+    const isNumeric = /^[+\-\d,.%x]+$/.test(text.trim())
+    return (
+      <td
+        className={cn(
+          "border-t border-[var(--color-border-subtle)] px-3 py-2",
+          isNumeric ? "text-right font-mono text-xs" : ""
+        )}
+        {...props}
+      >
+        {children}
+      </td>
+    )
+  },
   blockquote: ({ children, ...props }) => (
     <blockquote
       className="my-3 border-l-3 border-[var(--color-accent-400)] bg-[var(--color-surface-50)] px-4 py-2 text-xs text-[var(--color-text-secondary)]"

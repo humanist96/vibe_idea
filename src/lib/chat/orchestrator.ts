@@ -46,6 +46,16 @@ import {
   buildUSSectorContext,
   buildUSIPOContext,
 } from "./context-builders"
+import type { PortfolioItem } from "@/store/portfolio"
+import {
+  assemblePortfolioContext,
+  buildPortfolioAnalysisContext,
+} from "./intents/portfolio-analysis"
+import { buildStockComparisonContext } from "./intents/stock-comparison"
+import type { ReportSummaryPayload } from "./intents/report-summary"
+import { buildReportSummaryContext } from "./intents/report-summary"
+import { buildScenarioAnalysisContext } from "./intents/scenario-analysis"
+import { extractMentionedTickers, buildTickerContextHint } from "./context-tracker"
 
 // ── Intent types ──────────────────────────────────────────────
 
@@ -54,7 +64,10 @@ export type Intent =
   | "us_stock_analysis"
   | "market_overview"
   | "watchlist_review"
-  | "comparison"
+  | "stock_comparison"
+  | "portfolio_analysis"
+  | "report_summary"
+  | "scenario_analysis"
   | "education"
   | "greeting"
   | "general"
@@ -81,6 +94,38 @@ const INTENT_PATTERNS: readonly {
   readonly patterns: readonly RegExp[]
 }[] = [
   {
+    intent: "portfolio_analysis",
+    patterns: [
+      /내\s*포트폴리오\s*(?:분석|현황|어때|리뷰|점검)/,
+      /내\s*수익률\s*(?:어때|보여줘|알려줘)/,
+      /내\s*종목\s*전체\s*(?:분석|현황|어때)/,
+      /포트폴리오\s*(?:손익|평가|성과)/,
+      /내가\s*가진\s*(?:주식|종목)/,
+    ],
+  },
+  {
+    intent: "report_summary",
+    patterns: [
+      /(?:오늘|최근|마지막|가장\s*최근)\s*(?:데일리|보고서|리포트)\s*(?:요약|알려줘|보여줘|내용)/,
+      /데일리\s*보고서\s*(?:요약|내용|결과)/,
+      /보고서\s*(?:요약|내용|결과|확인)/,
+      /리포트\s*(?:요약|알려줘|확인)/,
+    ],
+  },
+  {
+    intent: "scenario_analysis",
+    patterns: [
+      /금리(?:가|이)\s*(?:오르면|인상되면|올라가면)/,
+      /금리(?:가|이)\s*(?:내리면|인하되면|내려가면)/,
+      /원화(?:가|이)\s*(?:약세|강세)(?:면|이면|라면)/,
+      /달러(?:가|이)\s*(?:오르면|내리면|강세면|약세면)/,
+      /경기\s*(?:침체|불황)(?:이|가)\s*오면/,
+      /(?:인플레이션|물가)\s*(?:상승|급등)(?:하면|이면)/,
+      /시나리오\s*(?:분석|상|하에서)/,
+      /(?:만약|가정|가령)\s*.*(?:면|다면|이라면)/,
+    ],
+  },
+  {
     intent: "market_overview",
     patterns: [
       /시장\s*(?:현황|상황|어때|어떤|어떻게|요약|동향|정리)/,
@@ -95,11 +140,10 @@ const INTENT_PATTERNS: readonly {
       /관심\s*종목\s*(?:리뷰|분석|현황|어때|전체|요약|정리)/,
       /내\s*종목/,
       /(?:전체|모든|다)\s*종목\s*(?:리뷰|분석|어때)/,
-      /포트폴리오\s*(?:리뷰|분석|현황|어때)/,
     ],
   },
   {
-    intent: "comparison",
+    intent: "stock_comparison",
     patterns: [
       /vs|비교|대비|(?:이랑|하고|랑)\s*비교/,
     ],
@@ -242,7 +286,9 @@ async function resolveMultipleStocks(
 export async function orchestrate(
   userMessage: string,
   watchlistTickers: readonly string[] = [],
-  marketMode: "kr" | "us" = "kr"
+  marketMode: "kr" | "us" = "kr",
+  portfolioItems: readonly PortfolioItem[] = [],
+  latestReportSummary: ReportSummaryPayload | null = null
 ): Promise<OrchestratorResult> {
   // 1. 컴플라이언스 체크
   const compliance = checkCompliance(userMessage)
@@ -373,19 +419,122 @@ export async function orchestrate(
       break
     }
 
-    case "comparison": {
-      const stocks = await resolveMultipleStocks(userMessage)
-      if (stocks.length >= 2) {
-        const [dataA, dataB] = await Promise.all([
-          fetchComprehensiveStockData(stocks[0].ticker, stocks[0].name),
-          fetchComprehensiveStockData(stocks[1].ticker, stocks[1].name),
+    case "stock_comparison": {
+      try {
+        const stocks = await resolveMultipleStocks(userMessage)
+        if (stocks.length >= 2) {
+          const [dataA, dataB] = await Promise.all([
+            fetchComprehensiveStockData(stocks[0].ticker, stocks[0].name),
+            fetchComprehensiveStockData(stocks[1].ticker, stocks[1].name),
+          ])
+          contextData = buildStockComparisonContext(
+            stocks[0],
+            stocks[1],
+            dataA,
+            dataB
+          )
+        } else if (stocks.length === 1) {
+          const data = await fetchComprehensiveStockData(stocks[0].ticker, stocks[0].name)
+          contextData = buildEnhancedStockContext(stocks[0].name, stocks[0].ticker, data)
+        }
+      } catch {
+        contextData = "\n[종목 비교 데이터 조회 중 오류가 발생했습니다.]"
+      }
+      break
+    }
+
+    case "portfolio_analysis": {
+      try {
+        if (portfolioItems.length === 0) {
+          contextData = "\n[포트폴리오가 비어 있습니다. 포트폴리오에 종목을 추가해주세요.]"
+          break
+        }
+        const krItems = portfolioItems.filter((i) => i.market === "KR")
+        const usItems = portfolioItems.filter((i) => i.market === "US")
+        const allTickers = krItems.map((i) => i.ticker)
+
+        const [stocksMap, consensusMap] = await Promise.all([
+          allTickers.length > 0
+            ? fetchMultipleStockData(allTickers)
+            : Promise.resolve(new Map<string, import("./data-fetcher").StockData>()),
+          allTickers.length > 0
+            ? fetchMultipleConsensus(allTickers)
+            : Promise.resolve(new Map<string, null>()),
         ])
-        const ctxA = buildEnhancedStockContext(stocks[0].name, stocks[0].ticker, dataA)
-        const ctxB = buildEnhancedStockContext(stocks[1].name, stocks[1].ticker, dataB)
-        contextData = `${ctxA}\n\n---\n${ctxB}`
-      } else if (stocks.length === 1) {
-        const data = await fetchComprehensiveStockData(stocks[0].ticker, stocks[0].name)
-        contextData = buildEnhancedStockContext(stocks[0].name, stocks[0].ticker, data)
+
+        // US 종목 가격 조회
+        let usQuotes = new Map<string, { readonly price: number; readonly changePercent: number }>()
+        if (usItems.length > 0) {
+          try {
+            const { getUSQuoteBatch } = await import("@/lib/api/finnhub")
+            const usSymbols = usItems.map((i) => i.ticker)
+            const batchResult = await getUSQuoteBatch(usSymbols)
+            usQuotes = new Map(
+              usItems.map((i) => {
+                const q = batchResult.get(i.ticker)
+                return [i.ticker, { price: q?.c ?? 0, changePercent: q?.dp ?? 0 }] as const
+              })
+            )
+          } catch {
+            // US 조회 실패 시 빈 맵 유지
+          }
+        }
+
+        // 가격 맵 구성
+        const priceMap = new Map<string, { readonly price: number; readonly changePercent: number }>()
+        for (const item of krItems) {
+          const data = stocksMap.get(item.ticker)
+          priceMap.set(item.ticker, {
+            price: data?.quote?.price ?? 0,
+            changePercent: data?.quote?.changePercent ?? 0,
+          })
+        }
+        for (const [ticker, quote] of usQuotes) {
+          priceMap.set(ticker, quote)
+        }
+
+        // AI 점수 맵 구성
+        const aiScoreMap = new Map<string, number | null>()
+        for (const item of krItems) {
+          const data = stocksMap.get(item.ticker)
+          aiScoreMap.set(item.ticker, data?.aiScore?.aiScore ?? null)
+        }
+
+        const portfolioCtx = assemblePortfolioContext(portfolioItems, priceMap, aiScoreMap)
+        contextData = buildPortfolioAnalysisContext(portfolioCtx)
+      } catch {
+        contextData = "\n[포트폴리오 데이터 조회 중 오류가 발생했습니다.]"
+      }
+      break
+    }
+
+    case "report_summary": {
+      try {
+        if (!latestReportSummary) {
+          contextData = "\n[저장된 보고서가 없습니다. 먼저 데일리 보고서를 생성해주세요.]"
+          break
+        }
+        contextData = buildReportSummaryContext(latestReportSummary)
+      } catch {
+        contextData = "\n[보고서 데이터 처리 중 오류가 발생했습니다.]"
+      }
+      break
+    }
+
+    case "scenario_analysis": {
+      try {
+        if (portfolioItems.length === 0) {
+          contextData = "\n[포트폴리오가 비어 있습니다. 포트폴리오에 종목을 추가하면 시나리오 분석이 가능합니다.]"
+          break
+        }
+        const macro = await fetchMacroData()
+        contextData = buildScenarioAnalysisContext(
+          userMessage,
+          portfolioItems,
+          macro
+        )
+      } catch {
+        contextData = "\n[시나리오 분석 데이터 조회 중 오류가 발생했습니다.]"
       }
       break
     }
