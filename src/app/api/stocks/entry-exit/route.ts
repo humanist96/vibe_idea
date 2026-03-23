@@ -22,20 +22,26 @@ const schema = z.object({
 
 const SYSTEM_PROMPT = `당신은 매매 타이밍 코치입니다. 기술적/가치 지표를 종합하여 최적의 매수/매도 시점을 코칭하세요.
 
+## 중요: 가격 산출 규칙
+- 모든 가격(idealPrice, targetPrice, stopLoss, supportLevels, resistanceLevels)은 반드시 현재가와 동일한 단위의 원(KRW) 절대값으로 표기하세요.
+- 예시: 현재가 160,600원이면 → stopLoss는 152,570 (5% 하락), targetPrice는 176,660 (10% 상승) 등
+- 절대로 가격을 축약하지 마세요 (예: 152가 아니라 152,000 또는 152,570)
+- 지지선/저항선도 현재가 근처의 합리적인 원 단위 절대값이어야 합니다.
+
 반환 형식 (JSON만):
 {
   "signal": "강력 매수" | "매수" | "보유" | "비중축소" | "매도",
   "confidence": 1~100,
   "timing": {
     "entry": {
-      "idealPrice": 숫자,
-      "supportLevels": [숫자, 숫자],
+      "idealPrice": 현재가 근처의 원 단위 절대값,
+      "supportLevels": [원 단위 절대값, 원 단위 절대값],
       "strategy": "매수 전략 1~2문장"
     },
     "exit": {
-      "targetPrice": 숫자,
-      "resistanceLevels": [숫자, 숫자],
-      "stopLoss": 숫자,
+      "targetPrice": 원 단위 절대값,
+      "resistanceLevels": [원 단위 절대값, 원 단위 절대값],
+      "stopLoss": 원 단위 절대값,
       "strategy": "매도 전략 1~2문장"
     }
   },
@@ -58,7 +64,7 @@ const SYSTEM_PROMPT = `당신은 매매 타이밍 코치입니다. 기술적/가
 - 52주 신고가 근접 → 돌파 매수 or 차익 실현 판단
 - 거래량 급증 + 양봉 → 긍정 시그널
 - 보유 중이면 평균단가 대비 수익률 고려
-- stopLoss는 현재가 대비 -5~10% 수준
+- stopLoss는 현재가 대비 -5~10% 수준 (원 단위 절대값)
 - 반드시 유효한 JSON만`
 
 export async function POST(req: NextRequest) {
@@ -100,7 +106,35 @@ export async function POST(req: NextRequest) {
     if (!content) {
       return NextResponse.json({ success: false, error: "AI 응답 없음" }, { status: 500 })
     }
-    return NextResponse.json({ success: true, data: JSON.parse(content) })
+    const data = JSON.parse(content)
+
+    // 가격 sanity check: AI가 비정상적으로 작은 값을 반환하면 현재가 기반으로 보정
+    const price = s.currentPrice
+    const minReasonable = price * 0.3 // 현재가의 30% 미만이면 비정상
+    const timing = data.timing
+    if (timing) {
+      if (timing.entry) {
+        if (timing.entry.idealPrice < minReasonable) {
+          timing.entry.idealPrice = Math.round(price * 0.95)
+        }
+        timing.entry.supportLevels = (timing.entry.supportLevels ?? []).map(
+          (v: number) => v < minReasonable ? Math.round(price * 0.9) : v
+        )
+      }
+      if (timing.exit) {
+        if (timing.exit.targetPrice < minReasonable) {
+          timing.exit.targetPrice = Math.round(price * 1.1)
+        }
+        if (timing.exit.stopLoss < minReasonable) {
+          timing.exit.stopLoss = Math.round(price * 0.93)
+        }
+        timing.exit.resistanceLevels = (timing.exit.resistanceLevels ?? []).map(
+          (v: number) => v < minReasonable ? Math.round(price * 1.05) : v
+        )
+      }
+    }
+
+    return NextResponse.json({ success: true, data })
   } catch (error) {
     const msg = error instanceof Error ? error.message : "알 수 없는 오류"
     return NextResponse.json({ success: false, error: msg }, { status: 500 })
