@@ -4,6 +4,7 @@
  */
 
 import { generateAIAnalysis } from "@/lib/api/openai"
+import { analyzeBatch } from "./batch-utils"
 import {
   buildMoveAnalysisPrompt,
   buildExecutiveSummaryPrompt,
@@ -275,19 +276,23 @@ export async function analyzeReportData(
 ): Promise<AnalyzedReportData> {
   onProgress?.({ phase: "analyzing", progress: 42, message: "종목별 등락 원인 분석 중..." })
 
-  // 종목별 분석 (순차 호출 — OpenAI rate limit 고려)
-  const stockAnalyses: StockAnalysis[] = []
-  for (let i = 0; i < raw.stocks.length; i++) {
-    const stock = raw.stocks[i]
-    const analysis = await analyzeStockMove(stock, raw.market, raw.date)
-    stockAnalyses.push(analysis)
-    const pct = 42 + Math.round(((i + 1) / raw.stocks.length) * 20)
-    onProgress?.({
-      phase: "analyzing",
-      progress: pct,
-      message: `${stock.name} 분석 완료 (${i + 1}/${raw.stocks.length})`,
-    })
-  }
+  // 종목별 분석 (5건 배치 병렬 — 타임아웃 최적화)
+  const stockAnalyses = await analyzeBatch(
+    raw.stocks,
+    (stock) => analyzeStockMove(stock, raw.market, raw.date),
+    (stock) => buildFallbackAnalysis(stock),
+    {
+      batchSize: 5,
+      onBatchComplete: (completed, total) => {
+        const pct = 42 + Math.round((completed / total) * 20)
+        onProgress?.({
+          phase: "analyzing",
+          progress: pct,
+          message: `${completed}/${total} 종목 분석 완료`,
+        })
+      },
+    }
+  )
 
   onProgress?.({ phase: "analyzing", progress: 65, message: "종합 요약 생성 중..." })
 

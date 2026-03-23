@@ -4,6 +4,7 @@
  */
 
 import { generateAIAnalysis } from "@/lib/api/openai"
+import { analyzeBatch } from "./batch-utils"
 import {
   buildWeeklyStockPrompt,
   buildWeeklySummaryPrompt,
@@ -247,19 +248,23 @@ export async function analyzeWeeklyData(
 ): Promise<WeeklyAnalyzedData> {
   onProgress?.({ phase: "analyzing", progress: 42, message: "종목별 주간 분석 중..." })
 
-  // 1. 종목별 분석 (순차 호출 — OpenAI rate limit 고려)
-  const stockAnalyses: WeeklyStockAnalysis[] = []
-  for (let i = 0; i < raw.stocks.length; i++) {
-    const stock = raw.stocks[i]
-    const analysis = await analyzeWeeklyStock(stock, raw.market)
-    stockAnalyses.push(analysis)
-    const pct = 42 + Math.round(((i + 1) / raw.stocks.length) * 20)
-    onProgress?.({
-      phase: "analyzing",
-      progress: pct,
-      message: `${stock.name} 주간 분석 완료 (${i + 1}/${raw.stocks.length})`,
-    })
-  }
+  // 1. 종목별 분석 (5건 배치 병렬 — 타임아웃 최적화)
+  const stockAnalyses = await analyzeBatch(
+    raw.stocks,
+    (stock) => analyzeWeeklyStock(stock, raw.market),
+    (stock) => buildFallbackWeeklyAnalysis(stock, toStockReportDataForRisk(stock)),
+    {
+      batchSize: 5,
+      onBatchComplete: (completed, total) => {
+        const pct = 42 + Math.round((completed / total) * 20)
+        onProgress?.({
+          phase: "analyzing",
+          progress: pct,
+          message: `${completed}/${total} 종목 주간 분석 완료`,
+        })
+      },
+    }
+  )
 
   onProgress?.({ phase: "analyzing", progress: 65, message: "주간 종합 요약 생성 중..." })
 
