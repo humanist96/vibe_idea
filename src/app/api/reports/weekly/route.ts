@@ -77,16 +77,20 @@ export async function POST(req: NextRequest) {
       .map((p) => `${p.name}(${p.ticker}): 현재가 ${p.currentPrice.toLocaleString()}원, 주간 ${p.changePercent >= 0 ? "+" : ""}${p.changePercent.toFixed(1)}%`)
       .join("\n")
 
-    const now = new Date()
-    const weekStart = new Date(now)
-    weekStart.setDate(now.getDate() - now.getDay() + 1)
-    const weekTitle = `${weekStart.getMonth() + 1}월 ${Math.ceil(weekStart.getDate() / 7)}째주 브리핑`
+    // KST 기준 날짜 산출
+    const kstNow = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }))
+    const kstMonth = kstNow.getMonth() + 1
+    const kstDate = kstNow.getDate()
+    const weekOfMonth = Math.ceil(kstDate / 7)
+    const weekTitle = `${kstMonth}월 ${weekOfMonth}째주 브리핑`
 
-    const prompt = `아래는 사용자의 포트폴리오 종목 주간 현황입니다.
+    const kstDateStr = `${kstNow.getFullYear()}-${String(kstMonth).padStart(2, "0")}-${String(kstDate).padStart(2, "0")}`
+
+    const prompt = `오늘은 ${kstDateStr}입니다. 아래는 사용자의 포트폴리오 종목 주간 현황입니다.
 
 ${portfolioSummary}
 
-위 데이터를 기반으로 주간 AI 브리핑을 JSON으로 생성하세요.
+위 데이터를 기반으로 ${weekTitle}을 JSON으로 생성하세요.
 
 예시:
 {"weekTitle":"${weekTitle}","marketReview":{"sentiment":"중립","highlights":["주요 이벤트1","주요 이벤트2"],"summary":"시장 요약 1~2문장"},"portfolioReview":{"totalReturn":"+2.3%","bestPick":{"name":"종목명","reason":"이유"},"worstPick":{"name":"종목명","reason":"이유"},"grade":"B"},"nextWeekOutlook":{"events":["이벤트1"],"watchList":["주목 포인트1","주목 포인트2"],"strategy":"전략 1~2문장"},"actionItems":[{"priority":"높음","action":"행동1"},{"priority":"보통","action":"행동2"}],"quote":"투자 관련 명언 한 줄"}
