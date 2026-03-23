@@ -20,52 +20,36 @@ const schema = z.object({
   holdingShares: z.number().optional(),
 })
 
-const SYSTEM_PROMPT = `당신은 매매 타이밍 코치입니다. 기술적/가치 지표를 종합하여 최적의 매수/매도 시점을 코칭하세요.
+function buildSystemPrompt(currentPrice: number): string {
+  const stop = Math.round(currentPrice * 0.93)
+  const target = Math.round(currentPrice * 1.1)
+  const support1 = Math.round(currentPrice * 0.95)
+  const support2 = Math.round(currentPrice * 0.9)
+  const resist1 = Math.round(currentPrice * 1.05)
+  const resist2 = Math.round(currentPrice * 1.1)
+  const ideal = Math.round(currentPrice * 0.97)
 
-## 중요: 가격 산출 규칙
-- 모든 가격(idealPrice, targetPrice, stopLoss, supportLevels, resistanceLevels)은 반드시 현재가와 동일한 단위의 원(KRW) 절대값으로 표기하세요.
-- 예시: 현재가 160,600원이면 → stopLoss는 152,570 (5% 하락), targetPrice는 176,660 (10% 상승) 등
-- 절대로 가격을 축약하지 마세요 (예: 152가 아니라 152,000 또는 152,570)
-- 지지선/저항선도 현재가 근처의 합리적인 원 단위 절대값이어야 합니다.
+  return `당신은 매매 타이밍 코치입니다. 기술적/가치 지표를 종합하여 최적의 매수/매도 시점을 코칭하세요.
 
-반환 형식 (JSON만):
-{
-  "signal": "강력 매수" | "매수" | "보유" | "비중축소" | "매도",
-  "confidence": 1~100,
-  "timing": {
-    "entry": {
-      "idealPrice": 현재가 근처의 원 단위 절대값,
-      "supportLevels": [원 단위 절대값, 원 단위 절대값],
-      "strategy": "매수 전략 1~2문장"
-    },
-    "exit": {
-      "targetPrice": 원 단위 절대값,
-      "resistanceLevels": [원 단위 절대값, 원 단위 절대값],
-      "stopLoss": 원 단위 절대값,
-      "strategy": "매도 전략 1~2문장"
-    }
-  },
-  "technicalView": {
-    "trend": "상승" | "횡보" | "하락",
-    "momentum": "강세" | "중립" | "약세",
-    "volumeSignal": "긍정" | "중립" | "부정",
-    "comment": "기술적 관점 1문장"
-  },
-  "positionSizing": {
-    "recommendedWeight": "포트폴리오 비중 %",
-    "splitStrategy": "분할매수/매도 전략 1문장"
-  },
-  "risks": ["리스크1", "리스크2"],
-  "summary": "매매 타이밍 코칭 요약 2~3문장"
-}
+## 중요: 가격 규칙
+- 모든 가격은 현재가(${currentPrice}원)와 동일한 단위의 원(KRW) 절대값이어야 합니다.
+- 절대로 축약하지 마세요. 현재가가 160,600이면 손절가는 152,570처럼 현재가 근처여야 합니다.
+
+아래 JSON 예시를 참고하되, 실제 분석 결과에 맞게 값을 바꾸세요:
+{"signal":"보유","confidence":65,"timing":{"entry":{"idealPrice":${ideal},"supportLevels":[${support1},${support2}],"strategy":"분할 매수 전략"},"exit":{"targetPrice":${target},"resistanceLevels":[${resist1},${resist2}],"stopLoss":${stop},"strategy":"목표가 도달 시 분할 매도"}},"technicalView":{"trend":"횡보","momentum":"중립","volumeSignal":"중립","comment":"기술적 관점"},"positionSizing":{"recommendedWeight":"10%","splitStrategy":"3회 분할매수"},"risks":["리스크1","리스크2"],"summary":"코칭 요약 2~3문장"}
+
+signal: "강력 매수", "매수", "보유", "비중축소", "매도" 중 하나
+trend: "상승", "횡보", "하락" 중 하나
+momentum: "강세", "중립", "약세" 중 하나
+volumeSignal: "긍정", "중립", "부정" 중 하나
 
 분석 기준:
 - RSI 30이하 과매도 → 매수 기회, 70이상 과매수 → 주의
 - 52주 신고가 근접 → 돌파 매수 or 차익 실현 판단
 - 거래량 급증 + 양봉 → 긍정 시그널
 - 보유 중이면 평균단가 대비 수익률 고려
-- stopLoss는 현재가 대비 -5~10% 수준 (원 단위 절대값)
-- 반드시 유효한 JSON만`
+- stopLoss는 현재가 대비 -5~10% 수준`
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -94,7 +78,7 @@ export async function POST(req: NextRequest) {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: buildSystemPrompt(s.currentPrice) },
         { role: "user", content: `매매 타이밍을 코칭해주세요.\n\n${parts}` },
       ],
       temperature: 0.2,
@@ -106,12 +90,29 @@ export async function POST(req: NextRequest) {
     if (!content) {
       return NextResponse.json({ success: false, error: "AI 응답 없음" }, { status: 500 })
     }
-    const data = JSON.parse(content)
+
+    let data: Record<string, unknown>
+    try {
+      data = JSON.parse(content)
+    } catch {
+      // response_format이 실패한 경우 sanitize 시도
+      const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) {
+        return NextResponse.json({ success: false, error: "AI 응답 파싱 실패" }, { status: 500 })
+      }
+      const sanitized = jsonMatch[0]
+        .replace(/,\s*([}\]])/g, "$1")
+        .replace(/'/g, '"')
+        .replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":')
+      data = JSON.parse(sanitized)
+    }
 
     // 가격 sanity check: AI가 비정상적으로 작은 값을 반환하면 현재가 기반으로 보정
     const price = s.currentPrice
-    const minReasonable = price * 0.3 // 현재가의 30% 미만이면 비정상
-    const timing = data.timing
+    const minReasonable = price * 0.3
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const timing = data.timing as any
     if (timing) {
       if (timing.entry) {
         if (timing.entry.idealPrice < minReasonable) {
