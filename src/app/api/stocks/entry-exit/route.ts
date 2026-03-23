@@ -93,22 +93,14 @@ export async function POST(req: NextRequest) {
       ],
       temperature: 0.2,
       max_tokens: 700,
+      response_format: { type: "json_object" },
     })
 
     const content = completion.choices[0]?.message?.content?.trim()
     if (!content) {
       return NextResponse.json({ success: false, error: "AI 응답 없음" }, { status: 500 })
     }
-    const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
-    const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) {
-      return NextResponse.json({ success: false, error: "AI 응답 파싱 실패" }, { status: 500 })
-    }
-    const sanitized = jsonMatch[0]
-      .replace(/,\s*([}\]])/g, "$1")        // trailing comma 제거
-      .replace(/'/g, '"')                    // 작은따옴표 → 큰따옴표
-      .replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":') // unquoted key → quoted key
-    return NextResponse.json({ success: true, data: JSON.parse(sanitized) })
+    return NextResponse.json({ success: true, data: JSON.parse(content) })
   } catch (error) {
     const msg = error instanceof Error ? error.message : "알 수 없는 오류"
     return NextResponse.json({ success: false, error: msg }, { status: 500 })
